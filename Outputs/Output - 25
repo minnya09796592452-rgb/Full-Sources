@@ -1,0 +1,1069 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# WS="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# sed -n '426,690p' "$WS" | nl -ba -v 426
+   426                  }
+   427                  if (m_slopeBuffer.EnabledBuffers() == 0)                                                                                                428                  {
+   429                          Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+   430                          Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+   431                          return;
+   432                  }
+   433                  int numGrids = m_conditions[0].Key.NumGrids;
+   434                  if (numGrids <= 2)
+   435                  {
+   436                          m_slopeBuffer.DisableBuffer(1);
+   437                  }
+   438                  if (!m_slopeBuffer.HasRun || m_slopeBuffer.TimeValue != time)
+   439                  {
+   440                          m_slopeBuffer.InitMaterial = m_slopeInitMat;
+   441                          m_slopeBuffer.InitPass = numGrids - 1;
+   442                          m_slopeBuffer.Run(m_conditions[0], time);
+   443                  }
+   444                  if (!m_slopeBuffer.BeenSampled)
+   445                  {
+   446                          m_slopeBuffer.EnableSampling();
+   447                          if (numGrids > 0)
+   448                          {
+   449                                  m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(0));
+   450                                  Graphics.Blit(null, m_slopeMaps[0], m_slopeCopyMat, 0);                                                                 451                                  Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMaps[0]);                                                              452                          }
+   453                          else
+   454                          {
+   455                                  Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+   456                          }
+   457                          if (numGrids > 2)
+   458                          {
+   459                                  m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(1));
+   460                                  Graphics.Blit(null, m_slopeMaps[1], m_slopeCopyMat, 0);
+   461                                  Shader.SetGlobalTexture("Ceto_SlopeMap1", m_slopeMaps[1]);
+   462                          }
+   463                          else
+   464                          {
+   465                                  Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+   466                          }
+   467                          m_slopeBuffer.DisableSampling();
+   468                          m_slopeBuffer.BeenSampled = true;
+   469                  }
+   470          }
+   471
+   472          private void GenerateDisplacement(float time)
+   473          {
+   474                  if (!disableDisplacements && SystemInfo.graphicsShaderLevel < 30 && m_displacementBuffer.IsGPU)                                         475                  {
+   476                          Ocean.LogWarning("Spectrum displacements needs at least SM3 to run on GPU. Disabling displacement.");
+   477                          disableDisplacements = true;
+   478                  }
+   479                  m_displacementBuffer.EnableBuffer(-1);
+   480                  if (disableDisplacements)
+   481                  {
+   482                          m_displacementBuffer.DisableBuffer(-1);
+   483                  }
+   484                  if (!disableDisplacements && choppyness == 0f)
+   485                  {
+   486                          m_displacementBuffer.DisableBuffer(1);
+   487                          m_displacementBuffer.DisableBuffer(2);
+   488                  }
+   489                  if (!disableDisplacements && choppyness > 0f)
+   490                  {
+   491                          m_displacementBuffer.EnableBuffer(1);                                                                                           492                          m_displacementBuffer.EnableBuffer(2);
+   493                  }
+   494                  if (m_displacementBuffer.EnabledBuffers() == 0)
+   495                  {
+   496                          Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+   497                          Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+   498                          Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+   499                          Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+   500                  }
+   501                  else
+   502                  {
+   503                          if (!m_displacementBuffer.Done)
+   504                          {
+   505                                  return;
+   506                          }
+   507                          int numGrids = m_conditions[0].Key.NumGrids;
+   508                          if (numGrids <= 2)
+   509                          {
+   510                                  m_displacementBuffer.DisableBuffer(2);
+   511                          }
+   512                          if (!m_displacementBuffer.HasRun || m_displacementBuffer.TimeValue != time)
+   513                          {
+   514                                  m_displacementBuffer.InitMaterial = m_displacementInitMat;
+   515                                  m_displacementBuffer.InitPass = numGrids - 1;
+   516                                  m_displacementBuffer.Run(m_conditions[0], time);
+   517                          }
+   518                          if (!m_displacementBuffer.BeenSampled)
+   519                          {
+   520                                  m_displacementBuffer.EnableSampling();
+   521                                  m_displacementCopyMat.SetTexture("Ceto_HeightBuffer", m_displacementBuffer.GetTexture(0));
+   522                                  m_displacementCopyMat.SetTexture("Ceto_DisplacementBuffer", m_displacementBuffer.GetTexture(1));
+   523                                  if (numGrids > 0)
+   524                                  {
+   525                                          Graphics.Blit(null, m_displacementMaps[0], m_displacementCopyMat, (numGrids == 1) ? 4 : 0);
+   526                                          Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMaps[0]);
+   527                                  }
+   528                                  else
+   529                                  {
+   530                                          Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+   531                                  }
+   532                                  if (numGrids > 1)
+   533                                  {
+   534                                          Graphics.Blit(null, m_displacementMaps[1], m_displacementCopyMat, 1);
+   535                                          Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMaps[1]);
+   536                                  }
+   537                                  else
+   538                                  {
+   539                                          Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+   540                                  }
+   541                                  m_displacementCopyMat.SetTexture("Ceto_DisplacementBuffer", m_displacementBuffer.GetTexture(2));
+   542                                  if (numGrids > 2)
+   543                                  {
+   544                                          Graphics.Blit(null, m_displacementMaps[2], m_displacementCopyMat, 2);
+   545                                          Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMaps[2]);
+   546                                  }
+   547                                  else
+   548                                  {
+   549                                          Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+   550                                  }
+   551                                  if (numGrids > 3)
+   552                                  {
+   553                                          Graphics.Blit(null, m_displacementMaps[3], m_displacementCopyMat, 3);
+   554                                          Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMaps[3]);
+   555                                  }
+   556                                  else
+   557                                  {
+   558                                          Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+   559                                  }
+   560                                  m_displacementBuffer.DisableSampling();
+   561                                  m_displacementBuffer.BeenSampled = true;
+   562                                  if (m_displacementBuffer.IsGPU)
+   563                                  {
+   564                                          ReadFromGPU(numGrids);
+   565                                  }
+   566                                  FindRanges();
+   567                          }
+   568                  }
+   569          }
+   570
+   571          private void ReadFromGPU(int numGrids)
+   572          {
+   573                  if (!disableReadBack && readSdr == null)
+   574                  {
+   575                          Ocean.LogWarning("Trying to read GPU displacement data but the read shader is null");
+   576                  }
+   577                  bool flag = SystemInfo.graphicsShaderLevel >= 50 && SystemInfo.supportsComputeShaders;
+   578                  if ((!disableReadBack && readSdr != null && m_readBuffer != null) & flag)
+   579                  {
+   580                          InterpolatedArray2f[] readDisplacements = DisplacementBuffer.GetReadDisplacements();
+   581                          if (numGrids > 0)
+   582                          {
+   583                                  CBUtility.ReadFromRenderTexture(m_displacementMaps[0], 3, m_readBuffer, readSdr);
+   584                                  m_readBuffer.GetData(readDisplacements[0].Data);
+   585                          }
+   586                          else
+   587                          {
+   588                                  readDisplacements[0].Clear();
+   589                          }
+   590                          if (numGrids > 1)
+   591                          {
+   592                                  CBUtility.ReadFromRenderTexture(m_displacementMaps[1], 3, m_readBuffer, readSdr);
+   593                                  m_readBuffer.GetData(readDisplacements[1].Data);
+   594                          }
+   595                          else
+   596                          {
+   597                                  readDisplacements[1].Clear();
+   598                          }
+   599                          if (numGrids > 2)                                                                                                               600                          {
+   601                                  CBUtility.ReadFromRenderTexture(m_displacementMaps[2], 3, m_readBuffer, readSdr);
+   602                                  m_readBuffer.GetData(readDisplacements[2].Data);
+   603                          }
+   604                          else
+   605                          {
+   606                                  readDisplacements[2].Clear();
+   607                          }
+   608                          _ = 3;
+   609                  }
+   610          }
+   611
+   612          private void FindRanges()
+   613          {
+   614                  if (disableReadBack && DisplacementBuffer.IsGPU)
+   615                  {
+   616                          MaxDisplacement = new Vector2(0f, 40f * gridScale);
+   617                  }
+   618                  else if (m_findRangeTask == null || m_findRangeTask.Done)
+   619                  {
+   620                          if (m_findRangeTask == null)
+   621                          {
+   622                                  m_findRangeTask = new FindRangeTask(this);
+   623                          }
+   624                          m_findRangeTask.Reset();
+   625                          m_scheduler.Run(m_findRangeTask);
+   626                  }
+   627          }
+   628
+   629          private void GenerateFoam(float time)
+   630          {
+   631                  Vector4 value = Choppyness;
+   632                  if (!disableFoam && SystemInfo.graphicsShaderLevel < 30)
+   633                  {
+   634                          Ocean.LogWarning("Spectrum foam needs at least SM3 to run. Disabling foam.");
+   635                          disableFoam = true;
+   636                  }
+   637                  float sqrMagnitude = value.sqrMagnitude;
+   638                  m_jacobianBuffer.EnableBuffer(-1);                                                                                                      639                  if (disableFoam || foamAmount == 0f || sqrMagnitude == 0f || !m_conditions[0].SupportsJacobians)
+   640                  {
+   641                          m_jacobianBuffer.DisableBuffer(-1);
+   642                  }
+   643                  if (m_jacobianBuffer.EnabledBuffers() == 0)
+   644                  {
+   645                          Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
+   646                          return;
+   647                  }
+   648                  int numGrids = m_conditions[0].Key.NumGrids;
+   649                  switch (numGrids)
+   650                  {
+   651                  case 1:
+   652                          m_jacobianBuffer.DisableBuffer(1);
+   653                          m_jacobianBuffer.DisableBuffer(2);
+   654                          break;
+   655                  case 2:
+   656                          m_jacobianBuffer.DisableBuffer(2);
+   657                          break;
+   658                  }
+   659                  if (!m_jacobianBuffer.HasRun || m_jacobianBuffer.TimeValue != time)
+   660                  {
+   661                          m_foamInitMat.SetFloat("Ceto_FoamAmount", foamAmount);
+   662                          m_jacobianBuffer.InitMaterial = m_foamInitMat;
+   663                          m_jacobianBuffer.InitPass = numGrids - 1;
+   664                          m_jacobianBuffer.Run(m_conditions[0], time);
+   665                  }
+   666                  if (!m_jacobianBuffer.BeenSampled)
+   667                  {
+   668                          m_jacobianBuffer.EnableSampling();
+   669                          m_foamCopyMat.SetTexture("Ceto_JacobianBuffer0", m_jacobianBuffer.GetTexture(0));
+   670                          m_foamCopyMat.SetTexture("Ceto_JacobianBuffer1", m_jacobianBuffer.GetTexture(1));
+   671                          m_foamCopyMat.SetTexture("Ceto_JacobianBuffer2", m_jacobianBuffer.GetTexture(2));
+   672                          m_foamCopyMat.SetTexture("Ceto_HeightBuffer", m_displacementBuffer.GetTexture(0));
+   673                          m_foamCopyMat.SetVector("Ceto_FoamChoppyness", value);
+   674                          m_foamCopyMat.SetFloat("Ceto_FoamCoverage", foamCoverage);
+   675                          Graphics.Blit(null, m_foamMaps[0], m_foamCopyMat, numGrids - 1);
+   676                          Shader.SetGlobalTexture("Ceto_FoamMap0", m_foamMaps[0]);
+   677                          m_jacobianBuffer.DisableSampling();
+   678                          m_jacobianBuffer.BeenSampled = true;
+   679                  }
+   680          }
+   681
+   682          public void QueryWaves(WaveQuery query)
+   683          {
+   684                  if (enabled)
+   685                  {
+   686                          IDisplacementBuffer displacementBuffer = DisplacementBuffer;
+   687                          if (displacementBuffer != null && (!disableReadBack || !displacementBuffer.IsGPU) && (query.mode == QUERY_MODE.DISPLACEMENT || query.mode == QUERY_MODE.POSITION) && (query.sampleSpectrum[0] || query.sampleSpectrum[1] || query.sampleSpectrum[2] || query.sampleSpectrum[3]))
+   688                          {
+   689                                  displacementBuffer.QueryWaves(query, m_queryScaling);
+   690                          }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# WS="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# sed -n '691,943p' "$WS" | nl -ba -v 691
+   691                  }
+   692          }
+   693
+   694          private void CreateBuffers()
+   695          {
+   696                  GetFourierSize(out var size, out var isCpu);
+   697                  if (m_bufferSettings.beenCreated)
+   698                  {
+   699                          if (m_bufferSettings.size == size && m_bufferSettings.isCpu == isCpu)
+   700                          {
+   701                                  return;
+   702                          }
+   703                          while (m_scheduler.HasTasks())
+   704                          {
+   705                                  UpdateSpectrumScheduler();
+   706                          }
+   707                          Release();
+   708                          m_bufferSettings.beenCreated = false;
+   709                  }
+   710                  if (isCpu)                                                                                                                              711                  {
+   712                          m_displacementBuffer = new DisplacementBufferCPU(size, m_scheduler);
+   713                  }
+   714                  else
+   715                  {
+   716                          m_displacementBuffer = new DisplacementBufferGPU(size, fourierSdr);
+   717                  }
+   718                  m_slopeBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 2);
+   719                  m_jacobianBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 3);
+   720                  m_readBuffer = new ComputeBuffer(size * size, 12);
+   721                  m_conditions = new WaveSpectrumCondition[2];
+   722                  m_displacementMaps = new RenderTexture[4];
+   723                  m_slopeMaps = new RenderTexture[2];
+   724                  m_foamMaps = new RenderTexture[1];
+   725                  m_bufferSettings.beenCreated = true;
+   726                  m_bufferSettings.size = size;
+   727                  m_bufferSettings.isCpu = isCpu;
+   728          }
+   729
+   730          private void CreateRenderTextures()
+   731          {
+   732                  int size = m_bufferSettings.size;
+   733                  int ansio = 9;
+   734                  RenderTextureFormat format = RenderTextureFormat.ARGBFloat;
+   735                  for (int i = 0; i < m_displacementMaps.Length; i++)
+   736                  {
+   737                          CreateMap(ref m_displacementMaps[i], "Displacement", format, size, ansio);
+   738                  }
+   739                  for (int j = 0; j < m_slopeMaps.Length; j++)
+   740                  {
+   741                          CreateMap(ref m_slopeMaps[j], "Slope", format, size, ansio);
+   742                  }
+   743                  for (int k = 0; k < m_foamMaps.Length; k++)
+   744                  {
+   745                          CreateMap(ref m_foamMaps[k], "Foam", format, size, ansio);
+   746                  }
+   747          }
+   748
+   749          private void CreateMap(ref RenderTexture map, string name, RenderTextureFormat format, int size, int ansio)
+   750          {
+   751                  if (map != null)
+   752                  {
+   753                          if (!map.IsCreated())
+   754                          {
+   755                                  map.Create();
+   756                          }
+   757                          return;
+   758                  }                                                                                                                                       759                  map = new RenderTexture(size, size, 0, format, RenderTextureReadWrite.Linear);
+   760                  map.filterMode = FilterMode.Trilinear;
+   761                  map.wrapMode = TextureWrapMode.Repeat;
+   762                  map.anisoLevel = ansio;
+   763                  map.useMipMap = true;
+   764                  map.hideFlags = HideFlags.HideAndDontSave;
+   765                  map.name = "Ceto Wave Spectrum " + name + " Texture";
+   766                  map.Create();
+   767          }
+   768
+   769          private void CreateConditions()
+   770          {
+   771                  int size = m_bufferSettings.size;
+   772                  WaveSpectrumConditionKey waveSpectrumConditionKey = NewSpectrumConditionKey(size, windSpeed, m_ocean.windDir, waveAge);
+   773                  if (m_conditions[0] == null)
+   774                  {
+   775                          if (m_conditionCache.ContainsKey(waveSpectrumConditionKey))
+   776                          {
+   777                                  m_conditions[0] = m_conditionCache[waveSpectrumConditionKey];
+   778                                  return;
+   779                          }
+   780                          m_conditions[0] = NewSpectrumCondition(size, windSpeed, m_ocean.windDir, waveAge);
+   781                          SpectrumTask createSpectrumConditionTask = m_conditions[0].GetCreateSpectrumConditionTask();
+   782                          ((IThreadedTask)createSpectrumConditionTask).Start();
+   783                          ((IThreadedTask)createSpectrumConditionTask).Run();
+   784                          ((IThreadedTask)createSpectrumConditionTask).End();
+   785                          CacheCondition(m_conditions[0]);
+   786                  }
+   787                  else if (m_conditions[1] != null && m_conditions[1].Done)
+   788                  {
+   789                          m_conditions[0] = m_conditions[1];
+   790                          m_conditions[1] = null;
+   791                          CacheCondition(m_conditions[0]);
+   792                  }
+   793                  else if (m_conditions[1] == null && m_conditions[0].Done && waveSpectrumConditionKey != m_conditions[0].Key)
+   794                  {
+   795                          if (m_conditionCache.ContainsKey(waveSpectrumConditionKey))
+   796                          {
+   797                                  m_conditions[0] = m_conditionCache[waveSpectrumConditionKey];
+   798                                  return;
+   799                          }
+   800                          m_conditions[1] = NewSpectrumCondition(size, windSpeed, m_ocean.windDir, waveAge);
+   801                          IThreadedTask createSpectrumConditionTask2 = m_conditions[1].GetCreateSpectrumConditionTask();
+   802                          m_scheduler.Add(createSpectrumConditionTask2);
+   803                  }
+   804          }
+   805
+   806          private void CacheCondition(WaveSpectrumCondition condition)
+   807          {
+   808                  if (condition != null && m_conditionCache != null && !m_conditionCache.ContainsKey(condition.Key))
+   809                  {
+   810                          m_conditionCache.AddFirst(condition.Key, condition);
+   811                          while (m_conditionCache.Count != 0 && m_conditionCache.Count > MaxConditionCacheSize)
+   812                          {
+   813                                  m_conditionCache.RemoveLast().Release();
+   814                          }
+   815                  }
+   816          }
+   817
+   818          public void CreateAndCacheCondition(int fourierSize, float windSpeed, float windDir, float waveAge)
+   819          {
+   820                  if (m_conditionCache == null)
+   821                  {
+   822                          return;
+   823                  }
+   824                  if (m_conditionCache.Count >= MaxConditionCacheSize)
+   825                  {
+   826                          Ocean.LogWarning("Condition cache full. Condition not cached.");
+   827                          return;
+   828                  }
+   829                  if (!Mathf.IsPowerOfTwo(fourierSize) || fourierSize < 32 || fourierSize > 512)
+   830                  {
+   831                          Ocean.LogWarning("Fourier size must be a pow2 number from 32 to 512. Condition not cached.");
+   832                          return;
+   833                  }
+   834                  WaveSpectrumCondition waveSpectrumCondition = NewSpectrumCondition(fourierSize, windSpeed, windDir, waveAge);
+   835                  if (!m_conditionCache.ContainsKey(waveSpectrumCondition.Key))
+   836                  {
+   837                          SpectrumTask createSpectrumConditionTask = waveSpectrumCondition.GetCreateSpectrumConditionTask();
+   838                          ((IThreadedTask)createSpectrumConditionTask).Start();
+   839                          ((IThreadedTask)createSpectrumConditionTask).Run();
+   840                          ((IThreadedTask)createSpectrumConditionTask).End();
+   841                          m_conditionCache.AddFirst(waveSpectrumCondition.Key, waveSpectrumCondition);
+   842                  }
+   843          }
+   844
+   845          private WaveSpectrumCondition NewSpectrumCondition(int fourierSize, float windSpeed, float windDir, float waveAge)
+   846          {
+   847                  WaveSpectrumCondition waveSpectrumCondition = null;
+   848                  switch (spectrumType)
+   849                  {
+   850                  case SPECTRUM_TYPE.UNIFIED:
+   851                          return new UnifiedSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+   852                  case SPECTRUM_TYPE.UNIFIED_PHILLIPS:
+   853                          return new UnifiedPhillipsSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+   854                  case SPECTRUM_TYPE.PHILLIPS:
+   855                          return new PhillipsSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+   856                  case SPECTRUM_TYPE.CUSTOM:
+   857                          if (CustomWaveSpectrum == null)
+   858                          {                                                                                                                               859                                  Ocean.LogWarning("Custom spectrum type selected but no custom spectrum interface has been added to the wave spectrum. Defaulting to Unified Spectrum");
+   860                                  spectrumType = SPECTRUM_TYPE.UNIFIED;
+   861                                  return new UnifiedSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+   862                          }
+   863                          return new CustomWaveSpectrumCondition(CustomWaveSpectrum, fourierSize, windDir, numberOfGrids);
+   864                  default:
+   865                          throw new InvalidOperationException("Invalid spectrum type = " + spectrumType);
+   866                  }
+   867          }
+   868
+   869          private WaveSpectrumConditionKey NewSpectrumConditionKey(int fourierSize, float windSpeed, float windDir, float waveAge)
+   870          {
+   871                  WaveSpectrumConditionKey waveSpectrumConditionKey = null;
+   872                  switch (spectrumType)
+   873                  {
+   874                  case SPECTRUM_TYPE.UNIFIED:
+   875                          return new UnifiedSpectrumConditionKey(windSpeed, waveAge, fourierSize, windDir, spectrumType, numberOfGrids);
+   876                  case SPECTRUM_TYPE.UNIFIED_PHILLIPS:
+   877                          return new UnifiedSpectrumConditionKey(windSpeed, waveAge, fourierSize, windDir, spectrumType, numberOfGrids);
+   878                  case SPECTRUM_TYPE.PHILLIPS:
+   879                          return new PhillipsSpectrumConditionKey(windSpeed, fourierSize, windDir, spectrumType, numberOfGrids);
+   880                  case SPECTRUM_TYPE.CUSTOM:
+   881                          if (CustomWaveSpectrum == null)
+   882                          {
+   883                                  Ocean.LogWarning("Custom spectrum type selected but no custom spectrum interface has been added to the wave spectrum. Defaulting to Unified Spectrum");
+   884                                  spectrumType = SPECTRUM_TYPE.UNIFIED;
+   885                                  return new UnifiedSpectrumConditionKey(windSpeed, waveAge, fourierSize, windDir, spectrumType, numberOfGrids);
+   886                          }
+   887                          return CustomWaveSpectrum.CreateKey(fourierSize, windDir, spectrumType, numberOfGrids);
+   888                  default:
+   889                          throw new InvalidOperationException("Invalid spectrum type = " + spectrumType);
+   890                  }
+   891          }
+   892
+   893          private void GetFourierSize(out int size, out bool isCpu)
+   894          {
+   895                  switch ((int)fourierSize)                                                                                                               896                  {
+   897                  case 0:
+   898                          size = 32;
+   899                          isCpu = true;
+   900                          break;
+   901                  case 1:
+   902                          size = 32;
+   903                          isCpu = false;
+   904                          break;
+   905                  case 2:
+   906                          size = 64;
+   907                          isCpu = true;
+   908                          break;
+   909                  case 3:
+   910                          size = 64;
+   911                          isCpu = false;
+   912                          break;
+   913                  case 4:
+   914                          size = 128;
+   915                          isCpu = true;
+   916                          break;
+   917                  case 5:
+   918                          size = 128;
+   919                          isCpu = false;
+   920                          break;
+   921                  case 6:
+   922                          size = 256;
+   923                          isCpu = false;
+   924                          break;
+   925                  case 7:
+   926                          size = 512;
+   927                          isCpu = false;
+   928                          break;
+   929                  default:
+   930                          size = 64;
+   931                          isCpu = true;
+   932                          break;
+   933                  }
+   934                  bool flag = SystemInfo.graphicsShaderLevel >= 50 && SystemInfo.supportsComputeShaders;
+   935                  if (!isCpu && !disableReadBack && !flag)
+   936                  {
+   937                          Ocean.LogWarning("You card does not support dx11. Fourier can not be GPU. Changing to CPU. Disable read backs to use GPU but with no height querys.");
+   938                          fourierSize = FOURIER_SIZE.MEDIUM_64_CPU;
+   939                          size = 64;
+   940                          isCpu = true;
+   941                  }
+   942          }
+   943  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+--------------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# for f in IDisplacementBuffer.cs WaveSpectrumBufferCPU.cs WaveSpectrumBufferGPU.cs DisplacementBufferGPU.cs; do
+>   echo "==================== $f ===================="
+>   cat -n "$CETO/$f"
+> done
+==================== IDisplacementBuffer.cs ====================
+     1  using System.Collections.Generic;
+     2  using Ceto.Common.Containers.Interpolation;
+     3  using UnityEngine;
+     4
+     5  namespace Ceto;
+     6
+     7  public interface IDisplacementBuffer
+     8  {
+     9          bool IsGPU { get; }
+    10
+    11          int Size { get; }
+    12
+    13          InterpolatedArray2f[] GetReadDisplacements();
+    14
+    15          void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements);
+    16
+    17          void CopyDisplacements(IList<InterpolatedArray2f> des);
+    18
+    19          Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale);
+    20
+    21          void QueryWaves(WaveQuery query, QueryGridScaling scaling);
+    22
+    23          int EnabledBuffers();
+    24  }
+==================== WaveSpectrumBufferCPU.cs ====================
+     1  using System;
+     2  using System.Collections.Generic;
+     3  using Ceto.Common.Threading.Scheduling;                                                                                                                   4  using UnityEngine;
+     5
+     6  namespace Ceto;
+     7
+     8  public abstract class WaveSpectrumBufferCPU : WaveSpectrumBuffer
+     9  {
+    10          public class Buffer
+    11          {
+    12                  public IList<Vector4[]> data;
+    13
+    14                  public Color[] results;
+    15
+    16                  public Texture2D map;
+    17
+    18                  public bool disabled;
+    19
+    20                  public bool doublePacked;
+    21          }
+    22
+    23          public const int READ = 1;
+    24
+    25          public const int WRITE = 0;
+    26
+    27          protected Buffer[] m_buffers;
+    28
+    29          private FourierCPU m_fourier;
+    30
+    31          private Scheduler m_scheduler;
+    32
+    33          private List<FourierTask> m_fourierTasks;
+    34
+    35          protected InitSpectrumDisplacementsTask m_initTask;
+    36
+    37          public override bool Done => IsDone();
+    38
+    39          public override int Size => m_fourier.size;
+    40
+    41          public override bool IsGPU => false;
+    42
+    43          public Color[] WTable { get; private set; }
+    44
+    45          public WaveSpectrumBufferCPU(int size, int numBuffers, Scheduler scheduler)
+    46          {
+    47                  m_buffers = new Buffer[numBuffers];
+    48                  m_fourier = new FourierCPU(size);
+    49                  m_fourierTasks = new List<FourierTask>(3);
+    50                  m_fourierTasks.Add(null);
+    51                  m_fourierTasks.Add(null);
+    52                  m_fourierTasks.Add(null);
+    53                  m_scheduler = scheduler;
+    54                  for (int i = 0; i < numBuffers; i++)
+    55                  {
+    56                          m_buffers[i] = CreateBuffer(size);
+    57                  }
+    58          }
+    59
+    60          private Buffer CreateBuffer(int size)
+    61          {
+    62                  Buffer buffer = new Buffer();
+    63                  buffer.doublePacked = true;
+    64                  buffer.data = new List<Vector4[]>();
+    65                  buffer.data.Add(new Vector4[size * size]);
+    66                  buffer.data.Add(new Vector4[size * size]);
+    67                  buffer.results = new Color[size * size];
+    68                  buffer.map = new Texture2D(size, size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+    69                  buffer.map.wrapMode = TextureWrapMode.Repeat;
+    70                  buffer.map.filterMode = FilterMode.Bilinear;
+    71                  buffer.map.hideFlags = HideFlags.HideAndDontSave;
+    72                  buffer.map.name = "Ceto Wave Spectrum CPU Buffer";
+    73                  buffer.map.SetPixels(buffer.results);
+    74                  buffer.map.Apply();
+    75                  return buffer;
+    76          }
+    77
+    78          public override void Release()
+    79          {
+    80                  int num = m_buffers.Length;
+    81                  for (int i = 0; i < num; i++)
+    82                  {
+    83                          UnityEngine.Object.Destroy(m_buffers[i].map);
+    84                          m_buffers[i].map = null;
+    85                  }
+    86          }
+    87
+    88          public override Texture GetTexture(int idx)
+    89          {
+    90                  if (idx < 0 || idx >= m_buffers.Length)
+    91                  {
+    92                          return Texture2D.blackTexture;
+    93                  }
+    94                  if (m_buffers[idx].disabled)
+    95                  {
+    96                          return Texture2D.blackTexture;
+    97                  }
+    98                  return m_buffers[idx].map;
+    99          }
+   100
+   101          public Vector4[] GetWriteBuffer(int idx)
+   102          {
+   103                  if (idx < 0 || idx >= m_buffers.Length)
+   104                  {
+   105                          return null;
+   106                  }
+   107                  if (m_buffers[idx].disabled)
+   108                  {
+   109                          return null;
+   110                  }
+   111                  return m_buffers[idx].data[0];
+   112          }
+   113
+   114          public Vector4[] GetReadBuffer(int idx)
+   115          {
+   116                  if (idx < 0 || idx >= m_buffers.Length)
+   117                  {
+   118                          return null;
+   119                  }
+   120                  if (m_buffers[idx].disabled)
+   121                  {
+   122                          return null;
+   123                  }
+   124                  return m_buffers[idx].data[1];
+   125          }
+   126
+   127          public Buffer GetBuffer(int idx)
+   128          {
+   129                  if (idx < 0 || idx >= m_buffers.Length)
+   130                  {
+   131                          return null;
+   132                  }
+   133                  if (m_buffers[idx].disabled)
+   134                  {
+   135                          return null;
+   136                  }
+   137                  return m_buffers[idx];
+   138          }
+   139
+   140          public override void EnableBuffer(int idx)
+   141          {
+   142                  int num = m_buffers.Length;
+   143                  if (idx < -1 || idx >= num)
+   144                  {                                                                                                                                       145                          return;
+   146                  }
+   147                  if (idx == -1)
+   148                  {
+   149                          for (int i = 0; i < num; i++)
+   150                          {
+   151                                  m_buffers[i].disabled = false;
+   152                          }
+   153                  }
+   154                  else
+   155                  {
+   156                          m_buffers[idx].disabled = false;
+   157                  }
+   158          }
+   159
+   160          public override void DisableBuffer(int idx)
+   161          {
+   162                  int num = m_buffers.Length;
+   163                  if (idx < -1 || idx >= num)
+   164                  {
+   165                          return;
+   166                  }
+   167                  if (idx == -1)
+   168                  {
+   169                          for (int i = 0; i < num; i++)
+   170                          {
+   171                                  m_buffers[i].disabled = true;
+   172                          }
+   173                  }
+   174                  else
+   175                  {
+   176                          m_buffers[idx].disabled = true;                                                                                                 177                  }
+   178          }                                                                                                                                               179
+   180          public bool IsDone()
+   181          {
+   182                  if (m_initTask == null)
+   183                  {
+   184                          return true;
+   185                  }
+   186                  if (!m_initTask.Done)
+   187                  {
+   188                          return false;
+   189                  }
+   190                  int count = m_fourierTasks.Count;
+   191                  for (int i = 0; i < count; i++)
+   192                  {
+   193                          if (m_fourierTasks[i] != null && !m_fourierTasks[i].Done)
+   194                          {
+   195                                  return false;
+   196                          }
+   197                  }
+   198                  return true;
+   199          }
+   200
+   201          public override int EnabledBuffers()
+   202          {
+   203                  int num = 0;
+   204                  int num2 = m_buffers.Length;
+   205                  for (int i = 0; i < num2; i++)
+   206                  {
+   207                          if (!m_buffers[i].disabled)
+   208                          {
+   209                                  num++;
+   210                          }
+   211                  }
+   212                  return num;
+   213          }
+   214
+   215          public override bool IsEnabledBuffer(int idx)
+   216          {
+   217                  if (idx < 0 || idx >= m_buffers.Length)
+   218                  {
+   219                          return false;
+   220                  }
+   221                  return !m_buffers[idx].disabled;                                                                                                        222          }
+   223
+   224          public override void Run(WaveSpectrumCondition condition, float time)
+   225          {
+   226                  if (!IsDone())                                                                                                                          227                  {
+   228                          throw new InvalidOperationException("Can not run when there are tasks that have not finished");
+   229                  }                                                                                                                                       230                  TimeValue = time;                                                                                                                       231                  HasRun = true;                                                                                                                          232                  BeenSampled = false;                                                                                                                    233                  if (EnabledBuffers() == 0)                                                                                                              234                  {                                                                                                                                       235                          return;                                                                                                                         236                  }                                                                                                                                       237                  Initilize(condition, time);
+   238                  if (Ocean.DISABLE_FOURIER_MULTITHREADING)                                                                                               239                  {                                                                                                                                       240                          m_initTask.Start();                                                                                                             241                          m_initTask.Run();                                                                                                               242                          m_initTask.End();                                                                                                               243                  }                                                                                                                                       244                  int num = m_buffers.Length;                                                                                                             245                  for (int i = 0; i < num; i++)                                                                                                           246                  {                                                                                                                                       247                          if (!m_buffers[i].disabled)                                                                                                     248                          {                                                                                                                               249                                  if (m_fourierTasks[i] == null)                                                                                          250                                  {                                                                                                                       251                                          m_fourierTasks[i] = new FourierTask(this, m_fourier, i, m_initTask.NumGrids);                                   252                                  }                                                                                                                       253                                  else                                                                                                                    254                                  {                                                                                                                       255                                          m_fourierTasks[i].Reset(i, m_initTask.NumGrids);                                                                256                                  }                                                                                                                       257                                  FourierTask fourierTask = m_fourierTasks[i];                                                                            258                                  if (fourierTask.Done)                                                                                                   259                                  {                                                                                                                       260                                          throw new InvalidOperationException("Fourier task should not be done before running");                          261                                  }                                                                                                                       262                                  if (Ocean.DISABLE_FOURIER_MULTITHREADING)                                                                               263                                  {                                                                                                                       264                                          fourierTask.Start();                                                                                            265                                          fourierTask.Run();                                                                                              266                                          fourierTask.End();                                                                                              267                                  }                                                                                                                       268                                  else                                                                                                                    269                                  {                                                                                                                       270                                          fourierTask.RunOnStopWaiting = true;                                                                            271                                          fourierTask.WaitOn(m_initTask);                                                                                 272                                          m_scheduler.AddWaiting(fourierTask);                                                                            273                                  }                                                                                                                       274                          }                                                                                                                               275                  }                                                                                                                                       276                  if (!Ocean.DISABLE_FOURIER_MULTITHREADING)                                                                                              277                  {                                                                                                                                       278                          m_initTask.NoFinish = true;                                                                                                     279                          m_scheduler.Run(m_initTask);                                                                                                    280                  }                                                                                                                                       281          }                                                                                                                                               282  }                                                                                                                                                    ==================== WaveSpectrumBufferGPU.cs ====================                                                                                                1  using System;                                                                                                                                             2  using System.Collections.Generic;                                                                                                                         3  using Ceto.Common.Unity.Utility;                                                                                                                          4  using UnityEngine;                                                                                                                                        5                                                                                                                                                            6  namespace Ceto;
+     7
+     8  public class WaveSpectrumBufferGPU : WaveSpectrumBuffer
+     9  {                                                                                                                                                        10          private struct Buffer
+    11          {
+    12                  public RenderTexture[] data;
+    13                                                                                                                                                           14                  public bool disabled;
+    15          }
+    16
+    17          private Buffer[] m_buffers;
+    18
+    19          private bool m_samplingEnabled;
+    20
+    21          private int m_index = -1;
+    22
+    23          private FourierGPU m_fourier;
+    24
+    25          private IList<RenderTexture[]> m_enabledData;
+    26
+    27          private string m_bufferName;
+    28
+    29          private IList<RenderTexture> m_tmpList;
+    30
+    31          private RenderBuffer[] m_tmpBuffer2;
+    32
+    33          private RenderBuffer[] m_tmpBuffer3;
+    34                                                                                                                                                           35          private RenderBuffer[] m_tmpBuffer4;                                                                                                             36                                                                                                                                                           37          private Vector4 m_offset;                                                                                                                        38                                                                                                                                                           39          public override bool Done => true;                                                                                                               40                                                                                                                                                           41          public override int Size => m_fourier.size;                                                                                                      42
+    43          public override bool IsGPU => true;
+    44
+    45          public WaveSpectrumBufferGPU(int size, Shader fourierSdr, int numBuffers)
+    46          {
+    47                  if (numBuffers < 1 || numBuffers > 4)
+    48                  {
+    49                          throw new InvalidOperationException("Number of buffers is " + numBuffers + " but must be between (inclusive) 1 and 4");
+    50                  }
+    51                  m_buffers = new Buffer[numBuffers];
+    52                  m_fourier = new FourierGPU(size, fourierSdr);
+    53                  m_tmpList = new List<RenderTexture>();
+    54                  m_tmpBuffer2 = new RenderBuffer[2];
+    55                  m_tmpBuffer3 = new RenderBuffer[3];
+    56                  m_tmpBuffer4 = new RenderBuffer[4];
+    57                  m_offset = new Vector4(1f + 0.5f / (float)Size, 1f + 0.5f / (float)Size, 0f, 0f);
+    58                  for (int i = 0; i < numBuffers; i++)
+    59                  {
+    60                          m_buffers[i] = CreateBuffer(size);
+    61                  }
+    62                  m_enabledData = new List<RenderTexture[]>();
+    63                  UpdateEnabledData();
+    64                  m_bufferName = "Ceto Wave Spectrum GPU Buffer";
+    65          }
+    66
+    67          private Buffer CreateBuffer(int size)
+    68          {
+    69                  return new Buffer
+    70                  {
+    71                          data = new RenderTexture[2]
+    72                  };
+    73          }
+    74
+    75          public override Texture GetTexture(int idx)
+    76          {
+    77                  if (m_index == -1)
+    78                  {
+    79                          return Texture2D.blackTexture;
+    80                  }
+    81                  if (idx < 0 || idx >= m_buffers.Length)
+    82                  {
+    83                          return Texture2D.blackTexture;
+    84                  }
+    85                  if (m_buffers[idx].disabled)
+    86                  {
+    87                          return Texture2D.blackTexture;
+    88                  }
+    89                  return m_buffers[idx].data[m_index];
+    90          }
+    91
+    92          public override void Release()
+    93          {
+    94                  m_tmpList.Clear();
+    95                  m_fourier.Release();
+    96                  int num = m_buffers.Length;
+    97                  for (int i = 0; i < num; i++)
+    98                  {
+    99                          m_buffers[i].data[0] = null;
+   100                          m_buffers[i].data[1] = null;
+   101                  }
+   102          }
+   103
+   104          protected override void Initilize(WaveSpectrumCondition condition, float time)
+   105          {
+   106                  if (InitMaterial == null)
+   107                  {                                                                                                                                       108                          throw new InvalidOperationException("GPU buffer has not had its Init material set");
+   109                  }                                                                                                                                       110                  if (InitPass == -1)
+   111                  {                                                                                                                                       112                          throw new InvalidOperationException("GPU buffer has not had its Init material pass set");
+   113                  }
+   114                  InitMaterial.SetTexture("Ceto_Spectrum01", (condition.Spectrum01 != null) ? condition.Spectrum01 : Texture2D.blackTexture);
+   115                  InitMaterial.SetTexture("Ceto_Spectrum23", (condition.Spectrum23 != null) ? condition.Spectrum23 : Texture2D.blackTexture);             116                  InitMaterial.SetTexture("Ceto_WTable", condition.WTable);
+   117                  InitMaterial.SetVector("Ceto_InverseGridSizes", condition.InverseGridSizes());                                                          118                  InitMaterial.SetVector("Ceto_GridSizes", condition.GridSizes);
+   119                  InitMaterial.SetVector("Ceto_Offset", m_offset);
+   120                  InitMaterial.SetFloat("Ceto_Time", time);
+   121                  m_tmpList.Clear();
+   122                  int num = m_buffers.Length;
+   123                  for (int i = 0; i < num; i++)
+   124                  {                                                                                                                                       125                          if (!m_buffers[i].disabled)
+   126                          {
+   127                                  m_tmpList.Add(m_buffers[i].data[1]);
+   128                          }
+   129                  }                                                                                                                                       130                  switch (m_tmpList.Count)
+   131                  {
+   132                  case 1:
+   133                          Graphics.Blit(null, m_tmpList[0], InitMaterial, InitPass);                                                                      134                          break;
+   135                  case 2:                                                                                                                                 136                          m_tmpBuffer2[0] = m_tmpList[0].colorBuffer;
+   137                          m_tmpBuffer2[1] = m_tmpList[1].colorBuffer;
+   138                          RTUtility.MultiTargetBlit(m_tmpBuffer2, m_tmpList[0].depthBuffer, InitMaterial, InitPass);
+   139                          break;
+   140                  case 3:                                                                                                                                 141                          m_tmpBuffer3[0] = m_tmpList[0].colorBuffer;
+   142                          m_tmpBuffer3[1] = m_tmpList[1].colorBuffer;
+   143                          m_tmpBuffer3[2] = m_tmpList[2].colorBuffer;
+   144                          RTUtility.MultiTargetBlit(m_tmpBuffer3, m_tmpList[0].depthBuffer, InitMaterial, InitPass);                                      145                          break;
+   146                  case 4:
+   147                          m_tmpBuffer4[0] = m_tmpList[0].colorBuffer;
+   148                          m_tmpBuffer4[1] = m_tmpList[1].colorBuffer;                                                                                     149                          m_tmpBuffer4[2] = m_tmpList[2].colorBuffer;
+   150                          m_tmpBuffer4[3] = m_tmpList[3].colorBuffer;
+   151                          RTUtility.MultiTargetBlit(m_tmpBuffer4, m_tmpList[0].depthBuffer, InitMaterial, InitPass);                                      152                          break;
+   153                  }                                                                                                                                       154          }
+   155
+   156          public void UpdateEnabledData()                                                                                                                 157          {
+   158                  m_enabledData.Clear();
+   159                  int num = m_buffers.Length;
+   160                  for (int i = 0; i < num; i++)                                                                                                           161                  {
+   162                          if (!m_buffers[i].disabled)                                                                                                     163                          {
+   164                                  m_enabledData.Add(m_buffers[i].data);
+   165                          }
+   166                  }
+   167          }                                                                                                                                               168
+   169          public override void EnableBuffer(int idx)
+   170          {
+   171                  int num = m_buffers.Length;
+   172                  if (idx < -1 || idx >= num)                                                                                                             173                  {
+   174                          return;                                                                                                                         175                  }
+   176                  if (idx == -1)
+   177                  {
+   178                          for (int i = 0; i < num; i++)
+   179                          {                                                                                                                               180                                  m_buffers[i].disabled = false;
+   181                          }
+   182                  }
+   183                  else
+   184                  {                                                                                                                                       185                          m_buffers[idx].disabled = false;
+   186                  }                                                                                                                                       187                  UpdateEnabledData();
+   188          }
+   189
+   190          public override void DisableBuffer(int idx)
+   191          {                                                                                                                                               192                  int num = m_buffers.Length;
+   193                  if (idx < -1 || idx >= num)
+   194                  {
+   195                          return;
+   196                  }
+   197                  if (idx == -1)
+   198                  {                                                                                                                                       199                          for (int i = 0; i < num; i++)
+   200                          {                                                                                                                               201                                  m_buffers[i].disabled = true;
+   202                          }                                                                                                                               203                  }
+   204                  else                                                                                                                                    205                  {
+   206                          m_buffers[idx].disabled = true;                                                                                                 207                  }
+   208                  UpdateEnabledData();                                                                                                                    209          }
+   210
+   211          public override int EnabledBuffers()
+   212          {
+   213                  return m_enabledData.Count;
+   214          }
+   215
+   216          public override bool IsEnabledBuffer(int idx)
+   217          {
+   218                  if (idx < 0 || idx >= m_buffers.Length)
+   219                  {
+   220                          return false;
+   221                  }
+   222                  return !m_buffers[idx].disabled;
+   223          }
+   224
+   225          private void CreateTextures()
+   226          {
+   227                  int count = m_enabledData.Count;
+   228                  for (int i = 0; i < count; i++)
+   229                  {
+   230                          for (int j = 0; j < 2; j++)
+   231                          {
+   232                                  if (m_enabledData[i][j] != null)
+   233                                  {
+   234                                          RenderTexture.ReleaseTemporary(m_enabledData[i][j]);
+   235                                  }
+   236                                  RenderTexture temporary = RenderTexture.GetTemporary(Size, Size, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+   237                                  temporary.filterMode = FilterMode.Point;
+   238                                  temporary.wrapMode = TextureWrapMode.Clamp;
+   239                                  temporary.name = m_bufferName;
+   240                                  temporary.anisoLevel = 0;
+   241                                  temporary.Create();
+   242                                  m_enabledData[i][j] = temporary;
+   243                          }
+   244                  }
+   245          }
+   246
+   247          public override void Run(WaveSpectrumCondition condition, float time)
+   248          {
+   249                  TimeValue = time;                                                                                                                       250                  HasRun = true;
+   251                  BeenSampled = false;
+   252                  if (m_samplingEnabled)
+   253                  {                                                                                                                                       254                          throw new InvalidOperationException("Can not run if sampling enabled");
+   255                  }                                                                                                                                       256                  UpdateEnabledData();
+   257                  CreateTextures();
+   258                  int count = m_enabledData.Count;
+   259                  if (count != 0)
+   260                  {
+   261                          Initilize(condition, time);
+   262                          switch (count)                                                                                                                  263                          {
+   264                          case 1:                                                                                                                         265                                  m_index = m_fourier.PeformFFT(m_enabledData[0]);
+   266                                  break;
+   267                          case 2:                                                                                                                         268                                  m_index = m_fourier.PeformFFT(m_enabledData[0], m_enabledData[1]);
+   269                                  break;
+   270                          case 3:
+   271                                  m_index = m_fourier.PeformFFT(m_enabledData[0], m_enabledData[1], m_enabledData[2]);                                    272                                  break;
+   273                          case 4:                                                                                                                         274                                  m_index = m_fourier.PeformFFT(m_enabledData[0], m_enabledData[1], m_enabledData[2], m_enabledData[3]);
+   275                                  break;                                                                                                                  276                          }
+   277                  }                                                                                                                                       278          }                                                                                                                                               279
+   280          public override void EnableSampling()
+   281          {
+   282                  if (m_index == -1)
+   283                  {                                                                                                                                       284                          return;
+   285                  }                                                                                                                                       286                  m_samplingEnabled = true;
+   287                  int num = m_buffers.Length;                                                                                                             288                  for (int i = 0; i < num; i++)
+   289                  {
+   290                          if (!(m_buffers[i].data[m_index] == null))                                                                                      291                          {
+   292                                  m_buffers[i].data[m_index].filterMode = FilterMode.Bilinear;
+   293                                  m_buffers[i].data[m_index].wrapMode = TextureWrapMode.Repeat;
+   294                          }
+   295                  }                                                                                                                                       296          }
+   297                                                                                                                                                          298          public override void DisableSampling()
+   299          {                                                                                                                                               300                  if (m_index == -1)
+   301                  {
+   302                          return;                                                                                                                         303                  }
+   304                  m_samplingEnabled = false;                                                                                                              305                  int num = m_buffers.Length;
+   306                  for (int i = 0; i < num; i++)
+   307                  {
+   308                          if (!(m_buffers[i].data[m_index] == null))
+   309                          {
+   310                                  m_buffers[i].data[m_index].filterMode = FilterMode.Point;                                                               311                                  m_buffers[i].data[m_index].wrapMode = TextureWrapMode.Clamp;
+   312                          }
+   313                  }
+   314          }
+   315  }
+==================== DisplacementBufferGPU.cs ====================
+     1  using System.Collections.Generic;
+     2  using Ceto.Common.Containers.Interpolation;
+     3  using UnityEngine;
+     4
+     5  namespace Ceto;
+     6
+     7  public class DisplacementBufferGPU : WaveSpectrumBufferGPU, IDisplacementBuffer
+     8  {
+     9          private static readonly int NUM_BUFFERS = 3;
+    10
+    11          private InterpolatedArray2f[] m_displacements;
+    12
+    13          public DisplacementBufferGPU(int size, Shader fourierSdr)
+    14                  : base(size, fourierSdr, NUM_BUFFERS)
+    15          {
+    16                  int gRIDS = QueryDisplacements.GRIDS;
+    17                  int cHANNELS = QueryDisplacements.CHANNELS;
+    18                  m_displacements = new InterpolatedArray2f[gRIDS];
+    19                  for (int i = 0; i < gRIDS; i++)
+    20                  {
+    21                          m_displacements[i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+    22                  }
+    23          }
+    24
+    25          public InterpolatedArray2f[] GetReadDisplacements()
+    26          {
+    27                  return m_displacements;
+    28          }
+    29                                                                                                                                                           30          public void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements)
+    31          {                                                                                                                                                32                  QueryDisplacements.CopyAndCreateDisplacements(m_displacements, out displacements);
+    33          }
+    34
+    35          public void CopyDisplacements(IList<InterpolatedArray2f> displacements)                                                                          36          {
+    37                  QueryDisplacements.CopyDisplacements(m_displacements, displacements);                                                                    38          }
+    39
+    40          public Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale)
+    41          {
+    42                  return QueryDisplacements.MaxRange(m_displacements, choppyness, gridScale, null);
+    43          }
+    44                                                                                                                                                           45          public void QueryWaves(WaveQuery query, QueryGridScaling scaling)
+    46          {
+    47                  int num = EnabledBuffers();
+    48                  if (num != 0)
+    49                  {                                                                                                                                        50                          QueryDisplacements.QueryWaves(query, num, m_displacements, scaling);
+    51                  }
+    52          }
+    53  }                                                                                                                                                    root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-------------
