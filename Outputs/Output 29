@@ -1,0 +1,264 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CETO/QueryDisplacements.cs"
+     1  using System;
+     2  using System.Collections.Generic;
+     3  using Ceto.Common.Containers.Interpolation;
+     4  using Ceto.Common.Threading.Tasks;
+     5  using UnityEngine;
+     6
+     7  namespace Ceto;                                                                                                                                           8
+     9  public static class QueryDisplacements
+    10  {
+    11          public static readonly int CHANNELS = 3;
+    12
+    13          public static readonly int GRIDS = 4;
+    14
+    15          public static void QueryWaves(WaveQuery query, int enabled, IList<InterpolatedArray2f> displacements, QueryGridScaling scaling)                  16          {
+    17                  if (displacements.Count != GRIDS)
+    18                  {
+    19                          int gRIDS = GRIDS;
+    20                          throw new InvalidOperationException("Query Displacements requires a displacement buffer for each of the " + gRIDS + " grids.");                                                                                                                                                               21                  }
+    22                  if (displacements[0].Channels != CHANNELS)                                                                                               23                  {
+    24                          int gRIDS = CHANNELS;                                                                                                            25                          throw new InvalidOperationException("Query Displacements requires displacement buffers have " + gRIDS + " channels.");
+    26                  }                                                                                                                                        27                  if (query.mode != QUERY_MODE.DISPLACEMENT && query.mode != QUERY_MODE.POSITION)
+    28                  {                                                                                                                                        29                          return;
+    30                  }                                                                                                                                        31                  float num = query.posX + scaling.offset.x;
+    32                  float num2 = query.posZ + scaling.offset.z;                                                                                              33                  if (scaling.result == null)
+    34                  {                                                                                                                                        35                          scaling.result = new float[CHANNELS];
+    36                  }                                                                                                                                        37                  switch (enabled)
+    38                  {                                                                                                                                        39                  case 0:
+    40                          break;                                                                                                                           41                  default:
+    42                          if (query.mode != QUERY_MODE.DISPLACEMENT)                                                                                       43                          {
+    44                                  float num3 = num;                                                                                                        45                                  float num4 = num2;
+    46                                  float num5 = num;                                                                                                        47                                  float num6 = num2;
+    48                                  float num7 = query.minError;                                                                                             49                                  if (num7 < WaveQuery.MIN_ERROR)
+    50                                  {                                                                                                                        51                                          num7 = WaveQuery.MIN_ERROR;
+    52                                  }                                                                                                                        53                                  num7 *= num7;
+    54                                  int num8 = 0;                                                                                                            55                                  float num9;
+    56                                  float num10;                                                                                                             57                                  float num13;
+    58                                  do
+    59                                  {
+    60                                          num5 += num - num3;
+    61                                          num6 += num2 - num4;
+    62                                          Sample(query.result.displacement, displacements, query.sampleSpectrum, num5, num6, scaling);
+    63                                          num9 = query.result.displacement[0].x + query.result.displacement[1].x + query.result.displacement[2].x + query.result.displacement[3].x;
+    64                                          num10 = query.result.displacement[0].z + query.result.displacement[1].z + query.result.displacement[2].z + query.result.displacement[3].z;
+    65                                          num3 = num5 + num9;
+    66                                          num4 = num6 + num10;
+    67                                          num8++;
+    68                                          float num11 = num - num3;
+    69                                          float num12 = num2 - num4;
+    70                                          num13 = num11 * num11 + num12 * num12;
+    71                                  }
+    72                                  while (num13 > num7 && num8 <= WaveQuery.MAX_ITERATIONS);
+    73                                  query.result.height = query.result.displacement[0].y + query.result.displacement[1].y + query.result.displacement[2].y + query.result.displacement[3].y;
+    74                                  query.result.displacementX = num9;
+    75                                  query.result.displacementZ = num10;
+    76                                  query.result.iterations = num8;
+    77                                  query.result.error = num13;
+    78                                  query.result.height = Mathf.Clamp(query.result.height, -40f, 40f);
+    79                                  break;
+    80                          }
+    81                          goto case 1;
+    82                  case 1:
+    83                          SampleHeightOnly(query.result.displacement, displacements, query.sampleSpectrum, num, num2, scaling);
+    84                          query.result.height = query.result.displacement[0].y + query.result.displacement[1].y + query.result.displacement[2].y + query.result.displacement[3].y;
+    85                          query.result.displacementX = 0f;                                                                                                 86                          query.result.displacementZ = 0f;                                                                                                 87                          query.result.iterations = 0;
+    88                          query.result.error = 0f;
+    89                          query.result.height = Mathf.Clamp(query.result.height, -40f, 40f);
+    90                          break;
+    91                  }
+    92          }
+    93
+    94          private static void SampleHeightOnly(Vector3[] d, IList<InterpolatedArray2f> displacements, bool[] sample, float x, float z, QueryGridScaling scaling)                                                                                                                                                        95          {
+    96                  float[] result = scaling.result;
+    97                  if (sample[0] && scaling.numGrids > 0)
+    98                  {
+    99                          float x2 = x * scaling.invGridSizes.x;
+   100                          float y = z * scaling.invGridSizes.x;                                                                                           101                          displacements[0].Get(x2, y, result);
+   102                          d[0].y = result[1] * scaling.scaleY;                                                                                            103                  }
+   104                  if (sample[1] && scaling.numGrids > 1)                                                                                                  105                  {
+   106                          float x2 = x * scaling.invGridSizes.y;                                                                                          107                          float y = z * scaling.invGridSizes.y;
+   108                          displacements[1].Get(x2, y, result);                                                                                            109                          d[1].y = result[1] * scaling.scaleY;
+   110                  }                                                                                                                                       111                  if (sample[2] && scaling.numGrids > 2)
+   112                  {                                                                                                                                       113                          float x2 = x * scaling.invGridSizes.z;
+   114                          float y = z * scaling.invGridSizes.z;                                                                                           115                          displacements[2].Get(x2, y, result);
+   116                          d[2].y = result[1] * scaling.scaleY;                                                                                            117                  }
+   118                  if (sample[3] && scaling.numGrids > 3)                                                                                                  119                  {
+   120                          float x2 = x * scaling.invGridSizes.w;                                                                                          121                          float y = z * scaling.invGridSizes.w;
+   122                          displacements[3].Get(x2, y, result);                                                                                            123                          d[3].y = result[1] * scaling.scaleY;                                                                                            124                  }                                                                                                                                       125          }
+   126                                                                                                                                                          127          private static void Sample(Vector3[] d, IList<InterpolatedArray2f> displacements, bool[] sample, float x, float z, QueryGridScaling scaling)
+   128          {                                                                                                                                               129                  float[] result = scaling.result;
+   130                  if (sample[0] && scaling.numGrids > 0)                                                                                                  131                  {
+   132                          float x2 = x * scaling.invGridSizes.x;                                                                                          133                          float y = z * scaling.invGridSizes.x;
+   134                          displacements[0].Get(x2, y, result);                                                                                            135                          d[0].x = result[0] * scaling.choppyness.x;
+   136                          d[0].y = result[1] * scaling.scaleY;                                                                                            137                          d[0].z = result[2] * scaling.choppyness.x;
+   138                  }
+   139                  if (sample[1] && scaling.numGrids > 1)
+   140                  {
+   141                          float x2 = x * scaling.invGridSizes.y;
+   142                          float y = z * scaling.invGridSizes.y;
+   143                          displacements[1].Get(x2, y, result);
+   144                          d[1].x = result[0] * scaling.choppyness.y;
+   145                          d[1].y = result[1] * scaling.scaleY;
+   146                          d[1].z = result[2] * scaling.choppyness.y;
+   147                  }
+   148                  if (sample[2] && scaling.numGrids > 2)
+   149                  {
+   150                          float x2 = x * scaling.invGridSizes.z;
+   151                          float y = z * scaling.invGridSizes.z;
+   152                          displacements[2].Get(x2, y, result);
+   153                          d[2].x = result[0] * scaling.choppyness.z;
+   154                          d[2].y = result[1] * scaling.scaleY;
+   155                          d[2].z = result[2] * scaling.choppyness.z;
+   156                  }
+   157                  if (sample[3] && scaling.numGrids > 3)
+   158                  {
+   159                          float x2 = x * scaling.invGridSizes.w;
+   160                          float y = z * scaling.invGridSizes.w;
+   161                          displacements[3].Get(x2, y, result);
+   162                          d[3].x = result[0] * scaling.choppyness.w;
+   163                          d[3].y = result[1] * scaling.scaleY;
+   164                          d[3].z = result[2] * scaling.choppyness.w;
+   165                  }                                                                                                                                       166          }
+   167
+   168          public static Vector4 MaxRange(IList<InterpolatedArray2f> displacements, Vector4 choppyness, Vector2 gridScale, ICancelToken token)
+   169          {
+   170                  if (displacements.Count != GRIDS)
+   171                  {
+   172                          int gRIDS = GRIDS;
+   173                          throw new InvalidOperationException("Query Displacements requires a displacement buffer for each of the " + gRIDS + " grids.");
+   174                  }
+   175                  if (displacements[0].Channels != CHANNELS)
+   176                  {
+   177                          int gRIDS = CHANNELS;
+   178                          throw new InvalidOperationException("Query Displacements requires displacement buffers have " + gRIDS + " channels.");
+   179                  }
+   180                  int sX = displacements[0].SX;                                                                                                           181                  Vector3 vector = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
+   182                  Vector3 vector2 = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+   183                  Vector3[] array = new Vector3[4] { vector, vector, vector, vector };                                                                    184                  Vector3[] array2 = new Vector3[4] { vector2, vector2, vector2, vector2 };
+   185                  float[] array3 = new float[CHANNELS];
+   186                  int gRIDS2 = GRIDS;
+   187                  gRIDS2 = 3;
+   188                  for (int i = 0; i < gRIDS2; i++)
+   189                  {
+   190                          float[] data = displacements[i].Data;
+   191                          for (int j = 0; j < sX; j++)
+   192                          {
+   193                                  for (int k = 0; k < sX; k++)
+   194                                  {
+   195                                          if (token != null && token.Cancelled)                                                                           196                                          {
+   197                                                  return Vector4.zero;
+   198                                          }
+   199                                          int num = (k + j * sX) * CHANNELS;
+   200                                          array3[0] = data[num];
+   201                                          array3[1] = data[num + 1];                                                                                      202                                          array3[2] = data[num + 2];
+   203                                          if (array3[0] < array2[i].x)                                                                                    204                                          {
+   205                                                  array2[i].x = array3[0];                                                                                206                                          }
+   207                                          if (array3[0] > array[i].x)                                                                                     208                                          {
+   209                                                  array[i].x = array3[0];                                                                                 210                                          }
+   211                                          if (array3[1] < array2[i].y)                                                                                    212                                          {
+   213                                                  array2[i].y = array3[1];                                                                                214                                          }
+   215                                          if (array3[1] > array[i].y)                                                                                     216                                          {                                                                                                               217                                                  array[i].y = array3[1];                                                                                 218                                          }
+   219                                          if (array3[2] < array2[i].z)                                                                                    220                                          {
+   221                                                  array2[i].z = array3[2];                                                                                222                                          }
+   223                                          if (array3[2] > array[i].z)                                                                                     224                                          {
+   225                                                  array[i].z = array3[2];                                                                                 226                                          }
+   227                                  }                                                                                                                       228                          }
+   229                  }                                                                                                                                       230                  Vector4 zero = Vector4.zero;
+   231                  for (int l = 0; l < gRIDS2; l++)                                                                                                        232                  {
+   233                          zero.x += Mathf.Max(array[l].x, Mathf.Abs(array2[l].x)) * choppyness[l];                                                        234                          zero.y += Mathf.Max(array[l].y, Mathf.Abs(array2[l].y));
+   235                          zero.z += Mathf.Max(array[l].z, Mathf.Abs(array2[l].z)) * choppyness[l];                                                        236                  }
+   237                  zero.x *= gridScale.x;                                                                                                                  238                  zero.y *= gridScale.y;
+   239                  zero.z *= gridScale.x;
+   240                  return zero;                                                                                                                            241          }
+   242
+   243          public static void CopyAndCreateDisplacements(IList<InterpolatedArray2f> source, out IList<InterpolatedArray2f> des)
+   244          {
+   245                  if (source.Count != GRIDS)
+   246                  {
+   247                          int gRIDS = GRIDS;
+   248                          throw new InvalidOperationException("Query Displacements requires a displacement buffer for each of the " + gRIDS + " grids.");
+   249                  }
+   250                  if (source[0].Channels != CHANNELS)
+   251                  {
+   252                          int gRIDS = CHANNELS;
+   253                          throw new InvalidOperationException("Query Displacements requires displacement buffers have " + gRIDS + " channels.");
+   254                  }
+   255                  int sX = source[0].SX;
+   256                  des = new InterpolatedArray2f[GRIDS];
+   257                  des[0] = new InterpolatedArray2f(source[0].Data, sX, sX, CHANNELS, wrap: true);
+   258                  des[1] = new InterpolatedArray2f(source[1].Data, sX, sX, CHANNELS, wrap: true);
+   259                  des[2] = new InterpolatedArray2f(source[2].Data, sX, sX, CHANNELS, wrap: true);
+   260                  des[3] = new InterpolatedArray2f(source[3].Data, sX, sX, CHANNELS, wrap: true);
+   261          }
+   262
+   263          public static void CopyDisplacements(IList<InterpolatedArray2f> source, IList<InterpolatedArray2f> des)
+   264          {
+   265                  if (source.Count != GRIDS)
+   266                  {
+   267                          int gRIDS = GRIDS;
+   268                          throw new InvalidOperationException("Query Displacements requires a displacement buffer for each of the " + gRIDS + " grids.");
+   269                  }
+   270                  if (source[0].Channels != CHANNELS)
+   271                  {
+   272                          int gRIDS = CHANNELS;
+   273                          throw new InvalidOperationException("Query Displacements requires displacement buffers have " + gRIDS + " channels.");
+   274                  }
+   275                  des[0].Copy(source[0].Data);
+   276                  des[1].Copy(source[1].Data);                                                                                                            277                  des[2].Copy(source[2].Data);
+   278                  des[3].Copy(source[3].Data);
+   279          }
+   280  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. ALL RUNTIME KEYWORDS IN CETO C# SOURCE ==="
+=== 1. ALL RUNTIME KEYWORDS IN CETO C# SOURCE ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");                                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");                                                                                                                        /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");                                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");                                                                                                                                      /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");                                                                                                                     /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");                                                                                                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");                                                                                                                              /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");                                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                                               root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. MATCH GLOBAL + LOCAL KEYWORDS & SAVE FULL RUNTIME ACTIVE GLSL ==="          === 2. MATCH GLOBAL + LOCAL KEYWORDS & SAVE FULL RUNTIME ACTIVE GLSL ===                                                                                     root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'                                                                       > import UnityPy, lz4.block, re                                                                                                                              > from pathlib import Path                                                                                                                                   >                                                                                                                                                            > data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")                                                    > out_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders")                                         > out_dir.mkdir(parents=True, exist_ok=True)                                                                                                                 > e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))                                                                                                  >                                                                                                                                                            > ceto_active_kws = {                                                                                                                                        >     "CETO_USE_4_SPECTRUM_GRIDS",                                                                                                                           >     "CETO_OCEAN_TOPSIDE",                                                                                                                                  >     "CETO_OCEAN_UNDERSIDE",                                                                                                                                >     "CETO_REFLECTION_ON",                                                                                                                                  >     "CETO_UNDERWATER_ON",                                                                                                                                  >     "CETO_STEEP_FOAM",                                                                                                                                     >     "DIRECTIONAL",                                                                                                                                         > }                                                                                                                                                          >                                                                                                                                                            > for pid, label, pass_idx in ((175, "OceanTopSide_Transparent", 1), (143, "OceanUnderSide_Transparent", 0)):                                                >     sh = next(o.read() for o in e0.objects if o.path_id == pid)                                                                                            >     pf = sh.m_ParsedForm                                                                                                                                   >     name_map = {idx: name for name, idx in pf.m_NameIndices.items()} if hasattr(pf, "m_NameIndices") else {}                                               >     subshader = next(iter(pf.m_SubShaders))                                                                                                                >     ps = subshader.m_Passes[pass_idx]                                                                                                                      >                                                                                                                                                            >     frag_combos = []                                                                                                                                       >     for sp in ps.progFragment.m_SubPrograms:                                                                                                               >         gkw = tuple(sorted(name_map.get(k, str(k)) for k in (sp.m_GlobalKeywordIndices or [])))                                                            >         lkw = tuple(sorted(name_map.get(k, str(k)) for k in (sp.m_LocalKeywordIndices or [])))                                                             >         frag_combos.append((gkw, lkw, sp.m_BlobIndex))                                                                                                     >
+>     all_kws = sorted({kw for g, l, _ in frag_combos for kw in (g + l)})
+>     print(f"\n==================== {label} (pid={pid}) ====================")
+>     print(f"All Keywords in Shader ({len(all_kws)}): {all_kws}")                                                                                           >
+>     def score_combo(item):                                                                                                                                 >         g, l, bidx = item
+>         kws = set(g + l)                                                                                                                                   >         ceto_hits = len(kws & ceto_active_kws)
+>         extra_penalty = len(kws - ceto_active_kws)                                                                                                         >         return (ceto_hits, -extra_penalty)
+>                                                                                                                                                            >     best_gkw, best_lkw, best_fidx = max(frag_combos, key=score_combo)
+>     print(f"Selected Fragment BlobIdx={best_fidx} | GlobalKW={list(best_gkw)} | LocalKW={list(best_lkw)}")                                                 >
+>     vert_combos = []                                                                                                                                       >     for sp in ps.progVertex.m_SubPrograms:
+>         gkw = tuple(sorted(name_map.get(k, str(k)) for k in (sp.m_GlobalKeywordIndices or [])))                                                            >         lkw = tuple(sorted(name_map.get(k, str(k)) for k in (sp.m_LocalKeywordIndices or [])))
+>         vert_combos.append((gkw, lkw, sp.m_BlobIndex))                                                                                                     >
+>     exact_v = [b for g, l, b in vert_combos if g == best_gkw and l == best_lkw]                                                                            >     if exact_v:
+>         best_vidx = next(iter(exact_v))                                                                                                                    >         vg, vl = best_gkw, best_lkw
+>     else:                                                                                                                                                  >         vg, vl, best_vidx = max(vert_combos, key=score_combo)
+>     print(f"Selected Vertex   BlobIdx={best_vidx} | GlobalKW={list(vg)} | LocalKW={list(vl)}")                                                             >                                                                                                                                                            >     p_idx = list(sh.platforms).index(15)                                                                                                                   >     off, clen, dlen = sum(sh.offsets[p_idx]), sum(sh.compressedLengths[p_idx]), sum(sh.decompressedLengths[p_idx])                                         >     dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")                           >     all_shaders = re.findall(r"(#version[\s\S]*?\n\})", dec)                                                                                               >                                                                                                                                                            >     v_src = all_shaders[best_vidx].strip()                                                                                                                 >     f_src = all_shaders[best_fidx].strip()                                                                                                                 >     out_file = out_dir / f"{label}_pid{pid}_RUNTIME_ACTIVE.glsl"
+>     out_file.write_text(                                                                                                                                   >         f"// Shader: {label} (pid={pid}) | Pass[{pass_idx}]\n"
+>         f"// Vertex   BlobIdx={best_vidx} | GlobalKW={list(vg)} | LocalKW={list(vl)}\n"                                                                    >         f"// Fragment BlobIdx={best_fidx} | GlobalKW={list(best_gkw)} | LocalKW={list(best_lkw)}\n\n"
+>         f"// ==================== FULL VERTEX SHADER ====================\n{v_src}\n\n"                                                                    >         f"// ==================== FULL FRAGMENT SHADER ====================\n{f_src}\n"
+>     )
+>     print(f"[SAVED]: {out_file.name} ({out_file.stat().st_size} bytes | Vert={len(v_src.splitlines())} lines, Frag={len(f_src.splitlines())} lines)")
+> EOF
+
+==================== OceanTopSide_Transparent (pid=175) ====================
+All Keywords in Shader (0): []
+Selected Fragment BlobIdx=352 | GlobalKW=[] | LocalKW=[]
+Selected Vertex   BlobIdx=0 | GlobalKW=[] | LocalKW=[]
+[SAVED]: OceanTopSide_Transparent_pid175_RUNTIME_ACTIVE.glsl (19923 bytes | Vert=223 lines, Frag=223 lines)
+
+==================== OceanUnderSide_Transparent (pid=143) ====================
+All Keywords in Shader (0): []
+Selected Fragment BlobIdx=352 | GlobalKW=[] | LocalKW=[]
+Selected Vertex   BlobIdx=0 | GlobalKW=[] | LocalKW=[]
+[SAVED]: OceanUnderSide_Transparent_pid143_RUNTIME_ACTIVE.glsl (19940 bytes | Vert=223 lines, Frag=223 lines)
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+---------
