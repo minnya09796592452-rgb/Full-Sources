@@ -687,3 +687,84 @@ The original root-level output files have been collected under [`Outputs/`](http
 - [Output 3](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%203.txt)
 
 These are raw terminal-output records; the README sections above are the human-readable audit. Keep future raw outputs in `Outputs/Output N.txt` and continue appending verified findings here.
+
+
+---
+
+## 18. Fourier GPU program extraction audit — Output 4
+
+Source record: [Output 4 at commit `07bad70be68c6a29c501714242f8212167153b2d`](https://github.com/minnya09796592452-rgb/Full-Sources/tree/07bad70be68c6a29c501714242f8212167153b2d/Outputs/Output%204)
+
+### 18.1 Original IL resolves the FourierTask constructor anomaly
+
+The Output 4 IL excerpt confirms the constructor reads `m_index` before it assigns the supplied `index` argument:
+
+- `IL_0008`: load `m_index`
+- `IL_000d`: compare with `-1`
+- `IL_0010`: throw if equal
+- The shown excerpt then continues at `IL_001b` to process the buffer argument.
+
+Because this is a newly constructed object's integer field, it is initially zero unless initialized otherwise. Therefore the guard does **not** validate the constructor's `index` argument. This is now confirmed in the supplied IL excerpt, not merely a decompiler display quirk. The later assignment location should still be inspected in the remaining IL to document the full constructor sequence.
+
+### 18.2 Extracted shader program artifacts
+
+The extraction decompresses `sharedassets0.assets` Shader path ID 178 (`Ceto/Fourier`) from its compressed blob using LZ4 and saves two platform payloads:
+
+| Platform | Extracted file | Size | Marker scan |
+|---|---|---:|---|
+| 4 | `Ceto_Fourier_plat4_seg0.bin` | 10,624 bytes | 9 occurrences of `DXBC` |
+| 15 | `Ceto_Fourier_plat15_seg0.bin` | 29,060 bytes | 16 occurrences of `#version` |
+| 15 | `Ceto_Fourier_plat15_seg0_GLSL.txt` | 29,088 bytes | Latin-1 text dump containing GLSL sections and binary metadata |
+
+The platform 15 dump includes readable GLSL fragment programs. The platform 4 binary contains DXBC markers, but Output 4 does not disassemble or map the DXBC chunks to individual passes. The marker count alone is not a count of shader passes or proof of nine distinct complete programs.
+
+### 18.3 GLSL fragment arithmetic — first pass family decoded
+
+The readable platform 15 GLSL sections expose the butterfly operation. For each input texture, the shader:
+
+1. Samples `Ceto_ButterFlyLookUp` to obtain two source coordinates and twiddle components.
+2. Samples the first source coordinate from each `Ceto_ReadBufferN` texture.
+3. Forms the twiddle product from the sampled complex pairs. The emitted components include the real/imaginary multiply terms using the lookup's cosine/sine pair.
+4. Samples the second source coordinate and adds it to the twiddled first-source result.
+5. Writes one output render target per input read buffer.
+
+The GLSL uses packed RGBA values: the arithmetic operates on two complex pairs in the RG and BA lanes. The exact interpretation of those pairs as displacement/slope/Jacobian channels must be connected to the C# buffer packing and downstream consumers before assigning physical meaning.
+
+The extracted text contains the one-buffer, two-buffer, three-buffer, and four-buffer fragment variants, with the number of read samplers and output render targets increasing accordingly. Each variant has an X-coordinate and Y-coordinate form; the coordinate selection differs between those forms, matching the two-axis FFT stages in `FourierGPU`.
+
+**Important limitation:** the shown GLSL is a translated platform-15 representation. It provides readable arithmetic, but transform sign/direction and normalization still depend on the actual lookup values, stage ordering, and any scaling outside this shader. No normalization multiply is visible in the displayed butterfly fragment arithmetic itself.
+
+### 18.4 Updated verification status
+
+| Area | Status |
+|---|---|
+| FourierTask constructor guard | Confirmed by supplied IL: field checked before argument assignment |
+| Platform 4 shader payload | Extracted binary with DXBC markers; disassembly not supplied |
+| Platform 15 shader payload | Extracted payload and GLSL text dump |
+| Butterfly lookup sampling | Confirmed in readable GLSL |
+| Two-source butterfly combine | Confirmed in readable GLSL |
+| Packed RGBA complex arithmetic | Confirmed structurally in GLSL operations |
+| 1–4 read-buffer/output variants | Present in extracted GLSL text |
+| X/Y coordinate variants | Present; coordinate selection differs by axis |
+| Exact channel-to-physical-field mapping | Not yet verified |
+| Transform sign/direction | Not yet fully established |
+| Normalization/scaling across full pipeline | Not yet verified |
+| DXBC-to-pass mapping | Not yet established |
+
+### 18.5 Next evidence required
+
+1. Parse the GLSL dump into clean, separately named fragment variants and map each to pass indices 0–7 using the C# pass constants and sampler/output counts.
+2. Disassemble the platform-4 DXBC payload and compare its arithmetic with the platform-15 GLSL variants.
+3. Decode butterfly lookup texture generation into explicit coordinate/twiddle equations, then combine with the shader arithmetic to determine transform sign and stage convention.
+4. Trace all scale factors before and after Fourier execution to establish normalization.
+5. Connect the RG/BA complex lanes and each read-buffer index to the exact grid/displacement/slope/Jacobian data structures and render-texture consumers.
+
+**Evidence boundary:** Output 4 provides readable GLSL for the Fourier butterfly and raw DXBC payload extraction. It materially advances shader arithmetic recovery, but does not yet establish the full transform convention, scaling, or complete data-channel semantics.
+
+---
+
+## 19. Raw Output 4 archive
+
+- [Output 4.txt](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%204.txt) — original terminal output archived alongside Outputs 1–3.
+- [Fourier DXBC/GLSL blobs](https://github.com/minnya09796592452-rgb/Full-Sources/tree/main/Outputs/Fourier_DXBC_Blobs) — extracted platform payloads and readable GLSL dump.
+
