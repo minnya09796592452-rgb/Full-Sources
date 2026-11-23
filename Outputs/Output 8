@@ -1,0 +1,272 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN_OUT="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. WAVESPECTRUM.CS: GENERATEFOAM, GENERATEDISPLACEMENT, READFROMGPU ==="
+=== 1. WAVESPECTRUM.CS: GENERATEFOAM, GENERATEDISPLACEMENT, READFROMGPU ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# sed -n '405,630p' "$CLEAN_OUT/CSharp_Scripts/Ceto/WaveSpectrum.cs"
+                m_queryScaling.invGridSizes = invGridSizes;
+                m_queryScaling.scaleY = gridScale;
+                m_queryScaling.choppyness = Choppyness * gridScale;
+                m_queryScaling.offset = m_ocean.PositionOffset;
+                m_queryScaling.numGrids = m_conditions[0].Key.NumGrids;
+        }
+
+        private void GenerateSlopes(float time)
+        {
+                if (!disableSlopes && SystemInfo.graphicsShaderLevel < 30)
+                {
+                        Ocean.LogWarning("Spectrum slopes needs at least SM3 to run. Disabling slopes.");
+                        disableSlopes = true;
+                }
+                if (disableSlopes)
+                {
+                        m_slopeBuffer.DisableBuffer(-1);
+                }
+                else
+                {
+                        m_slopeBuffer.EnableBuffer(-1);
+                }
+                if (m_slopeBuffer.EnabledBuffers() == 0)
+                {
+                        Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+                        Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+                        return;
+                }
+                int numGrids = m_conditions[0].Key.NumGrids;
+                if (numGrids <= 2)
+                {
+                        m_slopeBuffer.DisableBuffer(1);
+                }
+                if (!m_slopeBuffer.HasRun || m_slopeBuffer.TimeValue != time)
+                {
+                        m_slopeBuffer.InitMaterial = m_slopeInitMat;
+                        m_slopeBuffer.InitPass = numGrids - 1;
+                        m_slopeBuffer.Run(m_conditions[0], time);
+                }
+                if (!m_slopeBuffer.BeenSampled)
+                {
+                        m_slopeBuffer.EnableSampling();
+                        if (numGrids > 0)
+                        {
+                                m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(0));
+                                Graphics.Blit(null, m_slopeMaps[0], m_slopeCopyMat, 0);
+                                Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMaps[0]);
+                        }
+                        else
+                        {
+                                Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+                        }
+                        if (numGrids > 2)
+                        {
+                                m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(1));
+                                Graphics.Blit(null, m_slopeMaps[1], m_slopeCopyMat, 0);
+                                Shader.SetGlobalTexture("Ceto_SlopeMap1", m_slopeMaps[1]);
+                        }
+                        else
+                        {
+                                Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+                        }
+                        m_slopeBuffer.DisableSampling();
+                        m_slopeBuffer.BeenSampled = true;
+                }
+        }
+
+        private void GenerateDisplacement(float time)
+        {
+                if (!disableDisplacements && SystemInfo.graphicsShaderLevel < 30 && m_displacementBuffer.IsGPU)
+                {
+                        Ocean.LogWarning("Spectrum displacements needs at least SM3 to run on GPU. Disabling displacement.");
+                        disableDisplacements = true;
+                }
+                m_displacementBuffer.EnableBuffer(-1);
+                if (disableDisplacements)
+                {
+                        m_displacementBuffer.DisableBuffer(-1);                                                                                                              }
+                if (!disableDisplacements && choppyness == 0f)
+                {
+                        m_displacementBuffer.DisableBuffer(1);
+                        m_displacementBuffer.DisableBuffer(2);
+                }
+                if (!disableDisplacements && choppyness > 0f)
+                {
+                        m_displacementBuffer.EnableBuffer(1);
+                        m_displacementBuffer.EnableBuffer(2);
+                }                                                                                                                                                            if (m_displacementBuffer.EnabledBuffers() == 0)
+                {
+                        Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+                        Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+                        Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+                        Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+                }
+                else
+                {
+                        if (!m_displacementBuffer.Done)
+                        {
+                                return;
+                        }
+                        int numGrids = m_conditions[0].Key.NumGrids;
+                        if (numGrids <= 2)
+                        {
+                                m_displacementBuffer.DisableBuffer(2);
+                        }
+                        if (!m_displacementBuffer.HasRun || m_displacementBuffer.TimeValue != time)
+                        {
+                                m_displacementBuffer.InitMaterial = m_displacementInitMat;
+                                m_displacementBuffer.InitPass = numGrids - 1;
+                                m_displacementBuffer.Run(m_conditions[0], time);
+                        }
+                        if (!m_displacementBuffer.BeenSampled)
+                        {
+                                m_displacementBuffer.EnableSampling();
+                                m_displacementCopyMat.SetTexture("Ceto_HeightBuffer", m_displacementBuffer.GetTexture(0));
+                                m_displacementCopyMat.SetTexture("Ceto_DisplacementBuffer", m_displacementBuffer.GetTexture(1));
+                                if (numGrids > 0)
+                                {
+                                        Graphics.Blit(null, m_displacementMaps[0], m_displacementCopyMat, (numGrids == 1) ? 4 : 0);
+                                        Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMaps[0]);
+                                }
+                                else
+                                {
+                                        Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+                                }
+                                if (numGrids > 1)
+                                {
+                                        Graphics.Blit(null, m_displacementMaps[1], m_displacementCopyMat, 1);
+                                        Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMaps[1]);
+                                }
+                                else
+                                {
+                                        Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+                                }
+                                m_displacementCopyMat.SetTexture("Ceto_DisplacementBuffer", m_displacementBuffer.GetTexture(2));
+                                if (numGrids > 2)
+                                {
+                                        Graphics.Blit(null, m_displacementMaps[2], m_displacementCopyMat, 2);
+                                        Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMaps[2]);
+                                }
+                                else
+                                {
+                                        Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+                                }
+                                if (numGrids > 3)
+                                {
+                                        Graphics.Blit(null, m_displacementMaps[3], m_displacementCopyMat, 3);
+                                        Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMaps[3]);
+                                }                                                                                                                                                            else
+                                {                                                                                                                                                                    Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+                                }
+                                m_displacementBuffer.DisableSampling();
+                                m_displacementBuffer.BeenSampled = true;
+                                if (m_displacementBuffer.IsGPU)
+                                {
+                                        ReadFromGPU(numGrids);                                                                                                                               }
+                                FindRanges();
+                        }
+                }
+        }
+
+        private void ReadFromGPU(int numGrids)
+        {
+                if (!disableReadBack && readSdr == null)
+                {
+                        Ocean.LogWarning("Trying to read GPU displacement data but the read shader is null");
+                }
+                bool flag = SystemInfo.graphicsShaderLevel >= 50 && SystemInfo.supportsComputeShaders;
+                if ((!disableReadBack && readSdr != null && m_readBuffer != null) & flag)
+                {
+                        InterpolatedArray2f[] readDisplacements = DisplacementBuffer.GetReadDisplacements();
+                        if (numGrids > 0)
+                        {
+                                CBUtility.ReadFromRenderTexture(m_displacementMaps[0], 3, m_readBuffer, readSdr);
+                                m_readBuffer.GetData(readDisplacements[0].Data);
+                        }
+                        else
+                        {
+                                readDisplacements[0].Clear();
+                        }
+                        if (numGrids > 1)
+                        {
+                                CBUtility.ReadFromRenderTexture(m_displacementMaps[1], 3, m_readBuffer, readSdr);
+                                m_readBuffer.GetData(readDisplacements[1].Data);
+                        }
+                        else
+                        {
+                                readDisplacements[1].Clear();
+                        }
+                        if (numGrids > 2)
+                        {
+                                CBUtility.ReadFromRenderTexture(m_displacementMaps[2], 3, m_readBuffer, readSdr);
+                                m_readBuffer.GetData(readDisplacements[2].Data);                                                                                                     }
+                        else
+                        {
+                                readDisplacements[2].Clear();
+                        }                                                                                                                                                            _ = 3;
+                }
+        }
+
+        private void FindRanges()
+        {                                                                                                                                                                    if (disableReadBack && DisplacementBuffer.IsGPU)
+                {
+                        MaxDisplacement = new Vector2(0f, 40f * gridScale);
+                }
+                else if (m_findRangeTask == null || m_findRangeTask.Done)
+                {
+                        if (m_findRangeTask == null)
+                        {
+                                m_findRangeTask = new FindRangeTask(this);
+                        }
+                        m_findRangeTask.Reset();
+                        m_scheduler.Run(m_findRangeTask);
+                }
+        }
+
+        private void GenerateFoam(float time)
+        {
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. QUERYDISPLACEMENTS.CS: SAMPLE & SAMPLEHEIGHTONLY ==="
+=== 2. QUERYDISPLACEMENTS.CS: SAMPLE & SAMPLEHEIGHTONLY ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# sed -n '90,175p' "$CLEAN_OUT/CSharp_Scripts/Ceto/QueryDisplacements.cs"
+                        break;
+                }
+        }
+
+        private static void SampleHeightOnly(Vector3[] d, IList<InterpolatedArray2f> displacements, bool[] sample, float x, float z, QueryGridScaling scaling)
+        {
+                float[] result = scaling.result;
+                if (sample[0] && scaling.numGrids > 0)
+                {
+                        float x2 = x * scaling.invGridSizes.x;
+                        float y = z * scaling.invGridSizes.x;
+                        displacements[0].Get(x2, y, result);
+                        d[0].y = result[1] * scaling.scaleY;
+                }
+                if (sample[1] && scaling.numGrids > 1)
+                {
+                        float x2 = x * scaling.invGridSizes.y;                                                                                                                       float y = z * scaling.invGridSizes.y;
+                        displacements[1].Get(x2, y, result);
+                        d[1].y = result[1] * scaling.scaleY;
+                }
+                if (sample[2] && scaling.numGrids > 2)                                                                                                                       {
+                        float x2 = x * scaling.invGridSizes.z;                                                                                                                       float y = z * scaling.invGridSizes.z;
+                        displacements[2].Get(x2, y, result);                                                                                                                         d[2].y = result[1] * scaling.scaleY;
+                }                                                                                                                                                            if (sample[3] && scaling.numGrids > 3)
+                {                                                                                                                                                                    float x2 = x * scaling.invGridSizes.w;
+                        float y = z * scaling.invGridSizes.w;                                                                                                                        displacements[3].Get(x2, y, result);                                                                                                                         d[3].y = result[1] * scaling.scaleY;                                                                                                                 }
+        }                                                                                                                                                    
+        private static void Sample(Vector3[] d, IList<InterpolatedArray2f> displacements, bool[] sample, float x, float z, QueryGridScaling scaling)                 {
+                float[] result = scaling.result;                                                                                                                             if (sample[0] && scaling.numGrids > 0)
+                {                                                                                                                                                                    float x2 = x * scaling.invGridSizes.x;
+                        float y = z * scaling.invGridSizes.x;                                                                                                                        displacements[0].Get(x2, y, result);
+                        d[0].x = result[0] * scaling.choppyness.x;                                                                                                                   d[0].y = result[1] * scaling.scaleY;                                                                                                                         d[0].z = result[2] * scaling.choppyness.x;                                                                                                           }                                                                                                                                                            if (sample[1] && scaling.numGrids > 1)                                                                                                                       {
+                        float x2 = x * scaling.invGridSizes.y;                                                                                                                       float y = z * scaling.invGridSizes.y;
+                        displacements[1].Get(x2, y, result);                                                                                                                         d[1].x = result[0] * scaling.choppyness.y;
+                        d[1].y = result[1] * scaling.scaleY;                                                                                                                         d[1].z = result[2] * scaling.choppyness.y;
+                }                                                                                                                                                            if (sample[2] && scaling.numGrids > 2)                                                                                                                       {                                                                                                                                                                    float x2 = x * scaling.invGridSizes.z;
+                        float y = z * scaling.invGridSizes.z;                                                                                                                        displacements[2].Get(x2, y, result);
+                        d[2].x = result[0] * scaling.choppyness.z;                                                                                                                   d[2].y = result[1] * scaling.scaleY;
+                        d[2].z = result[2] * scaling.choppyness.z;                                                                                                           }
+                if (sample[3] && scaling.numGrids > 3)                                                                                                                       {
+                        float x2 = x * scaling.invGridSizes.w;                                                                                                                       float y = z * scaling.invGridSizes.w;
+                        displacements[3].Get(x2, y, result);                                                                                                                         d[3].x = result[0] * scaling.choppyness.w;                                                                                                                   d[3].y = result[1] * scaling.scaleY;                                                                                                                         d[3].z = result[2] * scaling.choppyness.w;                                                                                                           }                                                                                                                                                    }                                                                                                                                                                                                                                                                                                                         public static Vector4 MaxRange(IList<InterpolatedArray2f> displacements, Vector4 choppyness, Vector2 gridScale, ICancelToken token)                          {                                                                                                                                                                    if (displacements.Count != GRIDS)
+                {                                                                                                                                                                    int gRIDS = GRIDS;
+                        throw new InvalidOperationException("Query Displacements requires a displacement buffer for each of the " + gRIDS + " grids.");                      }
+                if (displacements[0].Channels != CHANNELS)                                                                                                   root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
