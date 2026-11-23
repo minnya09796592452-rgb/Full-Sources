@@ -1,0 +1,844 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. FULL QUERYWAVES() & WAVE QUERY METHODS IN OCEAN.CS ==="
+=== 2. FULL QUERYWAVES() & WAVE QUERY METHODS IN OCEAN.CS ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> from pathlib import Path
+> import re
+>
+> code = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/Ocean.cs").read_text(errors="ignore")
+> lines = code.splitlines()
+>
+> for idx, line in enumerate(lines):
+>     if any(k in line for k in ("QueryWaves", "QueryNormal", "Register", "WaveSpectrum")):
+>         start = max(0, idx - 2)
+>         end = min(len(lines), idx + 32)
+>         print(f"\n--- Lines {start+1} to {end} ---")
+>         for i in range(start, end):
+>             print(f"{i+1:4d}: {lines[i]}")
+> EOF
+
+--- Lines 123 to 156 ---
+ 123:   public PlanarReflection Reflection { get; set; }
+ 124:
+ 125:   public WaveSpectrum Spectrum { get; set; }
+ 126:
+ 127:   public UnderWater UnderWater { get; set; }
+ 128:
+ 129:   public IOceanTime OceanTime { get; set; }
+ 130:                                                                                                                                                         131:   public IProjection Projection { get; private set; }
+ 132:                                                                                                                                                         133:   public Vector3 PositionOffset
+ 134:   {
+ 135:           get
+ 136:           {
+ 137:                   return m_positionOffset;
+ 138:           }
+ 139:           set
+ 140:           {
+ 141:                   m_positionOffset = value;
+ 142:                   Shader.SetGlobalVector("Ceto_PosOffset", m_positionOffset);                                                                           143:           }
+ 144:   }
+ 145:
+ 146:   public int CameraCount => m_cameraData.Count;
+ 147:
+ 148:   public OverlayManager OverlayManager { get; private set; }
+ 149:
+ 150:   public bool WasError { get; private set; }
+ 151:
+ 152:   private void Awake()
+ 153:   {
+ 154:           try                                                                                                                                           155:           {
+ 156:                   if (Instance != null)
+
+--- Lines 388 to 421 ---
+ 388:   }
+ 389:
+ 390:   public void Register(OceanComponent component)
+ 391:   {
+ 392:           if (component is ProjectedGrid)
+ 393:           {
+ 394:                   Grid = component as ProjectedGrid;                                                                                                    395:                   return;
+ 396:           }
+ 397:           if (component is WaveSpectrum)
+ 398:           {
+ 399:                   Spectrum = component as WaveSpectrum;
+ 400:                   return;
+ 401:           }
+ 402:           if (component is PlanarReflection)
+ 403:           {
+ 404:                   Reflection = component as PlanarReflection;
+ 405:                   return;
+ 406:           }
+ 407:           if (component is UnderWater)
+ 408:           {
+ 409:                   UnderWater = component as UnderWater;
+ 410:                   return;                                                                                                                               411:           }
+ 412:           throw new InvalidCastException("Could not cast ocean component " + component.GetType());
+ 413:   }
+ 414:
+ 415:   public void Deregister(OceanComponent component)
+ 416:   {
+ 417:           if (component is ProjectedGrid)
+ 418:           {
+ 419:                   Grid = null;
+ 420:                   return;
+ 421:           }
+
+--- Lines 395 to 428 ---
+ 395:                   return;
+ 396:           }
+ 397:           if (component is WaveSpectrum)
+ 398:           {
+ 399:                   Spectrum = component as WaveSpectrum;                                                                                                 400:                   return;
+ 401:           }                                                                                                                                             402:           if (component is PlanarReflection)
+ 403:           {
+ 404:                   Reflection = component as PlanarReflection;
+ 405:                   return;                                                                                                                               406:           }
+ 407:           if (component is UnderWater)                                                                                                                  408:           {
+ 409:                   UnderWater = component as UnderWater;
+ 410:                   return;
+ 411:           }
+ 412:           throw new InvalidCastException("Could not cast ocean component " + component.GetType());
+ 413:   }
+ 414:                                                                                                                                                         415:   public void Deregister(OceanComponent component)
+ 416:   {
+ 417:           if (component is ProjectedGrid)
+ 418:           {
+ 419:                   Grid = null;                                                                                                                          420:                   return;
+ 421:           }
+ 422:           if (component is WaveSpectrum)
+ 423:           {                                                                                                                                             424:                   Spectrum = null;
+ 425:                   return;                                                                                                                               426:           }
+ 427:           if (component is PlanarReflection)
+ 428:           {
+                                                                                                                                                             --- Lines 397 to 430 ---                                                                                                                                      397:           if (component is WaveSpectrum)
+ 398:           {
+ 399:                   Spectrum = component as WaveSpectrum;
+ 400:                   return;                                                                                                                               401:           }
+ 402:           if (component is PlanarReflection)
+ 403:           {
+ 404:                   Reflection = component as PlanarReflection;                                                                                           405:                   return;
+ 406:           }
+ 407:           if (component is UnderWater)                                                                                                                  408:           {                                                                                                                                             409:                   UnderWater = component as UnderWater;                                                                                                 410:                   return;
+ 411:           }                                                                                                                                             412:           throw new InvalidCastException("Could not cast ocean component " + component.GetType());                                                      413:   }
+ 414:
+ 415:   public void Deregister(OceanComponent component)
+ 416:   {                                                                                                                                                     417:           if (component is ProjectedGrid)
+ 418:           {                                                                                                                                             419:                   Grid = null;
+ 420:                   return;
+ 421:           }
+ 422:           if (component is WaveSpectrum)
+ 423:           {                                                                                                                                             424:                   Spectrum = null;
+ 425:                   return;
+ 426:           }
+ 427:           if (component is PlanarReflection)
+ 428:           {                                                                                                                                             429:                   Reflection = null;
+ 430:                   return;                                                                                                                              
+--- Lines 420 to 453 ---
+ 420:                   return;
+ 421:           }
+ 422:           if (component is WaveSpectrum)                                                                                                                423:           {
+ 424:                   Spectrum = null;
+ 425:                   return;
+ 426:           }
+ 427:           if (component is PlanarReflection)                                                                                                            428:           {
+ 429:                   Reflection = null;                                                                                                                    430:                   return;
+ 431:           }
+ 432:           if (component is UnderWater)
+ 433:           {
+ 434:                   UnderWater = null;                                                                                                                    435:                   return;
+ 436:           }
+ 437:           throw new InvalidCastException("Could not cast ocean component " + component.GetType());
+ 438:   }
+ 439:
+ 440:   public static void LogError(string msg)
+ 441:   {                                                                                                                                                     442:           Debug.Log("<color=red>Ceto (" + VERSION + ") Error:</color> " + msg);
+ 443:   }                                                                                                                                                     444:
+ 445:   public static void LogWarning(string msg)                                                                                                             446:   {
+ 447:           if (!(Instance != null) || !Instance.disableWarnings)                                                                                         448:           {
+ 449:                   Debug.Log("<color=yellow>Ceto (" + VERSION + ") Warning:</color> " + msg);                                                            450:           }                                                                                                                                             451:   }                                                                                                                                                     452:
+ 453:   public static void LogInfo(string msg)
+
+--- Lines 574 to 607 ---
+ 574:   }
+ 575:
+ 576:   public void SetQueryWavesSampling(bool overlays, bool grid0, bool grid1, bool grid2, bool grid3)
+ 577:   {
+ 578:           m_query.sampleOverlay = overlays;                                                                                                             579:           m_query.sampleSpectrum[0] = grid0;
+ 580:           m_query.sampleSpectrum[1] = grid1;
+ 581:           m_query.sampleSpectrum[2] = grid2;
+ 582:           m_query.sampleSpectrum[3] = grid3;
+ 583:   }
+ 584:
+ 585:   public Vector3 QueryNormal(float x, float z)
+ 586:   {
+ 587:           float num = 0.5f;
+ 588:           float num2 = QueryWaves(x - num, z);
+ 589:           float num3 = QueryWaves(x, z - num);                                                                                                          590:           float num4 = QueryWaves(x + num, z);
+ 591:           float num5 = QueryWaves(x, z + num);
+ 592:           float num6 = num2 - num4;
+ 593:           float num7 = num3 - num5;
+ 594:           return new Vector3(num6, Mathf.Sqrt(1f - num6 * num6 - num7 * num7), num7);
+ 595:   }
+ 596:
+ 597:   public float QueryWaves(float x, float z)
+ 598:   {
+ 599:           m_query.result.Clear();
+ 600:           m_query.posX = x;
+ 601:           m_query.posZ = z;
+ 602:           if (enabled)
+ 603:           {
+ 604:                   if (Spectrum != null)
+ 605:                   {
+ 606:                           Spectrum.QueryWaves(m_query);
+ 607:                   }
+
+--- Lines 583 to 616 ---
+ 583:   }
+ 584:
+ 585:   public Vector3 QueryNormal(float x, float z)
+ 586:   {
+ 587:           float num = 0.5f;
+ 588:           float num2 = QueryWaves(x - num, z);
+ 589:           float num3 = QueryWaves(x, z - num);
+ 590:           float num4 = QueryWaves(x + num, z);
+ 591:           float num5 = QueryWaves(x, z + num);
+ 592:           float num6 = num2 - num4;
+ 593:           float num7 = num3 - num5;
+ 594:           return new Vector3(num6, Mathf.Sqrt(1f - num6 * num6 - num7 * num7), num7);
+ 595:   }
+ 596:
+ 597:   public float QueryWaves(float x, float z)
+ 598:   {
+ 599:           m_query.result.Clear();
+ 600:           m_query.posX = x;
+ 601:           m_query.posZ = z;
+ 602:           if (enabled)
+ 603:           {
+ 604:                   if (Spectrum != null)
+ 605:                   {
+ 606:                           Spectrum.QueryWaves(m_query);
+ 607:                   }
+ 608:                   if (OverlayManager != null)
+ 609:                   {
+ 610:                           OverlayManager.QueryWaves(m_query);                                                                                           611:                   }
+ 612:           }                                                                                                                                             613:           return m_query.result.height + level;
+ 614:   }
+ 615:
+ 616:   public float QueryWaves(float x, float z, out bool isClipped)
+
+--- Lines 586 to 619 ---
+ 586:   {
+ 587:           float num = 0.5f;
+ 588:           float num2 = QueryWaves(x - num, z);
+ 589:           float num3 = QueryWaves(x, z - num);                                                                                                          590:           float num4 = QueryWaves(x + num, z);
+ 591:           float num5 = QueryWaves(x, z + num);                                                                                                          592:           float num6 = num2 - num4;
+ 593:           float num7 = num3 - num5;                                                                                                                     594:           return new Vector3(num6, Mathf.Sqrt(1f - num6 * num6 - num7 * num7), num7);
+ 595:   }
+ 596:
+ 597:   public float QueryWaves(float x, float z)
+ 598:   {
+ 599:           m_query.result.Clear();
+ 600:           m_query.posX = x;                                                                                                                             601:           m_query.posZ = z;                                                                                                                             602:           if (enabled)
+ 603:           {
+ 604:                   if (Spectrum != null)
+ 605:                   {
+ 606:                           Spectrum.QueryWaves(m_query);
+ 607:                   }
+ 608:                   if (OverlayManager != null)
+ 609:                   {
+ 610:                           OverlayManager.QueryWaves(m_query);
+ 611:                   }
+ 612:           }                                                                                                                                             613:           return m_query.result.height + level;
+ 614:   }
+ 615:
+ 616:   public float QueryWaves(float x, float z, out bool isClipped)
+ 617:   {
+ 618:           m_query.result.Clear();
+ 619:           m_query.posX = x;
+
+--- Lines 587 to 620 ---
+ 587:           float num = 0.5f;
+ 588:           float num2 = QueryWaves(x - num, z);
+ 589:           float num3 = QueryWaves(x, z - num);                                                                                                          590:           float num4 = QueryWaves(x + num, z);
+ 591:           float num5 = QueryWaves(x, z + num);
+ 592:           float num6 = num2 - num4;
+ 593:           float num7 = num3 - num5;
+ 594:           return new Vector3(num6, Mathf.Sqrt(1f - num6 * num6 - num7 * num7), num7);
+ 595:   }
+ 596:
+ 597:   public float QueryWaves(float x, float z)
+ 598:   {
+ 599:           m_query.result.Clear();
+ 600:           m_query.posX = x;
+ 601:           m_query.posZ = z;
+ 602:           if (enabled)
+ 603:           {                                                                                                                                             604:                   if (Spectrum != null)
+ 605:                   {
+ 606:                           Spectrum.QueryWaves(m_query);
+ 607:                   }
+ 608:                   if (OverlayManager != null)                                                                                                           609:                   {
+ 610:                           OverlayManager.QueryWaves(m_query);
+ 611:                   }
+ 612:           }
+ 613:           return m_query.result.height + level;
+ 614:   }                                                                                                                                                     615:
+ 616:   public float QueryWaves(float x, float z, out bool isClipped)
+ 617:   {
+ 618:           m_query.result.Clear();
+ 619:           m_query.posX = x;
+ 620:           m_query.posZ = z;
+
+--- Lines 588 to 621 ---
+ 588:           float num2 = QueryWaves(x - num, z);
+ 589:           float num3 = QueryWaves(x, z - num);
+ 590:           float num4 = QueryWaves(x + num, z);
+ 591:           float num5 = QueryWaves(x, z + num);
+ 592:           float num6 = num2 - num4;
+ 593:           float num7 = num3 - num5;
+ 594:           return new Vector3(num6, Mathf.Sqrt(1f - num6 * num6 - num7 * num7), num7);
+ 595:   }
+ 596:
+ 597:   public float QueryWaves(float x, float z)
+ 598:   {
+ 599:           m_query.result.Clear();
+ 600:           m_query.posX = x;
+ 601:           m_query.posZ = z;
+ 602:           if (enabled)
+ 603:           {
+ 604:                   if (Spectrum != null)
+ 605:                   {                                                                                                                                     606:                           Spectrum.QueryWaves(m_query);
+ 607:                   }
+ 608:                   if (OverlayManager != null)
+ 609:                   {
+ 610:                           OverlayManager.QueryWaves(m_query);
+ 611:                   }
+ 612:           }
+ 613:           return m_query.result.height + level;
+ 614:   }
+ 615:
+ 616:   public float QueryWaves(float x, float z, out bool isClipped)
+ 617:   {
+ 618:           m_query.result.Clear();                                                                                                                       619:           m_query.posX = x;
+ 620:           m_query.posZ = z;
+ 621:           if (enabled)
+
+--- Lines 589 to 622 ---                                                                                                                                      589:           float num3 = QueryWaves(x, z - num);
+ 590:           float num4 = QueryWaves(x + num, z);                                                                                                          591:           float num5 = QueryWaves(x, z + num);
+ 592:           float num6 = num2 - num4;                                                                                                                     593:           float num7 = num3 - num5;
+ 594:           return new Vector3(num6, Mathf.Sqrt(1f - num6 * num6 - num7 * num7), num7);                                                                   595:   }
+ 596:                                                                                                                                                         597:   public float QueryWaves(float x, float z)
+ 598:   {                                                                                                                                                     599:           m_query.result.Clear();                                                                                                                       600:           m_query.posX = x;                                                                                                                             601:           m_query.posZ = z;
+ 602:           if (enabled)                                                                                                                                  603:           {
+ 604:                   if (Spectrum != null)                                                                                                                 605:                   {
+ 606:                           Spectrum.QueryWaves(m_query);                                                                                                 607:                   }
+ 608:                   if (OverlayManager != null)                                                                                                           609:                   {
+ 610:                           OverlayManager.QueryWaves(m_query);                                                                                           611:                   }
+ 612:           }                                                                                                                                             613:           return m_query.result.height + level;                                                                                                         614:   }                                                                                                                                                     615:                                                                                                                                                         616:   public float QueryWaves(float x, float z, out bool isClipped)                                                                                         617:   {
+ 618:           m_query.result.Clear();                                                                                                                       619:           m_query.posX = x;
+ 620:           m_query.posZ = z;                                                                                                                             621:           if (enabled)
+ 622:           {                                                                                                                                            
+--- Lines 595 to 628 ---                                                                                                                                      595:   }                                                                                                                                                     596:                                                                                                                                                         597:   public float QueryWaves(float x, float z)
+ 598:   {                                                                                                                                                     599:           m_query.result.Clear();
+ 600:           m_query.posX = x;                                                                                                                             601:           m_query.posZ = z;
+ 602:           if (enabled)                                                                                                                                  603:           {
+ 604:                   if (Spectrum != null)                                                                                                                 605:                   {
+ 606:                           Spectrum.QueryWaves(m_query);                                                                                                 607:                   }
+ 608:                   if (OverlayManager != null)                                                                                                           609:                   {                                                                                                                                     610:                           OverlayManager.QueryWaves(m_query);                                                                                           611:                   }                                                                                                                                     612:           }                                                                                                                                             613:           return m_query.result.height + level;                                                                                                         614:   }                                                                                                                                                     615:                                                                                                                                                         616:   public float QueryWaves(float x, float z, out bool isClipped)                                                                                         617:   {
+ 618:           m_query.result.Clear();                                                                                                                       619:           m_query.posX = x;
+ 620:           m_query.posZ = z;                                                                                                                             621:           if (enabled)
+ 622:           {                                                                                                                                             623:                   if (Spectrum != null)
+ 624:                   {                                                                                                                                     625:                           Spectrum.QueryWaves(m_query);
+ 626:                   }                                                                                                                                     627:                   if (OverlayManager != null)
+ 628:                   {                                                                                                                                                                                                                                                                                                 --- Lines 604 to 637 ---                                                                                                                                      604:                   if (Spectrum != null)                                                                                                                 605:                   {                                                                                                                                     606:                           Spectrum.QueryWaves(m_query);                                                                                                 607:                   }                                                                                                                                     608:                   if (OverlayManager != null)                                                                                                           609:                   {                                                                                                                                     610:                           OverlayManager.QueryWaves(m_query);                                                                                           611:                   }                                                                                                                                     612:           }                                                                                                                                             613:           return m_query.result.height + level;                                                                                                         614:   }                                                                                                                                                     615:                                                                                                                                                         616:   public float QueryWaves(float x, float z, out bool isClipped)
+ 617:   {                                                                                                                                                     618:           m_query.result.Clear();
+ 619:           m_query.posX = x;                                                                                                                             620:           m_query.posZ = z;
+ 621:           if (enabled)                                                                                                                                  622:           {
+ 623:                   if (Spectrum != null)                                                                                                                 624:                   {
+ 625:                           Spectrum.QueryWaves(m_query);                                                                                                 626:                   }
+ 627:                   if (OverlayManager != null)                                                                                                           628:                   {                                                                                                                                     629:                           OverlayManager.QueryWaves(m_query);                                                                                           630:                   }
+ 631:           }                                                                                                                                             632:           isClipped = m_query.result.isClipped;                                                                                                         633:           return m_query.result.height + level;
+ 634:   }                                                                                                                                                     635:
+ 636:   public void QueryWaves(WaveQuery query)                                                                                                               637:   {
+
+--- Lines 608 to 641 ---
+ 608:                   if (OverlayManager != null)
+ 609:                   {
+ 610:                           OverlayManager.QueryWaves(m_query);
+ 611:                   }
+ 612:           }
+ 613:           return m_query.result.height + level;
+ 614:   }
+ 615:
+ 616:   public float QueryWaves(float x, float z, out bool isClipped)
+ 617:   {
+ 618:           m_query.result.Clear();
+ 619:           m_query.posX = x;
+ 620:           m_query.posZ = z;
+ 621:           if (enabled)
+ 622:           {
+ 623:                   if (Spectrum != null)
+ 624:                   {
+ 625:                           Spectrum.QueryWaves(m_query);
+ 626:                   }
+ 627:                   if (OverlayManager != null)
+ 628:                   {
+ 629:                           OverlayManager.QueryWaves(m_query);
+ 630:                   }
+ 631:           }
+ 632:           isClipped = m_query.result.isClipped;
+ 633:           return m_query.result.height + level;
+ 634:   }
+ 635:
+ 636:   public void QueryWaves(WaveQuery query)
+ 637:   {
+ 638:           query.result.Clear();
+ 639:           if (enabled)                                                                                                                                  640:           {
+ 641:                   if (Spectrum != null)
+
+--- Lines 614 to 647 ---
+ 614:   }
+ 615:
+ 616:   public float QueryWaves(float x, float z, out bool isClipped)
+ 617:   {
+ 618:           m_query.result.Clear();
+ 619:           m_query.posX = x;
+ 620:           m_query.posZ = z;
+ 621:           if (enabled)
+ 622:           {
+ 623:                   if (Spectrum != null)
+ 624:                   {
+ 625:                           Spectrum.QueryWaves(m_query);
+ 626:                   }
+ 627:                   if (OverlayManager != null)
+ 628:                   {
+ 629:                           OverlayManager.QueryWaves(m_query);
+ 630:                   }
+ 631:           }
+ 632:           isClipped = m_query.result.isClipped;
+ 633:           return m_query.result.height + level;
+ 634:   }
+ 635:
+ 636:   public void QueryWaves(WaveQuery query)
+ 637:   {
+ 638:           query.result.Clear();
+ 639:           if (enabled)
+ 640:           {
+ 641:                   if (Spectrum != null)
+ 642:                   {
+ 643:                           Spectrum.QueryWaves(query);
+ 644:                   }
+ 645:                   if (OverlayManager != null)
+ 646:                   {
+ 647:                           OverlayManager.QueryWaves(query);
+
+--- Lines 623 to 656 ---
+ 623:                   if (Spectrum != null)
+ 624:                   {
+ 625:                           Spectrum.QueryWaves(m_query);
+ 626:                   }
+ 627:                   if (OverlayManager != null)
+ 628:                   {
+ 629:                           OverlayManager.QueryWaves(m_query);
+ 630:                   }
+ 631:           }
+ 632:           isClipped = m_query.result.isClipped;
+ 633:           return m_query.result.height + level;
+ 634:   }                                                                                                                                                     635:
+ 636:   public void QueryWaves(WaveQuery query)                                                                                                               637:   {
+ 638:           query.result.Clear();
+ 639:           if (enabled)
+ 640:           {
+ 641:                   if (Spectrum != null)
+ 642:                   {
+ 643:                           Spectrum.QueryWaves(query);
+ 644:                   }
+ 645:                   if (OverlayManager != null)
+ 646:                   {
+ 647:                           OverlayManager.QueryWaves(query);
+ 648:                   }
+ 649:           }
+ 650:           query.result.height += level;
+ 651:   }
+ 652:
+ 653:   public void QueryWaves(IEnumerable<WaveQuery> querys)
+ 654:   {
+ 655:           foreach (WaveQuery query in querys)
+ 656:           {
+
+--- Lines 627 to 660 ---
+ 627:                   if (OverlayManager != null)
+ 628:                   {
+ 629:                           OverlayManager.QueryWaves(m_query);
+ 630:                   }
+ 631:           }
+ 632:           isClipped = m_query.result.isClipped;
+ 633:           return m_query.result.height + level;
+ 634:   }
+ 635:
+ 636:   public void QueryWaves(WaveQuery query)
+ 637:   {
+ 638:           query.result.Clear();
+ 639:           if (enabled)
+ 640:           {
+ 641:                   if (Spectrum != null)
+ 642:                   {
+ 643:                           Spectrum.QueryWaves(query);
+ 644:                   }
+ 645:                   if (OverlayManager != null)
+ 646:                   {
+ 647:                           OverlayManager.QueryWaves(query);
+ 648:                   }
+ 649:           }
+ 650:           query.result.height += level;
+ 651:   }
+ 652:
+ 653:   public void QueryWaves(IEnumerable<WaveQuery> querys)                                                                                                 654:   {
+ 655:           foreach (WaveQuery query in querys)
+ 656:           {
+ 657:                   query.result.Clear();                                                                                                                 658:                   if (enabled)                                                                                                                          659:                   {
+ 660:                           if (Spectrum != null)
+
+--- Lines 634 to 667 ---
+ 634:   }
+ 635:
+ 636:   public void QueryWaves(WaveQuery query)
+ 637:   {
+ 638:           query.result.Clear();
+ 639:           if (enabled)
+ 640:           {
+ 641:                   if (Spectrum != null)
+ 642:                   {
+ 643:                           Spectrum.QueryWaves(query);
+ 644:                   }
+ 645:                   if (OverlayManager != null)
+ 646:                   {
+ 647:                           OverlayManager.QueryWaves(query);
+ 648:                   }
+ 649:           }
+ 650:           query.result.height += level;
+ 651:   }
+ 652:
+ 653:   public void QueryWaves(IEnumerable<WaveQuery> querys)
+ 654:   {
+ 655:           foreach (WaveQuery query in querys)
+ 656:           {
+ 657:                   query.result.Clear();
+ 658:                   if (enabled)
+ 659:                   {
+ 660:                           if (Spectrum != null)
+ 661:                           {
+ 662:                                   Spectrum.QueryWaves(query);
+ 663:                           }
+ 664:                           if (OverlayManager != null)                                                                                                   665:                           {
+ 666:                                   OverlayManager.QueryWaves(query);
+ 667:                           }
+                                                                                                                                                             --- Lines 641 to 674 ---
+ 641:                   if (Spectrum != null)
+ 642:                   {
+ 643:                           Spectrum.QueryWaves(query);
+ 644:                   }
+ 645:                   if (OverlayManager != null)
+ 646:                   {
+ 647:                           OverlayManager.QueryWaves(query);
+ 648:                   }
+ 649:           }
+ 650:           query.result.height += level;
+ 651:   }
+ 652:
+ 653:   public void QueryWaves(IEnumerable<WaveQuery> querys)
+ 654:   {
+ 655:           foreach (WaveQuery query in querys)
+ 656:           {
+ 657:                   query.result.Clear();
+ 658:                   if (enabled)
+ 659:                   {
+ 660:                           if (Spectrum != null)
+ 661:                           {
+ 662:                                   Spectrum.QueryWaves(query);                                                                                           663:                           }                                                                                                                             664:                           if (OverlayManager != null)
+ 665:                           {
+ 666:                                   OverlayManager.QueryWaves(query);
+ 667:                           }
+ 668:                   }
+ 669:                   query.result.height += level;
+ 670:           }
+ 671:   }
+ 672:
+ 673:   public void QueryWavesWithAsyncTask(WaveQueryTask task)
+ 674:   {
+
+--- Lines 645 to 678 ---
+ 645:                   if (OverlayManager != null)
+ 646:                   {
+ 647:                           OverlayManager.QueryWaves(query);
+ 648:                   }
+ 649:           }
+ 650:           query.result.height += level;
+ 651:   }
+ 652:
+ 653:   public void QueryWaves(IEnumerable<WaveQuery> querys)
+ 654:   {                                                                                                                                                     655:           foreach (WaveQuery query in querys)
+ 656:           {
+ 657:                   query.result.Clear();
+ 658:                   if (enabled)
+ 659:                   {
+ 660:                           if (Spectrum != null)
+ 661:                           {
+ 662:                                   Spectrum.QueryWaves(query);
+ 663:                           }
+ 664:                           if (OverlayManager != null)
+ 665:                           {
+ 666:                                   OverlayManager.QueryWaves(query);
+ 667:                           }
+ 668:                   }
+ 669:                   query.result.height += level;
+ 670:           }
+ 671:   }                                                                                                                                                     672:
+ 673:   public void QueryWavesWithAsyncTask(WaveQueryTask task)
+ 674:   {
+ 675:           if (task != null && m_scheduler != null && (!task.IsScheduled || task.Done) && enabled)
+ 676:           {
+ 677:                   task.Reset(Spectrum, PositionOffset, level);
+ 678:                   if (task.SupportsOverlays)
+
+--- Lines 651 to 684 ---
+ 651:   }
+ 652:
+ 653:   public void QueryWaves(IEnumerable<WaveQuery> querys)
+ 654:   {
+ 655:           foreach (WaveQuery query in querys)
+ 656:           {
+ 657:                   query.result.Clear();
+ 658:                   if (enabled)
+ 659:                   {
+ 660:                           if (Spectrum != null)
+ 661:                           {
+ 662:                                   Spectrum.QueryWaves(query);
+ 663:                           }
+ 664:                           if (OverlayManager != null)
+ 665:                           {
+ 666:                                   OverlayManager.QueryWaves(query);
+ 667:                           }
+ 668:                   }
+ 669:                   query.result.height += level;
+ 670:           }
+ 671:   }
+ 672:
+ 673:   public void QueryWavesWithAsyncTask(WaveQueryTask task)
+ 674:   {
+ 675:           if (task != null && m_scheduler != null && (!task.IsScheduled || task.Done) && enabled)
+ 676:           {
+ 677:                   task.Reset(Spectrum, PositionOffset, level);
+ 678:                   if (task.SupportsOverlays)
+ 679:                   {
+ 680:                           task.OverlaySampler = OverlayManager;
+ 681:                   }
+ 682:                   else
+ 683:                   {
+ 684:                           task.OverlaySampler = null;
+
+--- Lines 660 to 693 ---
+ 660:                           if (Spectrum != null)
+ 661:                           {
+ 662:                                   Spectrum.QueryWaves(query);
+ 663:                           }
+ 664:                           if (OverlayManager != null)
+ 665:                           {
+ 666:                                   OverlayManager.QueryWaves(query);
+ 667:                           }
+ 668:                   }
+ 669:                   query.result.height += level;
+ 670:           }
+ 671:   }
+ 672:
+ 673:   public void QueryWavesWithAsyncTask(WaveQueryTask task)
+ 674:   {
+ 675:           if (task != null && m_scheduler != null && (!task.IsScheduled || task.Done) && enabled)
+ 676:           {
+ 677:                   task.Reset(Spectrum, PositionOffset, level);
+ 678:                   if (task.SupportsOverlays)
+ 679:                   {
+ 680:                           task.OverlaySampler = OverlayManager;
+ 681:                   }
+ 682:                   else
+ 683:                   {
+ 684:                           task.OverlaySampler = null;
+ 685:                   }
+ 686:                   task.IsScheduled = true;
+ 687:                   m_scheduler.Run(task);
+ 688:           }
+ 689:   }
+ 690:
+ 691:   private void OceanOnPreRender(Camera cam)
+ 692:   {
+ 693:           if (cam.enabled)
+
+--- Lines 664 to 697 ---
+ 664:                           if (OverlayManager != null)
+ 665:                           {
+ 666:                                   OverlayManager.QueryWaves(query);
+ 667:                           }
+ 668:                   }
+ 669:                   query.result.height += level;
+ 670:           }
+ 671:   }
+ 672:
+ 673:   public void QueryWavesWithAsyncTask(WaveQueryTask task)
+ 674:   {
+ 675:           if (task != null && m_scheduler != null && (!task.IsScheduled || task.Done) && enabled)
+ 676:           {
+ 677:                   task.Reset(Spectrum, PositionOffset, level);
+ 678:                   if (task.SupportsOverlays)
+ 679:                   {
+ 680:                           task.OverlaySampler = OverlayManager;
+ 681:                   }
+ 682:                   else
+ 683:                   {
+ 684:                           task.OverlaySampler = null;
+ 685:                   }
+ 686:                   task.IsScheduled = true;
+ 687:                   m_scheduler.Run(task);
+ 688:           }
+ 689:   }
+ 690:                                                                                                                                                         691:   private void OceanOnPreRender(Camera cam)
+ 692:   {
+ 693:           if (cam.enabled)
+ 694:           {
+ 695:                   CameraData data = FindCameraData(cam);
+ 696:                   if (Grid != null)
+ 697:                   {
+
+--- Lines 671 to 704 ---
+ 671:   }
+ 672:
+ 673:   public void QueryWavesWithAsyncTask(WaveQueryTask task)
+ 674:   {
+ 675:           if (task != null && m_scheduler != null && (!task.IsScheduled || task.Done) && enabled)
+ 676:           {
+ 677:                   task.Reset(Spectrum, PositionOffset, level);
+ 678:                   if (task.SupportsOverlays)
+ 679:                   {
+ 680:                           task.OverlaySampler = OverlayManager;
+ 681:                   }
+ 682:                   else
+ 683:                   {
+ 684:                           task.OverlaySampler = null;
+ 685:                   }
+ 686:                   task.IsScheduled = true;
+ 687:                   m_scheduler.Run(task);
+ 688:           }
+ 689:   }
+ 690:
+ 691:   private void OceanOnPreRender(Camera cam)
+ 692:   {
+ 693:           if (cam.enabled)
+ 694:           {
+ 695:                   CameraData data = FindCameraData(cam);
+ 696:                   if (Grid != null)
+ 697:                   {
+ 698:                           Grid.OceanOnPreRender(cam, data);
+ 699:                   }
+ 700:                   if (Spectrum != null)                                                                                                                 701:                   {
+ 702:                           Spectrum.OceanOnPreRender(cam, data);
+ 703:                   }
+ 704:                   if (Reflection != null)
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. WAVESPECTRUM.QUERYWAVES() ==="
+=== 1. WAVESPECTRUM.QUERYWAVES() ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "void QueryWaves" "$CETO/WaveSpectrum.cs" -A 28
+682:    public void QueryWaves(WaveQuery query)
+683-    {
+684-            if (enabled)
+685-            {
+686-                    IDisplacementBuffer displacementBuffer = DisplacementBuffer;
+687-                    if (displacementBuffer != null && (!disableReadBack || !displacementBuffer.IsGPU) && (query.mode == QUERY_MODE.DISPLACEMENT || query.mode == QUERY_MODE.POSITION) && (query.sampleSpectrum[0] || query.sampleSpectrum[1] || query.sampleSpectrum[2] || query.sampleSpectrum[3]))
+688-                    {
+689-                            displacementBuffer.QueryWaves(query, m_queryScaling);
+690-                    }
+691-            }
+692-    }
+693-
+694-    private void CreateBuffers()
+695-    {
+696-            GetFourierSize(out var size, out var isCpu);
+697-            if (m_bufferSettings.beenCreated)
+698-            {
+699-                    if (m_bufferSettings.size == size && m_bufferSettings.isCpu == isCpu)
+700-                    {
+701-                            return;
+702-                    }
+703-                    while (m_scheduler.HasTasks())
+704-                    {
+705-                            UpdateSpectrumScheduler();
+706-                    }
+707-                    Release();
+708-                    m_bufferSettings.beenCreated = false;
+709-            }
+710-            if (isCpu)
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. WAVEQUERYTASK.CS (ASYNC BUOYANCY / QUERY CONSUMER) ==="
+=== 2. WAVEQUERYTASK.CS (ASYNC BUOYANCY / QUERY CONSUMER) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CETO/WaveQueryTask.cs"                                                               1  using System;
+     2  using System.Collections.Generic;
+     3  using Ceto.Common.Containers.Interpolation;
+     4  using Ceto.Common.Threading.Tasks;
+     5  using UnityEngine;                                                                                                                                        6
+     7  namespace Ceto;
+     8
+     9  public abstract class WaveQueryTask : ThreadedTask
+    10  {                                                                                                                                                        11          protected IList<InterpolatedArray2f> Displacements;
+    12
+    13          public abstract bool SupportsOverlays { get; }
+    14                                                                                                                                                           15          public IOverlaySampler OverlaySampler { get; set; }
+    16                                                                                                                                                           17          public bool IsScheduled { get; set; }
+    18                                                                                                                                                           19          public Action<IEnumerable<WaveQuery>> CallBack { get; private set; }
+    20                                                                                                                                                           21          public IEnumerable<WaveQuery> Querys { get; private set; }
+    22                                                                                                                                                           23          protected float OceanLevel { get; private set; }
+    24                                                                                                                                                           25          protected int EnabledBuffers { get; private set; }
+    26                                                                                                                                                           27          protected QueryGridScaling Scaling { get; private set; }                                                                                         28                                                                                                                                                           29          protected int BufferSize { get; private set; }
+    30                                                                                                                                                           31          public WaveQueryTask(IEnumerable<WaveQuery> querys, Action<IEnumerable<WaveQuery>> callback, bool isThreaded)
+    32                  : base(isThreaded)                                                                                                                       33          {
+    34                  Querys = querys;                                                                                                                         35                  CallBack = callback;
+    36                  Scaling = new QueryGridScaling();                                                                                                        37          }
+    38                                                                                                                                                           39          public void Reset(WaveSpectrum spectrum, Vector3 offset, float level)
+    40          {                                                                                                                                                41                  base.Reset();
+    42                  IsScheduled = false;                                                                                                                     43                  if (spectrum != null && spectrum.DisplacementBuffer != null)
+    44                  {                                                                                                                                        45                          IDisplacementBuffer displacementBuffer = spectrum.DisplacementBuffer;
+    46                          if (Displacements == null || BufferSize != displacementBuffer.Size)
+    47                          {
+    48                                  displacementBuffer.CopyAndCreateDisplacements(out Displacements);
+    49                                  BufferSize = displacementBuffer.Size;
+    50                          }
+    51                          else
+    52                          {
+    53                                  displacementBuffer.CopyDisplacements(Displacements);
+    54                          }
+    55                          EnabledBuffers = displacementBuffer.EnabledBuffers();
+    56                          Vector4 invGridSizes = new Vector4
+    57                          {
+    58                                  x = 1f / (spectrum.GridSizes.x * spectrum.gridScale),
+    59                                  y = 1f / (spectrum.GridSizes.y * spectrum.gridScale),
+    60                                  z = 1f / (spectrum.GridSizes.z * spectrum.gridScale),
+    61                                  w = 1f / (spectrum.GridSizes.w * spectrum.gridScale)
+    62                          };
+    63                          Scaling.invGridSizes = invGridSizes;
+    64                          Scaling.choppyness = spectrum.Choppyness * spectrum.gridScale;
+    65                          Scaling.scaleY = spectrum.gridScale;
+    66                          Scaling.offset = offset;
+    67                          Scaling.numGrids = spectrum.numberOfGrids;
+    68                  }
+    69          }
+    70
+    71          public override void End()
+    72          {
+    73                  base.End();
+    74                  CallBack(Querys);
+    75          }                                                                                                                                                76  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+---------
