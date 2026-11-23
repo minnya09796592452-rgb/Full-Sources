@@ -1,0 +1,372 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN_OUT="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# WS="$CLEAN_OUT/CSharp_Scripts/Ceto/WaveSpectrum.cs"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# wc -l "$WS"
+943 /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== PART 1: FIELDS, START & CREATECONDITIONS (LINES 1-425) ==="
+=== PART 1: FIELDS, START & CREATECONDITIONS (LINES 1-425) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# sed -n '1,425p' "$WS" | nl -ba -v 1
+     1  using System;
+     2  using System.Collections.Generic;
+     3  using Ceto.Common.Containers.Interpolation;
+     4  using Ceto.Common.Containers.Queues;
+     5  using Ceto.Common.Threading.Scheduling;
+     6  using Ceto.Common.Threading.Tasks;
+     7  using Ceto.Common.Unity.Utility;
+     8  using UnityEngine;
+     9
+    10  namespace Ceto;                                                                                                                                          11
+    12  [AddComponentMenu("Ceto/Components/WaveSpectrum")]
+    13  [DisallowMultipleComponent]
+    14  [RequireComponent(typeof(Ocean))]
+    15  public class WaveSpectrum : OceanComponent
+    16  {
+    17          private struct BufferSettings
+    18          {
+    19                  public bool beenCreated;
+    20
+    21                  public bool isCpu;
+    22
+    23                  public int size;
+    24          }
+    25
+    26          public const float MAX_CHOPPYNESS = 1.2f;
+    27
+    28          public const float MAX_FOAM_AMOUNT = 6f;
+    29
+    30          public const float MAX_FOAM_COVERAGE = 0.5f;
+    31
+    32          public const float MAX_WIND_SPEED = 30f;
+    33
+    34          public const float MIN_WAVE_AGE = 0.5f;
+    35
+    36          public const float MAX_WAVE_AGE = 1f;
+    37
+    38          public const float MAX_WAVE_SPEED = 10f;
+    39
+    40          public const float MIN_GRID_SCALE = 0.1f;
+    41
+    42          public const float MAX_GRID_SCALE = 1f;
+    43
+    44          public const float MAX_WAVE_SMOOTHING = 6f;
+    45
+    46          public const float MIN_WAVE_SMOOTHING = 1f;
+    47
+    48          public const float MAX_SLOPE_SMOOTHING = 6f;
+    49                                                                                                                                                           50          public const float MIN_SLOPE_SMOOTHING = 1f;
+    51
+    52          public const float MAX_FOAM_SMOOTHING = 6f;
+    53
+    54          public const float MIN_FOAM_SMOOTHING = 1f;
+    55
+    56          public FOURIER_SIZE fourierSize = FOURIER_SIZE.MEDIUM_64_CPU;
+    57
+    58          public SPECTRUM_TYPE spectrumType;
+    59
+    60          [Range(1f, 4f)]
+    61          public int numberOfGrids = 4;
+    62
+    63          public bool disableReadBack = true;
+    64
+    65          public bool disableDisplacements;
+    66
+    67          public bool disableSlopes;
+    68
+    69          public bool disableFoam;
+    70
+    71          public bool textureFoam = true;
+    72
+    73          [Range(0f, 1.2f)]
+    74          public float choppyness = 0.8f;
+    75
+    76          [Range(0f, 6f)]
+    77          public float foamAmount = 1f;
+    78
+    79          [Range(0f, 0.5f)]
+    80          public float foamCoverage = 0.1f;
+    81
+    82          [Range(0f, 30f)]
+    83          public float windSpeed = 8f;
+    84
+    85          [Range(0.5f, 1f)]
+    86          public float waveAge = 0.64f;
+    87
+    88          [Range(0f, 10f)]
+    89          public float waveSpeed = 1f;
+    90
+    91          [Range(0.1f, 1f)]
+    92          public float gridScale = 0.5f;
+    93
+    94          [Range(1f, 6f)]
+    95          public float waveSmoothing = 2f;
+    96
+    97          [Range(1f, 6f)]
+    98          private float slopeSmoothing = 1f;
+    99
+   100          [Range(1f, 6f)]
+   101          private float foamSmoothing = 2f;
+   102
+   103          private RenderTexture[] m_displacementMaps;
+   104
+   105          private RenderTexture[] m_slopeMaps;
+   106
+   107          private RenderTexture[] m_foamMaps;
+   108
+   109          private Material m_slopeCopyMat;
+   110
+   111          private Material m_displacementCopyMat;
+   112
+   113          private Material m_foamCopyMat;
+   114
+   115          private Material m_slopeInitMat;
+   116
+   117          private Material m_displacementInitMat;
+   118
+   119          private Material m_foamInitMat;
+   120
+   121          private Vector4 m_gridSizes = Vector4.one;
+   122
+   123          private Vector4 m_choppyness = Vector4.one;
+   124
+   125          private Scheduler m_scheduler;
+   126
+   127          private WaveSpectrumCondition[] m_conditions;
+   128
+   129          private WaveSpectrumBuffer m_displacementBuffer;
+   130
+   131          private WaveSpectrumBuffer m_slopeBuffer;
+   132
+   133          private WaveSpectrumBuffer m_jacobianBuffer;
+   134
+   135          private FindRangeTask m_findRangeTask;
+   136
+   137          private ComputeBuffer m_readBuffer;
+   138
+   139          private QueryGridScaling m_queryScaling = new QueryGridScaling();
+   140
+   141          private BufferSettings m_bufferSettings;
+   142
+   143          private DictionaryQueue<WaveSpectrumConditionKey, WaveSpectrumCondition> m_conditionCache = new DictionaryQueue<WaveSpectrumConditionKey, WaveSpectrumCondition>();
+   144
+   145          private int m_maxConditionCacheSize = 10;
+   146
+   147          [HideInInspector]
+   148          public Shader initSlopeSdr;
+   149
+   150          [HideInInspector]
+   151          public Shader initDisplacementSdr;
+   152
+   153          [HideInInspector]
+   154          public Shader initJacobianSdr;
+   155
+   156          [HideInInspector]
+   157          public Shader fourierSdr;
+   158
+   159          [HideInInspector]
+   160          public Shader slopeCopySdr;
+   161
+   162          [HideInInspector]
+   163          public Shader displacementCopySdr;
+   164
+   165          [HideInInspector]
+   166          public Shader foamCopySdr;
+   167
+   168          [HideInInspector]
+   169          public ComputeShader readSdr;
+   170
+   171          public IList<RenderTexture> DisplacementMaps => m_displacementMaps;
+   172
+   173          public IList<RenderTexture> SlopeMaps => m_slopeMaps;
+   174
+   175          public IList<RenderTexture> FoamMaps => m_foamMaps;
+   176
+   177          public Vector2 MaxDisplacement { get; set; }
+   178
+   179          public bool IsCreatingNewCondition
+   180          {
+   181                  get
+   182                  {
+   183                          if (m_conditions != null)
+   184                          {
+   185                                  return m_conditions[1] != null;
+   186                          }
+   187                          return false;
+   188                  }
+   189          }
+   190
+   191          public Vector4 GridSizes => m_gridSizes;
+   192
+   193          public Vector4 Choppyness => m_choppyness;
+   194
+   195          public int MaxConditionCacheSize
+   196          {
+   197                  get
+   198                  {
+   199                          return m_maxConditionCacheSize;
+   200                  }
+   201                  set
+   202                  {
+   203                          m_maxConditionCacheSize = value;
+   204                  }
+   205          }
+   206
+   207          public IDisplacementBuffer DisplacementBuffer => m_displacementBuffer as IDisplacementBuffer;
+   208
+   209          public ICustomWaveSpectrum CustomWaveSpectrum { get; set; }
+   210
+   211          private void Start()
+   212          {
+   213                  try
+   214                  {
+   215                          Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+   216                          Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+   217                          Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+   218                          Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+   219                          Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+   220                          Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+   221                          Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
+   222                          m_slopeCopyMat = new Material(slopeCopySdr);
+   223                          m_displacementCopyMat = new Material(displacementCopySdr);
+   224                          m_foamCopyMat = new Material(foamCopySdr);
+   225                          m_slopeInitMat = new Material(initSlopeSdr);
+   226                          m_displacementInitMat = new Material(initDisplacementSdr);
+   227                          m_foamInitMat = new Material(initJacobianSdr);
+   228                          m_scheduler = new Scheduler();
+   229                          CreateBuffers();
+   230                          CreateRenderTextures();
+   231                          CreateConditions();
+   232                          UpdateQueryScaling();
+   233                  }
+   234                  catch (Exception ex)
+   235                  {
+   236                          Ocean.LogError(ex.ToString());
+   237                          WasError = true;
+   238                          enabled = false;
+   239                  }
+   240          }
+   241
+   242          protected override void OnDisable()
+   243          {
+   244                  base.OnDisable();
+   245                  Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+   246                  Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+   247                  Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+   248                  Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+   249                  Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+   250                  Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+   251                  Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+   252                  Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
+   253          }
+   254
+   255          protected override void OnDestroy()
+   256          {
+   257                  base.OnDestroy();
+   258                  try
+   259                  {
+   260                          if (m_scheduler != null)
+   261                          {
+   262                                  m_scheduler.ShutingDown = true;
+   263                                  m_scheduler.CancelAllTasks();
+   264                          }
+   265                          if (m_conditionCache != null)
+   266                          {
+   267                                  foreach (WaveSpectrumCondition item in m_conditionCache)
+   268                                  {
+   269                                          item.Release();
+   270                                  }
+   271                                  m_conditionCache.Clear();
+   272                                  m_conditionCache = null;
+   273                          }
+   274                          Release();
+   275                  }
+   276                  catch (Exception ex)
+   277                  {
+   278                          Ocean.LogError(ex.ToString());
+   279                          WasError = true;
+   280                          enabled = false;
+   281                  }
+   282          }
+   283                                                                                                                                                          284          private void Release()
+   285          {
+   286                  if (m_displacementBuffer != null)
+   287                  {
+   288                          m_displacementBuffer.Release();
+   289                          m_displacementBuffer = null;
+   290                  }
+   291                  if (m_slopeBuffer != null)
+   292                  {
+   293                          m_slopeBuffer.Release();
+   294                          m_slopeBuffer = null;
+   295                  }
+   296                  if (m_jacobianBuffer != null)
+   297                  {
+   298                          m_jacobianBuffer.Release();
+   299                          m_jacobianBuffer = null;
+   300                  }
+   301                  if (m_readBuffer != null)
+   302                  {
+   303                          m_readBuffer.Release();
+   304                          m_readBuffer = null;
+   305                  }
+   306                  if (m_conditions != null && m_conditions[0] != null && m_conditions[0].Done)
+   307                  {
+   308                          CacheCondition(m_conditions[0]);
+   309                          if (m_conditionCache == null || !m_conditionCache.ContainsKey(m_conditions[0].Key))
+   310                          {
+   311                                  m_conditions[0].Release();
+   312                                  m_conditions[0] = null;
+   313                          }
+   314                  }
+   315                  if (m_conditions != null && m_conditions[1] != null && m_conditions[1].Done && (m_conditionCache == null || !m_conditionCache.ContainsKey(m_conditions[1].Key)))
+   316                  {                                                                                                                                       317                          m_conditions[1].Release();
+   318                          m_conditions[1] = null;
+   319                  }
+   320                  m_conditions = null;
+   321                  m_findRangeTask = null;
+   322                  RTUtility.ReleaseAndDestroy(m_displacementMaps);
+   323                  m_displacementMaps = null;
+   324                  RTUtility.ReleaseAndDestroy(m_slopeMaps);
+   325                  m_slopeMaps = null;
+   326                  RTUtility.ReleaseAndDestroy(m_foamMaps);
+   327                  m_foamMaps = null;
+   328          }
+   329
+   330          private void Update()
+   331          {
+   332                  try
+   333                  {
+   334                          gridScale = Mathf.Clamp(gridScale, 0.1f, 1f);
+   335                          windSpeed = Mathf.Clamp(windSpeed, 0f, 30f);
+   336                          waveAge = Mathf.Clamp(waveAge, 0.5f, 1f);
+   337                          waveSpeed = Mathf.Clamp(waveSpeed, 0f, 10f);
+   338                          foamAmount = Mathf.Clamp(foamAmount, 0f, 6f);
+   339                          foamCoverage = Mathf.Clamp(foamCoverage, 0f, 0.5f);
+   340                          waveSmoothing = Mathf.Clamp(waveSmoothing, 1f, 6f);
+   341                          slopeSmoothing = Mathf.Clamp(slopeSmoothing, 1f, 6f);
+   342                          foamSmoothing = Mathf.Clamp(foamSmoothing, 1f, 6f);
+   343                          numberOfGrids = Mathf.Clamp(numberOfGrids, 1, 4);
+   344                          float time = m_ocean.OceanTime.Now * waveSpeed;
+   345                          CreateBuffers();
+   346                          CreateRenderTextures();
+   347                          CreateConditions();
+   348                          if (m_conditions[0].Key.NumGrids > 2)
+   349                          {
+   350                                  Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+   351                          }
+   352                          else
+   353                          {
+   354                                  Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+   355                          }
+   356                          UpdateQueryScaling();
+   357                          Shader.SetGlobalVector("Ceto_GridSizes", GridSizes);
+   358                          Shader.SetGlobalVector("Ceto_GridScale", new Vector2(gridScale, gridScale));
+   359                          Shader.SetGlobalVector("Ceto_Choppyness", Choppyness);                                                                          360                          Shader.SetGlobalFloat("Ceto_MapSize", m_bufferSettings.size);
+   361                          Shader.SetGlobalFloat("Ceto_WaveSmoothing", waveSmoothing);
+   362                          Shader.SetGlobalFloat("Ceto_SlopeSmoothing", slopeSmoothing);
+   363                          Shader.SetGlobalFloat("Ceto_FoamSmoothing", foamSmoothing);
+   364                          Shader.SetGlobalFloat("Ceto_TextureWaveFoam", textureFoam ? 1f : 0f);                                                           365                          UpdateSpectrumScheduler();
+   366                          GenerateDisplacement(time);
+   367                          GenerateSlopes(time);                                                                                                           368                          GenerateFoam(time);                                                                                                             369                  }                                                                                                                                       370                  catch (Exception ex)                                                                                                                    371                  {                                                                                                                                       372                          Ocean.LogError(ex.ToString());                                                                                                  373                          WasError = true;                                                                                                                374                          enabled = false;                                                                                                                375                  }
+   376          }                                                                                                                                               377                                                                                                                                                          378          private void UpdateSpectrumScheduler()                                                                                                          379          {                                                                                                                                               380                  try                                                                                                                                     381                  {                                                                                                                                       382                          m_scheduler.DisableMultithreading = Ocean.DISABLE_ALL_MULTITHREADING;                                                           383                          m_scheduler.CheckForException();                                                                                                384                          m_scheduler.Update();                                                                                                           385                  }                                                                                                                                       386                  catch (Exception ex)                                                                                                                    387                  {                                                                                                                                       388                          Ocean.LogError(ex.ToString());                                                                                                  389                          WasError = true;                                                                                                                390                          enabled = false;                                                                                                                391                  }                                                                                                                                       392          }                                                                                                                                               393                                                                                                                                                          394          private void UpdateQueryScaling()                                                                                                               395          {                                                                                                                                               396                  m_choppyness = m_conditions[0].Choppyness * Mathf.Clamp(choppyness, 0f, 1.2f);                                                          397                  m_gridSizes = m_conditions[0].GridSizes;                                                                                                398                  Vector4 invGridSizes = new Vector4                                                                                                      399                  {                                                                                                                                       400                          x = 1f / (GridSizes.x * gridScale),                                                                                             401                          y = 1f / (GridSizes.y * gridScale),                                                                                             402                          z = 1f / (GridSizes.z * gridScale),                                                                                             403                          w = 1f / (GridSizes.w * gridScale)                                                                                              404                  };                                                                                                                                      405                  m_queryScaling.invGridSizes = invGridSizes;                                                                                             406                  m_queryScaling.scaleY = gridScale;                                                                                                      407                  m_queryScaling.choppyness = Choppyness * gridScale;                                                                                     408                  m_queryScaling.offset = m_ocean.PositionOffset;                                                                                         409                  m_queryScaling.numGrids = m_conditions[0].Key.NumGrids;                                                                                 410          }                                                                                                                                               411                                                                                                                                                          412          private void GenerateSlopes(float time)                                                                                                         413          {                                                                                                                                               414                  if (!disableSlopes && SystemInfo.graphicsShaderLevel < 30)                                                                              415                  {                                                                                                                                       416                          Ocean.LogWarning("Spectrum slopes needs at least SM3 to run. Disabling slopes.");                                               417                          disableSlopes = true;                                                                                                           418                  }                                                                                                                                       419                  if (disableSlopes)                                                                                                                      420                  {                                                                                                                                       421                          m_slopeBuffer.DisableBuffer(-1);                                                                                                422                  }                                                                                                                                       423                  else                                                                                                                                    424                  {                                                                                                                                       425                          m_slopeBuffer.EnableBuffer(-1);                                                                                              root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-------------------
