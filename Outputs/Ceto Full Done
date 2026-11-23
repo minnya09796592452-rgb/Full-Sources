@@ -657,3 +657,193 @@ drwxrws---.  2 10237 1023 3.4K Nov 23 18:10 Ocean_Surface_Shaders
 -rw-rw----. 1 10237 1023  20K Nov 23 17:50 OceanUnderSide_Transparent_pid143_RUNTIME_ACTIVE.glsl
 -rw-rw----. 1 10237 1023  20K Nov 23 17:57 OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl
 root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+---------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. C# RUNTIME ENABLEKEYWORD / DISABLEKEYWORD EXACT LINES ==="
+=== 1. C# RUNTIME ENABLEKEYWORD / DISABLEKEYWORD EXACT LINES ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/" -C 2
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-59-  {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-60-          base.OnEnable();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-62-  }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-63-
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-65-  {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-66-          base.OnDisable();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-68-  }                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-69-
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-144-                 if (GetDisableReflections(cameraData.settings))
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-145-                 {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-147-                         cameraData.reflection.SetViewAsUpdated(current);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-148-                         return;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-149-                 }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");                                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-151-                 RenderTexture renderTexture = null;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-152-                 RenderTexture renderTexture2 = null;
+--                                                                                                                                                           /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-188-                         else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-189-                         {            /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-191-                                 RenderReflection(cameraData.reflection.cam, cameraData.reflection.target0, current.transform.position, current.transform.rotation, current.projectionMatrix, cameraData.settings);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-192-                                 renderTexture = cameraData.reflection.target0;
+--                                                                                                                                                           /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-222- private void RenderSteroReflection(ReflectionData data, Camera cam, OceanCameraSettings settings)                                                                                                 /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-223- {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-225-         RenderReflection(data.cam, data.target0, cam.transform.position, cam.transform.rotation, cam.projectionMatrix, settings);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs-226- }                                    --
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-243-     {                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-244-             base.OnDisable();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-246-             Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);                                                                                                                        /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-247-             Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);                                                                                                                        --                                                                                                                                                           /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-348-                     if (m_conditions[0].Key.NumGrids > 2)                                                                                                                                             /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-349-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-351-                     }                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-352-                     else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-353-                     {                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-355-                     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-356-                     UpdateQueryScaling();--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-116-               try                          /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-117-               {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-119-                       SetBottomActive(m_bottomMask, active: true);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-120-               }                            --
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-132-               try                          /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-133-               {                            /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");                                                                                                                                      /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-135-                       SetBottomActive(m_bottomMask, active: false);                                                                                                                                     /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-136-               }                            --                                                                                                                                                           /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-204-                       if (depthMode == DEPTH_MODE.USE_OCEAN_DEPTH_PASS)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-205-                       {                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");                                                                                                                     /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-207-                               if (underwaterMode == UNDERWATER_MODE.ABOVE_ONLY)                                                                                                                         /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-208-                               {
+--                                                                                                                                                           /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-215-                       else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-216-                       {                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");                                                                                                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-218-                               if (underwaterMode == UNDERWATER_MODE.ABOVE_ONLY)                                                                                                                         /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-219-                               {            --                                                                                                                                                           /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-332-                       else                 /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-333-                       {                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-335-                               RenderOceanMask(cameraData.mask, cameraData.mask.target0, current.transform.position, current.transform.rotation, current.projectionMatrix, sdr);                         /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-336-                               Shader.SetGlobalTexture(Ocean.OCEAN_MASK_TEXTURE_NAME0, cameraData.mask.target0);                                                                                         --                                                                                                                                                           /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-348-       private void RenderSteroOceanMask(MaskData data, Camera cam, Shader sdr)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-349-       {                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-351-               RenderOceanMask(data, data.target0, cam.transform.position, cam.transform.rotation, cam.projectionMatrix, sdr);                                                                           /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-352-               Shader.SetGlobalTexture(Ocean.OCEAN_MASK_TEXTURE_NAME0, data.target0);                                                                                                                    --
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-390-                       if (GetDisableUnderwater(cameraData.settings))
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-391-                       {                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");                                                                                                                              /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-393-                               cameraData.depth.SetViewAsUpdated(current);                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-394-                               return;      /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-395-                       }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-397-                       if (SystemInfo.graphicsShaderLevel < 30)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-398-                       {
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-428-                               else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-429-                               {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-431-                                       RenderOceanDepth(cameraData.depth, cameraData.depth.target0, current.transform.position, current.transform.rotation, current.projectionMatrix);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-432-                                       Shader.SetGlobalTexture(Ocean.OCEAN_DEPTH_TEXTURE_NAME0, cameraData.depth.target0);
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-450-       private void RenderSteroOceanDepth(DepthData data, Camera cam)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-451-       {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-453-               RenderOceanDepth(data, data.target0, cam.transform.position, cam.transform.rotation, cam.projectionMatrix);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs-454-               Shader.SetGlobalTexture(Ocean.OCEAN_DEPTH_TEXTURE_NAME0, data.target0);
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. UNPACK RAW 192B OF LEVEL2 WAVESPECTRUM (PID 271) ==="
+=== 2. UNPACK RAW 192B OF LEVEL2 WAVESPECTRUM (PID 271) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, struct
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e2 = UnityPy.load(str(data_dir / "level2"))
+>
+> ws_obj = next(o for o in e2.objects if o.path_id == 271)
+> raw = bytes(ws_obj.get_raw_data())
+> print(f"Total raw bytes: {len(raw)}B (Header 32B + Serialized Fields {len(raw)-32}B)")
+>                                                                                                                                                            > # Skip 32-byte MonoBehaviour header (m_GameObject PPtr 12B + m_Enabled 4B + m_Script PPtr 12B + m_Name 4B)
+> payload = raw[32:]
+> ints = struct.unpack(f"<{len(payload)//4}i", payload)
+> floats = struct.unpack(f"<{len(payload)//4}f", payload)
+>
+> for idx in range(len(ints)):
+>     print(f"  Offset +{idx*4:3d} (word[{idx:2d}]): int={ints[idx]:11d} | hex=0x{ints[idx]&0xffffffff:08x} | float={floats[idx]:.6g}")
+> EOF
+Total raw bytes: 192B (Header 32B + Serialized Fields 160B)
+  Offset +  0 (word[ 0]): int=          2 | hex=0x00000002 | float=2.8026e-45
+  Offset +  4 (word[ 1]): int=          0 | hex=0x00000000 | float=0
+  Offset +  8 (word[ 2]): int=          4 | hex=0x00000004 | float=5.60519e-45
+  Offset + 12 (word[ 3]): int=          0 | hex=0x00000000 | float=0
+  Offset + 16 (word[ 4]): int=          0 | hex=0x00000000 | float=0
+  Offset + 20 (word[ 5]): int=          0 | hex=0x00000000 | float=0
+  Offset + 24 (word[ 6]): int=          0 | hex=0x00000000 | float=0
+  Offset + 28 (word[ 7]): int=          1 | hex=0x00000001 | float=1.4013e-45
+  Offset + 32 (word[ 8]): int= 1065353216 | hex=0x3f800000 | float=1
+  Offset + 36 (word[ 9]): int= 1077936128 | hex=0x40400000 | float=3
+  Offset + 40 (word[10]): int= 1048576000 | hex=0x3e800000 | float=0.25
+  Offset + 44 (word[11]): int= 1082130432 | hex=0x40800000 | float=4
+  Offset + 48 (word[12]): int= 1061997773 | hex=0x3f4ccccd | float=0.8
+  Offset + 52 (word[13]): int= 1066192077 | hex=0x3f8ccccd | float=1.1
+  Offset + 56 (word[14]): int= 1056964608 | hex=0x3f000000 | float=0.5
+  Offset + 60 (word[15]): int= 1065353216 | hex=0x3f800000 | float=1
+  Offset + 64 (word[16]): int=          4 | hex=0x00000004 | float=5.60519e-45
+  Offset + 68 (word[17]): int=        176 | hex=0x000000b0 | float=2.46629e-43
+  Offset + 72 (word[18]): int=          0 | hex=0x00000000 | float=0
+  Offset + 76 (word[19]): int=          4 | hex=0x00000004 | float=5.60519e-45
+  Offset + 80 (word[20]): int=        154 | hex=0x0000009a | float=2.158e-43
+  Offset + 84 (word[21]): int=          0 | hex=0x00000000 | float=0
+  Offset + 88 (word[22]): int=          4 | hex=0x00000004 | float=5.60519e-45
+  Offset + 92 (word[23]): int=        159 | hex=0x0000009f | float=2.22806e-43
+  Offset + 96 (word[24]): int=          0 | hex=0x00000000 | float=0
+  Offset +100 (word[25]): int=          4 | hex=0x00000004 | float=5.60519e-45
+  Offset +104 (word[26]): int=        178 | hex=0x000000b2 | float=2.49431e-43
+  Offset +108 (word[27]): int=          0 | hex=0x00000000 | float=0
+  Offset +112 (word[28]): int=          4 | hex=0x00000004 | float=5.60519e-45
+  Offset +116 (word[29]): int=        147 | hex=0x00000093 | float=2.05991e-43
+  Offset +120 (word[30]): int=          0 | hex=0x00000000 | float=0
+  Offset +124 (word[31]): int=          4 | hex=0x00000004 | float=5.60519e-45
+  Offset +128 (word[32]): int=        181 | hex=0x000000b5 | float=2.53635e-43
+  Offset +132 (word[33]): int=          0 | hex=0x00000000 | float=0
+  Offset +136 (word[34]): int=          4 | hex=0x00000004 | float=5.60519e-45
+  Offset +140 (word[35]): int=        150 | hex=0x00000096 | float=2.10195e-43
+  Offset +144 (word[36]): int=          0 | hex=0x00000000 | float=0
+  Offset +148 (word[37]): int=          4 | hex=0x00000004 | float=5.60519e-45
+  Offset +152 (word[38]): int=        186 | hex=0x000000ba | float=2.60642e-43
+  Offset +156 (word[39]): int=          0 | hex=0x00000000 | float=0
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+--------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. CHECK ALL Ceto_DisplacementMap OCCURRENCES IN VERIFIED SHADER ==="
+=== 1. CHECK ALL Ceto_DisplacementMap OCCURRENCES IN VERIFIED SHADER ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -n "Ceto_DisplacementMap" "$CLEAN/Ocean_Surface_Shaders/OceanTopSide_Transparent_pid175_3GRID_VERIFIED.glsl"
+2:// Vertex   BlobIdx=44 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+3:// Fragment BlobIdx=372 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+47:UNITY_LOCATION(10) uniform  sampler2D Ceto_DisplacementMap0;
+48:UNITY_LOCATION(11) uniform  sampler2D Ceto_DisplacementMap1;
+49:UNITY_LOCATION(12) uniform  sampler2D Ceto_DisplacementMap2;
+158:    u_xlat1 = textureLod(Ceto_DisplacementMap2, u_xlat1.xy, u_xlat0.x);                                                                                  159:    u_xlat4 = textureLod(Ceto_DisplacementMap0, u_xlat2.xy, u_xlat0.y);
+160:    u_xlat0 = textureLod(Ceto_DisplacementMap1, u_xlat2.zw, u_xlat0.w);
+291:UNITY_LOCATION(11) uniform  sampler2D Ceto_DisplacementMap0;
+292:UNITY_LOCATION(12) uniform  sampler2D Ceto_DisplacementMap1;                                                                                             392:    u_xlat2 = textureLod(Ceto_DisplacementMap0, u_xlat1.xy, u_xlat0.x);                                                                                  393:    u_xlat0 = textureLod(Ceto_DisplacementMap1, u_xlat1.zw, u_xlat0.z);
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. WRITE COMPLETE SECTIONS 1-6 TO CETO_OCEAN_VERIFICATION_RECORD.MD ==="
+=== 2. WRITE COMPLETE SECTIONS 1-6 TO CETO_OCEAN_VERIFICATION_RECORD.MD ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' > "$CLEAN/CETO_OCEAN_VERIFICATION_RECORD.md"
+> # Stranded Deep — Ceto Ocean Engine Reverse-Engineering & Verification Record
+>
+o> ## 1. Spectrum & Task Execution Chain (`WaveSpectrum.cs` / `SpectrumTask.cs`)
+`> - **Spectrum Types:** `SPECTRUM_TYPE` (`UNIFIED`, `PHILLIPS`, `CUSTOM`) -> `UnifiedSpectrumCondition` / `PhillipsSpectrumCondition` (`UnifiedPhillipsSpectumCondition`).
+d> - **Cache Keys:** `WaveSpectrumConditionKey` (`UnifiedSpectrumConditionKey`, `PhillipsSpectrumConditionKey`) hashes wind speed, wind direction, wave age, rid sizes, and choppiness.
+> - **Spectrum Generation:** `SpectrumTask` computes initial directional wave spectrum $h_0(\mathbf{k})$ and dispersion $\omega(k)$ into `Spectrum01`, `Spectrum23`, and `WTable`.
+> - **Time Evolution:** `InitSpectrumDisplacementsTask` (CPU) and `Ceto/InitDisplacement`, `Ceto/InitSlope`, `Ceto/InitJacobians` (GPU) advance wave phases over time.
+>
+> ## 2. FFT Pipeline (`FourierCPU.cs` / `FourierGPU.cs` / `Ceto/Fourier` PID 178)
+> - **Transform Direction & Normalization:** Unnormalized inverse-style butterfly sum with $+2\pi k n / N$ exponent (`m_fourier.PeformFFT`), horizontal passes (`PASS_X_1..4`) followed by vertical passes (`PASS_Y_1..4`) via `j % 2` ping-pong render target switching (`Passes 0..7` in `Ceto_Fourier_Passes_0_to_7.glsl`).
+> - **Copy Blits:** `Ceto/DisplacementCopy` (`pid=181`), `Ceto/SlopeCopy`, and `Ceto/FoamCopy` (`pid=150`) unpack multi-target FFT outputs into `Ceto_DisplacementMap0..3`, `Ceto_SlopeMap0..1`, and `Ceto_FoamMap0..1`.
+>
+> ## 3. GPU -> CPU Readback & 12-Byte Stride Layout (`Read` ComputeShader PID 186)
+> - **ComputeBuffer Allocation (`WaveSpectrum.cs`):** `m_readBuffer = new ComputeBuffer(size * size, 12);` (`3 floats * 4 bytes = 12 bytes/texel`).
+> - **ComputeShader (`Read`, `sharedassets0.assets` `pid=186`):** Kernel `read2DC3` (`threadGroupSize=[8,8,1]`) copies `texelFetch(_Tex2D, ivec2(gl_GlobalInvocationID.xy), 0).xyz` via `floatBitsToInt` into `std430` buffer `_Buffer2DC3` (`uint value`) at row-major index `gl_GlobalInvocationID.y * _Width + gl_GlobalInvocationID.x`.
+> - **CPU Container (`InterpolatedArray2f.cs`):** `float[m_sx * m_sy * 3]` indexed as `(x + y * m_sx) * 3 + c` (`c=0: World X`, `c=1: World Y`, `c=2: World Z`).
+>
+> ## 4. Grid 4 (`index [3]`) Audit (`WaveSpectrum.ReadFromGPU` vs `QueryDisplacements.cs`)
+> - **GPU Readback (`WaveSpectrum.ReadFromGPU`):** Explicitly reads back Grids `0, 1, 2` (`numGrids > 0, 1, 2`) into `readDisplacements[0..2]`; `readDisplacements[3]` is never populated from GPU and remains `0.0f`.                                                                                                    > - **CPU Query (`QueryDisplacements.QueryWaves`):** Checks `scaling.numGrids > 3` and sums `d[0].y + d[1].y + d[2].y + d[3].y` (adding `0.0f` for Grid 3 without error), while `QueryDisplacements.MaxRange()` explicitly sets `numGrids2 = 3`.
+>
+> ## 5. Query & Buoyancy Integration (`Ocean.cs` / `WaveQueryTask.cs`)                                                                                       > - **Synchronous Queries:** `Ocean.QueryWaves()` -> `WaveSpectrum.QueryWaves()` -> `DisplacementBufferGPU.QueryWaves()` -> `QueryDisplacements.QueryWaves()` (up to 21 Newton-Raphson horizontal displacement iterations, height clamped to `[-40, 40]`).
+> - **Asynchronous Buoyancy:** `Ocean.QueryWavesWithAsyncTask(WaveQueryTask)` snapshots `Displacements` on the main thread via `CopyAndCreateDisplacements` / `CopyDisplacements` and executes `QueryDisplacements.QueryWaves` on the background `Scheduler`.
+>
+> ## 6. Serialized Scene Proof (`level2` `Ceto.WaveSpectrum` `pid=271`, 192 Bytes)
+> - `fourierSize = 2` (`128x128` FFT grid)
+> - `spectrumType = 0` (`SPECTRUM_TYPE.UNIFIED`)
+> - `numberOfGrids = 4` (Enables `CETO_USE_4_SPECTRUM_GRIDS` at runtime)
+> - `disableReadBack = false` (GPU -> CPU `Read` ComputeShader `pid=186` active)
+> - `gridSizes = Vector4(1.0, 3.0, 0.25, 4.0)`
+> - `choppyness = Vector4(0.8, 1.1, 0.5, 1.0)`
+> - **Shader PPtrs (`FileID=4` -> `sharedassets0.assets`):** `176` (`InitDisplacement`), `154` (`InitSlope`), `159` (`InitJacobians`), `178` (`Fourier`), `147` (`SlopeCopy`), `181` (`DisplacementCopy`), `150` (`FoamCopy`), `186` (`Read` ComputeShader).
+> - **Surface Shader Proof:** Across all `Ceto/` shaders in `sharedassets0.assets`, `OceanTopSide_Transparent` (`pid=175`) and `OceanUnderSide_Transparent` (`pid=143`) sample `Ceto_DisplacementMap0..2` in Vertex (`VertBlob=44`, `KeywordIndices=[6, 13]`) and `Ceto_DisplacementMap0..1` in Fragment (`FragBlob=372`), matching `WaveSpectrum.ReadFromGPU()` (`0..2`) and `QueryDisplacements.MaxRange()` (`numGrids2 = 3`).
+> EOF
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# wc -l "$CLEAN/CETO_OCEAN_VERIFICATION_RECORD.md"
+34 /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CETO_OCEAN_VERIFICATION_RECORD.md
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+---------
