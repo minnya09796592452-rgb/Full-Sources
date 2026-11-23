@@ -1,0 +1,264 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN_OUT="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. BUTTERFLY LOOKUP TABLE CREATION IN C# ==="
+=== 1. BUTTERFLY LOOKUP TABLE CREATION IN C# ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "ButterFlyLookUp|CreateButterfly|Butterfly" "$CLEAN_OUT/CSharp_Scripts/Ceto/" -A 35 | head -n 65
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs:42:                ComputeButterflyLookupTable();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-43-        }                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-44-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-45-        private int BitReverse(int i)        /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-46-        {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-47-                int num = i;                 /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-48-                int num2 = 0;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-49-                int num3 = 1;                /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-50-                for (int num4 = m_size / 2; num4 != 0; num4 /= 2)                                                                                                                                         /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-51-                {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-52-                        num = (((i & num4) > num4 - 1) ? 1 : 0);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-53-                        num2 += num * num3;  /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-54-                        num3 *= 2;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-55-                }                            /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-56-                return num2;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-57-        }                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-58-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs:59:        private void ComputeButterflyLookupTable()
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-60-        {                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-61-                m_butterflyLookupTable = new LookUp[m_size * m_passes];                                                                                                                                   /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-62-                for (int i = 0; i < m_passes; i++)                                                                                                                                                        /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-63-                {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-64-                        int num = (int)Mathf.Pow(2f, m_passes - 1 - i);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-65-                        int num2 = (int)Mathf.Pow(2f, i);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-66-                        for (int j = 0; j < num; j++)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-67-                        {                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-68-                                for (int k = 0; k < num2; k++)                                                                                                                                            /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-69-                                {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-70-                                        int num3;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-71-                                        int num4;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-72-                                        int j2;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-73-                                        int j3;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-74-                                        if (i == 0)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-75-                                        {    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-76-                                            num3 = j * num2 * 2 + k;                                                                                                                                      /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-77-                                            num4 = j * num2 * 2 + num2 + k;                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-78-                                            j2 = BitReverse(num3);                                                                                                                                        /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-79-                                            j3 = BitReverse(num4);                                                                                                                                        /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-80-                                        }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-81-                                        else /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-82-                                        {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-83-                                            num3 = j * num2 * 2 + k;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-84-                                            num4 = j * num2 * 2 + num2 + k;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-85-                                            j2 = num3;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-86-                                            j3 = num4;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-87-                                        }    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-88-                                        float num5 = Mathf.Cos(MathF.PI * 2f * (float)(k * num) / m_fsize);                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-89-                                        float num6 = Mathf.Sin(MathF.PI * 2f * (float)(k * num) / m_fsize);                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-90-                                        int num7 = num3 + i * m_size;                                                                                                                                     /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-91-                                        m_butterflyLookupTable[num7].j1 = j2;                                                                                                                             /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-92-                                        m_butterflyLookupTable[num7].j2 = j3;                                                                                                                             /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-93-                                        m_butterflyLookupTable[num7].wr = num5;                                                                                                                           /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierCPU.cs-94-                                        m_butterflyLookupTable[num7].wi = num6;                                                                                                                           --
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs:62:                ComputeButterflyLookupTable();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-63-                m_fourier.SetFloat("Ceto_FourierSize", m_fsize);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-64-                m_pass0RT2 = new RenderBuffer[2];
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-65-                m_pass1RT2 = new RenderBuffer[2];
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-66-                m_pass0RT3 = new RenderBuffer[3];
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-67-                m_pass1RT3 = new RenderBuffer[3];                                                                                                                                                         /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-68-                m_pass0RT4 = new RenderBuffer[4];
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-69-                m_pass1RT4 = new RenderBuffer[4];                                                                                                                                                         /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-70-        }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-71-                                             /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/FourierGPU.cs-72-        public void Release()
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. EXTRACT INITDISPLACEMENT, INITSLOPE, INITJACOBIANS GLSL ==="
+=== 2. EXTRACT INITDISPLACEMENT, INITSLOPE, INITJACOBIANS GLSL ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> for pid in (154, 176, 159):
+>     sh = next(o.read() for o in e0.objects if o.path_id == pid)
+>     pf_name = sh.m_ParsedForm.m_Name
+>     print(f"\n================ {pf_name} (pid={pid}) ================")
+>     p_idx = list(sh.platforms).index(15)
+>     off, clen, dlen = sh.offsets[p_idx][0], sh.compressedLengths[p_idx][0], sh.decompressedLengths[p_idx][0]
+>     dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")
+>     frags = [s for s in re.findall(r"(#version[\s\S]*?\n\})", dec) if "SV_Target" in s or "gl_FragData" in s]
+>     if frags:
+>         print(frags[0].strip())
+> EOF
+
+================ Ceto/InitDisplacement (pid=154) ================
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec2 u_xlat0;
+bvec2 u_xlatb0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+float u_xlat3;
+vec2 u_xlat4;
+bool u_xlatb5;
+vec2 u_xlat10;
+float u_xlat11;
+float u_xlat15;
+void main()
+{
+    u_xlatb0.xy = lessThan(vec4(0.5, 0.5, 0.0, 0.0), vs_TEXCOORD0.xyxx).xy;
+    u_xlat10.xy = vs_TEXCOORD0.xy + vec2(-1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat10.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat10.y : vs_TEXCOORD0.y;
+    u_xlat0.xy = u_xlat0.xy * Ceto_InverseGridSizes.xx;
+    u_xlat10.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat1 = textureLod(Ceto_Spectrum01, u_xlat10.xy, 0.0);
+    u_xlat2 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat10.xy = u_xlat1.xy + u_xlat2.xy;
+    u_xlat1.xy = (-u_xlat1.xy) + u_xlat2.xy;
+    u_xlat2 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat11 = u_xlat2.x * Ceto_Time;
+    u_xlat2.x = sin(u_xlat11);
+    u_xlat3 = cos(u_xlat11);
+    u_xlat15 = u_xlat10.y * u_xlat2.x;
+    u_xlat4.x = u_xlat10.x * u_xlat3 + (-u_xlat15);
+    u_xlat10.x = u_xlat1.y * u_xlat3;
+    u_xlat4.y = u_xlat1.x * u_xlat2.x + u_xlat10.x;
+    u_xlat1.xy = u_xlat0.xx * u_xlat4.xy;
+    u_xlat1.z = (-u_xlat1.y);
+    u_xlat10.xy = (-u_xlat0.yy) * u_xlat4.xy + u_xlat1.zx;
+    u_xlat0.x = dot(u_xlat0.xy, u_xlat0.xy);
+    u_xlat0.x = sqrt(u_xlat0.x);
+    SV_Target0.xy = u_xlat4.xy;
+    u_xlatb5 = u_xlat0.x==0.0;
+    u_xlat0.x = float(1.0) / u_xlat0.x;
+    u_xlat0.x = (u_xlatb5) ? 0.0 : u_xlat0.x;
+    SV_Target0.zw = u_xlat0.xx * u_xlat10.xy;
+    return;
+}
+
+================ Ceto/InitSlope (pid=176) ================
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec2 u_xlat0;
+bvec2 u_xlatb0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+float u_xlat3;
+vec2 u_xlat4;
+vec2 u_xlat10;
+float u_xlat11;
+float u_xlat15;
+void main()
+{
+    u_xlatb0.xy = lessThan(vec4(0.5, 0.5, 0.0, 0.0), vs_TEXCOORD0.xyxx).xy;
+    u_xlat10.xy = vs_TEXCOORD0.xy + vec2(-1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat10.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat10.y : vs_TEXCOORD0.y;
+    u_xlat0.xy = u_xlat0.xy * Ceto_InverseGridSizes.xx;
+    u_xlat10.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat1 = textureLod(Ceto_Spectrum01, u_xlat10.xy, 0.0);
+    u_xlat2 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat10.xy = u_xlat1.xy + u_xlat2.xy;
+    u_xlat1.xy = (-u_xlat1.xy) + u_xlat2.xy;
+    u_xlat2 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat11 = u_xlat2.x * Ceto_Time;
+    u_xlat2.x = sin(u_xlat11);
+    u_xlat3 = cos(u_xlat11);
+    u_xlat15 = u_xlat10.y * u_xlat2.x;
+    u_xlat4.x = u_xlat10.x * u_xlat3 + (-u_xlat15);
+    u_xlat10.x = u_xlat1.y * u_xlat3;
+    u_xlat4.y = u_xlat1.x * u_xlat2.x + u_xlat10.x;
+    u_xlat1.xy = u_xlat0.xx * u_xlat4.xy;
+    u_xlat1.z = (-u_xlat1.y);
+    SV_Target0.xy = (-u_xlat0.yy) * u_xlat4.xy + u_xlat1.zx;
+    SV_Target0.zw = vec2(0.0, 0.0);
+    return;
+}
+
+================ Ceto/InitJacobians (pid=159) ================
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_FoamAmount;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+bvec3 u_xlatb0;
+vec4 u_xlat1;
+bool u_xlatb1;
+vec4 u_xlat2;
+float u_xlat3;
+float u_xlat5;
+float u_xlat9;
+float u_xlat12;
+void main()
+{
+    u_xlatb0.xyz = lessThan(vec4(0.5, 0.5, 0.5, 0.0), vs_TEXCOORD0.xyxx).xyz;
+    u_xlat1.xyz = vs_TEXCOORD0.xyx + vec3(-1.0, -1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat1.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat1.y : vs_TEXCOORD0.y;
+    u_xlat0.z = (u_xlatb0.z) ? u_xlat1.z : vs_TEXCOORD0.x;
+    u_xlat0.xyz = u_xlat0.xyz * Ceto_InverseGridSizes.xxx;
+    u_xlat12 = dot(u_xlat0.yz, u_xlat0.yz);
+    u_xlat0.xyz = u_xlat0.xyy * u_xlat0.xyz;
+    u_xlat12 = sqrt(u_xlat12);                                                                                                                                   u_xlatb1 = u_xlat12==0.0;
+    u_xlat12 = float(1.0) / u_xlat12;
+    u_xlat12 = (u_xlatb1) ? 0.0 : u_xlat12;
+    u_xlat0.xyz = vec3(u_xlat12) * u_xlat0.xyz;
+    u_xlat1.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat1 = textureLod(Ceto_Spectrum01, u_xlat1.xy, 0.0);
+    u_xlat1.xy = u_xlat1.xy * vec2(Ceto_FoamAmount);
+    u_xlat2 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat1.xy = u_xlat2.xy * vec2(Ceto_FoamAmount) + u_xlat1.xy;
+    u_xlat2 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat9 = u_xlat2.x * Ceto_Time;
+    u_xlat2.x = sin(u_xlat9);
+    u_xlat3 = cos(u_xlat9);
+    u_xlat5 = u_xlat1.y * u_xlat2.x;
+    u_xlat1.x = u_xlat1.x * u_xlat3 + (-u_xlat5);
+    u_xlat0.w = 0.0;
+    SV_Target0 = u_xlat0 * (-u_xlat1.xxxx);
+    return;
+}
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
