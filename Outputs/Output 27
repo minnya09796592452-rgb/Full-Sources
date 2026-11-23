@@ -1,0 +1,232 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. ALL RUNTIME SHADER KEYWORDS IN CETO C# SOURCE ==="
+=== 1. ALL RUNTIME SHADER KEYWORDS IN CETO C# SOURCE ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/" -n
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. EXTRACT BASE VARIANT (VERT=0, FRAG=352) GLSL ==="
+=== 2. EXTRACT BASE VARIANT (VERT=0, FRAG=352) GLSL ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re
+> from itertools import islice
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> out_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders")
+> out_dir.mkdir(parents=True, exist_ok=True)
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> for pid, label in ((175, "OceanTopSide_Transparent"), (143, "OceanUnderSide_Transparent")):
+>     sh = next(o.read() for o in e0.objects if o.path_id == pid)
+>     p_idx = list(sh.platforms).index(15)
+>     off = sum(sh.offsets[p_idx])
+>     clen = sum(sh.compressedLengths[p_idx])
+>     dlen = sum(sh.decompressedLengths[p_idx])
+>     dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")
+>     all_shaders = re.findall(r"(#version[\s\S]*?\n\})", dec)
+>     v0 = next(islice(all_shaders, 0, 1)).strip()
+>     f352 = next(islice(all_shaders, 352, 353)).strip()
+>     out_file = out_dir / f"{label}_pid{pid}_BASE_VARIANT.glsl"
+>     out_file.write_text(f"// {label} (pid={pid}) Base Vertex [0] & Fragment [352]\n\n// === VERTEX [0] ===\n{v0}\n\n// === FRAGMENT [352] ===\n{f352}\n")
+>     print(f"\n==================== {label} (pid={pid}) -> SAVED {out_file.name} ====================")
+>     print("--- BASE VERTEX [0] (first 35 lines) ---")
+>     print("\n".join(v0.splitlines()[:35]))
+>     print("--- BASE FRAGMENT [352] (first 35 lines) ---")
+>     print("\n".join(f352.splitlines()[:35]))
+> EOF
+
+==================== OceanTopSide_Transparent (pid=175) -> SAVED OceanTopSide_Transparent_pid175_BASE_VARIANT.glsl ====================
+--- BASE VERTEX [0] (first 35 lines) ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require                                                                                                         #ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec3 _WorldSpaceCameraPos;
+uniform         vec4 _ProjectionParams;
+uniform         vec4 unity_SHBr;
+uniform         vec4 unity_SHBg;
+uniform         vec4 unity_SHBb;
+uniform         vec4 unity_SHC;
+uniform         vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform         vec4 hlslcc_mtx4x4unity_WorldToObject[4];
+uniform         vec4 unity_WorldTransformParams;
+uniform         vec4 hlslcc_mtx4x4unity_MatrixV[4];
+uniform         vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+uniform         vec3 Ceto_PosOffset;
+uniform         vec4 hlslcc_mtx4x4Ceto_Interpolation[4];
+uniform         vec4 Ceto_GridSizes;                                                                                                                         uniform         vec4 Ceto_Choppyness;
+--- BASE FRAGMENT [352] (first 35 lines) ---                                                                                                                 #version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec3 _WorldSpaceCameraPos;
+uniform         vec4 _ProjectionParams;
+uniform         vec4 unity_SHBr;
+uniform         vec4 unity_SHBg;
+uniform         vec4 unity_SHBb;
+uniform         vec4 unity_SHC;
+uniform         vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform         vec4 hlslcc_mtx4x4unity_WorldToObject[4];
+uniform         vec4 unity_WorldTransformParams;
+uniform         vec4 hlslcc_mtx4x4unity_MatrixV[4];
+uniform         vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+uniform         vec3 Ceto_PosOffset;
+uniform         vec4 hlslcc_mtx4x4Ceto_Interpolation[4];
+uniform         vec4 Ceto_GridSizes;
+uniform         vec4 Ceto_Choppyness;
+
+==================== OceanUnderSide_Transparent (pid=143) -> SAVED OceanUnderSide_Transparent_pid143_BASE_VARIANT.glsl ====================
+--- BASE VERTEX [0] (first 35 lines) ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif                                                                                                                                                       
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else                                                                                                                                                        #define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1                                                                                                                    #if UNITY_SUPPORTS_UNIFORM_LOCATION                                                                                                                          #define UNITY_LOCATION(x) layout(location = x)                                                                                                               #define UNITY_BINDING(x) layout(binding = x, std140)                                                                                                         #else                                                                                                                                                        #define UNITY_LOCATION(x)                                                                                                                                    #define UNITY_BINDING(x) layout(std140)                                                                                                                      #endif                                                                                                                                                       uniform         vec3 _WorldSpaceCameraPos;
+uniform         vec4 _ProjectionParams;                                                                                                                      uniform         vec4 unity_SHBr;                                                                                                                             uniform         vec4 unity_SHBg;                                                                                                                             uniform         vec4 unity_SHBb;                                                                                                                             uniform         vec4 unity_SHC;                                                                                                                              uniform         vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];                                                                                                    uniform         vec4 hlslcc_mtx4x4unity_WorldToObject[4];                                                                                                    uniform         vec4 unity_WorldTransformParams;                                                                                                             uniform         vec4 hlslcc_mtx4x4unity_MatrixV[4];                                                                                                          uniform         vec4 hlslcc_mtx4x4unity_MatrixVP[4];                                                                                                         uniform         vec3 Ceto_PosOffset;                                                                                                                         uniform         vec4 hlslcc_mtx4x4Ceto_Interpolation[4];                                                                                                     uniform         vec4 Ceto_GridSizes;                                                                                                                         uniform         vec4 Ceto_Choppyness;                                                                                                                        --- BASE FRAGMENT [352] (first 35 lines) ---                                                                                                                 #version 150                                                                                                                                                 #extension GL_ARB_explicit_attrib_location : require                                                                                                         #ifdef GL_ARB_shader_bit_encoding                                                                                                                            #extension GL_ARB_shader_bit_encoding : enable                                                                                                               #endif                                                                                                                                                                                                                                                                                                                    #define HLSLCC_ENABLE_UNIFORM_BUFFERS 1                                                                                                                      #if HLSLCC_ENABLE_UNIFORM_BUFFERS                                                                                                                            #define UNITY_UNIFORM                                                                                                                                        #else                                                                                                                                                        #define UNITY_UNIFORM uniform                                                                                                                                #endif                                                                                                                                                       #define UNITY_SUPPORTS_UNIFORM_LOCATION 1                                                                                                                    #if UNITY_SUPPORTS_UNIFORM_LOCATION                                                                                                                          #define UNITY_LOCATION(x) layout(location = x)                                                                                                               #define UNITY_BINDING(x) layout(binding = x, std140)                                                                                                         #else                                                                                                                                                        #define UNITY_LOCATION(x)                                                                                                                                    #define UNITY_BINDING(x) layout(std140)                                                                                                                      #endif                                                                                                                                                       uniform         vec3 _WorldSpaceCameraPos;                                                                                                                   uniform         vec4 _ProjectionParams;                                                                                                                      uniform         vec4 unity_SHBr;                                                                                                                             uniform         vec4 unity_SHBg;                                                                                                                             uniform         vec4 unity_SHBb;                                                                                                                             uniform         vec4 unity_SHC;                                                                                                                              uniform         vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];                                                                                                    uniform         vec4 hlslcc_mtx4x4unity_WorldToObject[4];                                                                                                    uniform         vec4 unity_WorldTransformParams;                                                                                                             uniform         vec4 hlslcc_mtx4x4unity_MatrixV[4];                                                                                                          uniform         vec4 hlslcc_mtx4x4unity_MatrixVP[4];                                                                                                         uniform         vec3 Ceto_PosOffset;                                                                                                                         uniform         vec4 hlslcc_mtx4x4Ceto_Interpolation[4];                                                                                                     uniform         vec4 Ceto_GridSizes;                                                                                                                         uniform         vec4 Ceto_Choppyness;                                                                                                                        root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+--------------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. CETO RUNTIME SHADER KEYWORDS ==="
+=== 1. CETO RUNTIME SHADER KEYWORDS ===                                                                                                                      root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");                                                                                                                     /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");                                                                                                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. CHECK ACTIVE LOCAL KEYWORDS & SAVE FULL ACTIVE VARIANT ==="
+=== 2. CHECK ACTIVE LOCAL KEYWORDS & SAVE FULL ACTIVE VARIANT ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> out_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> for pid, label in ((175, "OceanTopSide_Transparent"), (143, "OceanUnderSide_Transparent")):
+>     sh = next(o.read() for o in e0.objects if o.path_id == pid)
+>     pf = sh.m_ParsedForm
+>     name_map = {idx: name for name, idx in pf.m_NameIndices.items()} if hasattr(pf, "m_NameIndices") else {}
+>     ps = pf.m_SubShaders[1 if pid == 175 else 0] if False else pf.m_SubShaders[0].m_Passes[1 if pid == 175 else 0]
+>
+>     # Collect unique LocalKW combinations across Fragment SubPrograms
+>     unique_lkw = {}
+>     for sp in ps.progFragment.m_SubPrograms:
+>         lkw = tuple(sorted(name_map.get(k, str(k)) for k in (sp.m_LocalKeywordIndices or [])))
+>         if lkw not in unique_lkw:
+>             unique_lkw[lkw] = sp.m_BlobIndex
+>     print(f"\n[{label} pid={pid}] Unique LocalKeyword Combinations ({len(unique_lkw)}):")
+>     for lkw, bidx in unique_lkw.items():
+>         print(f"  BlobIdx={bidx} -> LocalKW={list(lkw)}")
+>
+>     # Decompress and save the 4-grid / active Ceto variant if present
+>     p_idx = list(sh.platforms).index(15)
+>     off, clen, dlen = sum(sh.offsets[p_idx]), sum(sh.compressedLengths[p_idx]), sum(sh.decompressedLengths[p_idx])
+>     dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")
+>     all_shaders = re.findall(r"(#version[\s\S]*?\n\})", dec)
+>
+>     # Save the highest-feature Ceto LocalKW variant alongside Base Variant
+>     best_lkw = max(unique_lkw.keys(), key=len)
+>     best_fidx = unique_lkw[best_lkw]
+>     # Find matching vertex prog with same LocalKW
+>     best_vidx = 0
+>     for sp in ps.progVertex.m_SubPrograms:
+>         lkw = tuple(sorted(name_map.get(k, str(k)) for k in (sp.m_LocalKeywordIndices or [])))
+>         if lkw == best_lkw:
+>             best_vidx = sp.m_BlobIndex
+>             break
+>     act_file = out_dir / f"{label}_pid{pid}_ACTIVE_VARIANT.glsl"
+>     act_file.write_text(f"// {label} Active LocalKW={list(best_lkw)}\n// === VERTEX [{best_vidx}] ===\n{all_shaders[best_vidx]}\n\n// === FRAGMENT [{best_fidx}] ===\n{all_shaders[best_fidx]}\n")
+>     print(f"  -> [SAVED FULL ACTIVE VARIANT]: {act_file.name} ({act_file.stat().st_size}B)")
+> EOF
+
+[OceanTopSide_Transparent pid=175] Unique LocalKeyword Combinations (1):
+  BlobIdx=352 -> LocalKW=[]
+  -> [SAVED FULL ACTIVE VARIANT]: OceanTopSide_Transparent_pid175_ACTIVE_VARIANT.glsl (19730B)
+
+[OceanUnderSide_Transparent pid=143] Unique LocalKeyword Combinations (1):
+  BlobIdx=352 -> LocalKW=[]
+  -> [SAVED FULL ACTIVE VARIANT]: OceanUnderSide_Transparent_pid143_ACTIVE_VARIANT.glsl (19747B)
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 3. FINAL PACKAGE CHECK IN ORIGINAL_SOURCES_CLEAN ==="
+=== 3. FINAL PACKAGE CHECK IN ORIGINAL_SOURCES_CLEAN ===                                                                                                     root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# ls -lh /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/                                                                                                                                              total 21M
+-rw-rw----. 1 10237 1023 5.2K Nov 23 16:31 Ceto_NormalFade_pid160.glsl                                                                                       -rw-rw----. 1 10237 1023 1.8K Nov 23 16:31 Ceto_OceanBottom_pid139.glsl
+-rw-rw----. 1 10237 1023  41K Nov 23 16:31 Ceto_OceanDepth_pid179.glsl
+-rw-rw----. 1 10237 1023  35K Nov 23 16:31 Ceto_OceanMaskFlipped_pid142.glsl
+-rw-rw----. 1 10237 1023  35K Nov 23 16:31 Ceto_OceanMask_pid168.glsl                                                                                        -rw-rw----. 1 10237 1023  11M Nov 23 16:31 Ceto_OceanTopSide_Transparent_pid175.glsl
+-rw-rw----. 1 10237 1023  11M Nov 23 16:31 Ceto_OceanUnderSide_Transparent_pid143.glsl                                                                       -rw-rw----. 1 10237 1023  20K Nov 23 17:17 OceanTopSide_Transparent_pid175_ACTIVE_VARIANT.glsl
+-rw-rw----. 1 10237 1023  20K Nov 23 17:16 OceanTopSide_Transparent_pid175_BASE_VARIANT.glsl
+-rw-rw----. 1 10237 1023  20K Nov 23 17:17 OceanUnderSide_Transparent_pid143_ACTIVE_VARIANT.glsl
+-rw-rw----. 1 10237 1023  20K Nov 23 17:16 OceanUnderSide_Transparent_pid143_BASE_VARIANT.glsl
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+------------
