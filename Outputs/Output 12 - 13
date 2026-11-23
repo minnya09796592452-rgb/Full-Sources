@@ -256,3 +256,87 @@ Variant[1] keys: ['targetRenderer', 'targetLevel', 'kernels', 'constantBuffers',
   Kernel 'read3DC4' threads=None in=None out=None cbs=None
   Kernel 'readSingle3D' threads=None in=None out=None cbs=None
   Kernel 'readSingleBilinear3D' threads=None in=None out=None cbs=None                                                                                       root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+
+
+
+
+
+
+
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+> cs_tree = next(o for o in e0.objects if o.path_id == 186).read_typetree()
+>
+> v1 = cs_tree["variants"][1]
+> k = next(x for x in v1["kernels"] if x["name"] == "read2DC3")
+> print("constantBuffers:", v1.get("constantBuffers"))
+> for idx, (vm_key, vm) in enumerate(k["variantMap"]):
+>     code = bytes(vm.get("code", []))
+>     print(f"\n--- read2DC3 GLSL Kernel (threadGroupSize={vm.get('threadGroupSize')}) ---")
+>     print(code.decode("latin1", errors="ignore").strip())
+> EOF
+constantBuffers: [{'name': '$Globals', 'byteSize': 48, 'params': [{'name': '_Width', 'type': 5, 'offset': 0, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}, {'name': '_Height', 'type': 5, 'offset': 4, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}]}, {'name': '$Globals', 'byteSize': 48, 'params': [{'name': '_IdxX', 'type': 5, 'offset': 12, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}, {'name': '_IdxY', 'type': 5, 'offset': 16, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}]}, {'name': '$Globals', 'byteSize': 48, 'params': [{'name': '_UV', 'type': 0, 'offset': 32, 'arraySize': 0, 'rowCount': 1, 'colCount': 4}]}, {'name': '$Globals', 'byteSize': 48, 'params': [{'name': '_Width', 'type': 5, 'offset': 0, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}, {'name': '_Height', 'type': 5, 'offset': 4, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}, {'name': '_Depth', 'type': 5, 'offset': 8, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}]}, {'name': '$Globals', 'byteSize': 48, 'params': [{'name': '_IdxX', 'type': 5, 'offset': 12, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}, {'name': '_IdxY', 'type': 5, 'offset': 16, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}, {'name': '_IdxZ', 'type': 5, 'offset': 20, 'arraySize': 0, 'rowCount': 1, 'colCount': 1}]}]
+
+--- read2DC3 GLSL Kernel (threadGroupSize=[8, 8, 1]) ---
+#version 430
+#extension GL_ARB_shading_language_420pack : require
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+precise vec4 u_xlat_precise_vec4;
+precise ivec4 u_xlat_precise_ivec4;
+precise bvec4 u_xlat_precise_bvec4;
+precise uvec4 u_xlat_precise_uvec4;
+UNITY_BINDING(0) uniform CGlobals {
+        uint _Width;
+        uint _Height;
+};
+UNITY_LOCATION(0) uniform  sampler2D _Tex2D;
+ struct _Buffer2DC3_type {
+        uint[3] value;
+};
+
+layout(std430, binding = 0) buffer _Buffer2DC3 {
+        _Buffer2DC3_type _Buffer2DC3_buf[];
+};
+int u_xlati0;
+bvec2 u_xlatb0;
+uvec4 u_xlatu1;
+ivec3 u_xlati2;
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+void main()
+{
+    u_xlatb0.xy = lessThan(gl_GlobalInvocationID.xyxx, uvec4(_Width, _Height, _Width, _Width)).xy;
+    u_xlatb0.x = u_xlatb0.y && u_xlatb0.x;
+    if(u_xlatb0.x){
+        u_xlati0 = int(gl_GlobalInvocationID.y) * int(_Width) + int(gl_GlobalInvocationID.x);
+        u_xlatu1.xy = gl_GlobalInvocationID.xy;
+        u_xlatu1.z = uint(0u);
+        u_xlatu1.w = uint(0u);
+        u_xlati2.xyz = floatBitsToInt(texelFetch(_Tex2D, ivec2(u_xlatu1.xy), int(u_xlatu1.w)).xyz);
+        _Buffer2DC3_buf[u_xlati0].value[(0 >> 2)] = uint(u_xlati2.x);
+        _Buffer2DC3_buf[u_xlati0].value[(0 >> 2) + 1] = uint(u_xlati2.y);
+        _Buffer2DC3_buf[u_xlati0].value[(0 >> 2) + 2] = uint(u_xlati2.z);
+    }
+    return;
+}
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
