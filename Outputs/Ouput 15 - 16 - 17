@@ -1,0 +1,1937 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN_OUT="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. FULL UNIFIEDSPECTRUM.CS ==="                                                === 1. FULL UNIFIEDSPECTRUM.CS ===                                                                                                                           root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat "$CLEAN_OUT/CSharp_Scripts/Ceto/UnifiedSpectrum.cs"
+using System;                                                                                                                                                using UnityEngine;
+                                                                                                                                                             namespace Ceto;
+                                                                                                                                                             public class UnifiedSpectrum : ISpectrum
+{                                                                                                                                                                    private readonly float GRAVITY = 9.818286f;
+                                                                                                                                                                     private readonly float WAVE_CM = 0.23f;
+                                                                                                                                                                     private readonly float WAVE_KM = 370f;                                                                                                                                                                                                                                                                                    private readonly float U10;                                                                                                                                                                                                                                                                                               private readonly float PI_2;
+                                                                                                                                                                     private readonly float SQRT_10;
+                                                                                                                                                                     private readonly float G_SQ_OMEGA_U10;
+                                                                                                                                                                     private readonly float Z_SQ_U10_G;
+                                                                                                                                                                     private readonly float LOG_OMEGA_6;                                                                                                                                                                                                                                                                                       private readonly float SIGMA;
+                                                                                                                                                                     private readonly float SQ_SIGMA_2;
+                                                                                                                                                                     private readonly float ALPHA_P;
+                                                                                                                                                                     private readonly float LOG_2_4;
+                                                                                                                                                                     private readonly float kp;
+                                                                                                                                                                     private readonly float cp;
+                                                                                                                                                                     private readonly float z0;                                                                                                                                                                                                                                                                                                private readonly float u_star;                                                                                                                                                                                                                                                                                            private readonly float gamma;                                                                                                                                                                                                                                                                                             private readonly float HALF_ALPHA_P_CP;                                                                                                                                                                                                                                                                                   private readonly float alpham;
+                                                                                                                                                                     private readonly float HALF_ALPHAM_WAVE_CM;
+                                                                                                                                                                     private readonly float am;
+                                                                                                                                                                     private readonly float WindSpeed;
+                                                                                                                                                                     private readonly float WaveAge;
+                                                                                                                                                                     private readonly Vector2 WindDir;
+                                                                                                                                                                     public UnifiedSpectrum(float windSpeed, float windDir, float waveAge)                                                                                        {                                                                                                                                                                    WindSpeed = windSpeed;                                                                                                                                       WaveAge = waveAge;                                                                                                                                           float f = windDir * MathF.PI / 180f;                                                                                                                         WindDir = new Vector2(Mathf.Cos(f), Mathf.Sin(f));                                                                                                           U10 = WindSpeed;                                                                                                                                             PI_2 = MathF.PI * 2f;                                                                                                                                        SQRT_10 = Mathf.Sqrt(10f);                                                                                                                                   G_SQ_OMEGA_U10 = GRAVITY * sqr(WaveAge / U10);                                                                                                               Z_SQ_U10_G = 3.7E-05f * sqr(U10) / 9.81f;                                                                                                                    LOG_OMEGA_6 = Mathf.Log(WaveAge) * 6f;                                                                                                                       SIGMA = 0.08f * (1f + 4f / Mathf.Pow(WaveAge, 3f));                                                                                                          SQ_SIGMA_2 = sqr(SIGMA) * 2f;                                                                                                                                ALPHA_P = 0.006f * Mathf.Sqrt(WaveAge);
+                LOG_2_4 = Mathf.Log(2f) / 4f;                                                                                                                                kp = G_SQ_OMEGA_U10;
+                cp = omega(kp) / kp;                                                                                                                                         z0 = Z_SQ_U10_G * Mathf.Pow(U10 / cp, 0.9f);
+                u_star = 0.41f * U10 / Mathf.Log(10f / z0);                                                                                                                  gamma = ((WaveAge < 1f) ? 1.7f : (1.7f + LOG_OMEGA_6));
+                HALF_ALPHA_P_CP = 0.5f * ALPHA_P * cp;                                                                                                                       alpham = 0.01f * ((u_star < WAVE_CM) ? (1f + Mathf.Log(u_star / WAVE_CM)) : (1f + 3f * Mathf.Log(u_star / WAVE_CM)));
+                HALF_ALPHAM_WAVE_CM = 0.5f * alpham * WAVE_CM;                                                                                                               am = 0.13f * u_star / WAVE_CM;
+        }                                                                                                                                                                                                                                                                                                                         private float sqr(float x)                                                                                                                                   {
+                return x * x;                                                                                                                                        }                                                                                                                                                    
+        private float omega(float k)                                                                                                                                 {
+                return Mathf.Sqrt(GRAVITY * k * (1f + sqr(k / WAVE_KM)));                                                                                            }
+
+        public float Spectrum(float kx, float ky)
+        {
+                float num = kx * WindDir.x - ky * WindDir.y;
+                float num2 = kx * WindDir.y + ky * WindDir.x;
+                kx = num;
+                ky = num2;
+                float num3 = Mathf.Sqrt(kx * kx + ky * ky);
+                float num4 = omega(num3) / num3;
+                float num5 = Mathf.Exp(-1.25f * sqr(kp / num3));
+                float p = Mathf.Exp(-1f / SQ_SIGMA_2 * sqr(Mathf.Sqrt(num3 / kp) - 1f));
+                float num6 = Mathf.Pow(gamma, p);
+                float num7 = num5 * num6 * Mathf.Exp((0f - WaveAge) / SQRT_10 * (Mathf.Sqrt(num3 / kp) - 1f));
+                float num8 = HALF_ALPHA_P_CP / num4 * num7;
+                float num9 = Mathf.Exp(-0.25f * sqr(num3 / WAVE_KM - 1f));
+                float num10 = HALF_ALPHAM_WAVE_CM / num4 * num9 * num5;
+                float num11 = (float)Math.Tanh(LOG_2_4 + 4f * Mathf.Pow(num4 / cp, 2.5f) + am * Mathf.Pow(WAVE_CM / num4, 2.5f));
+                float num12 = Mathf.Atan2(ky, kx);
+                if (kx < 0f)
+                {
+                        return 0f;
+                }
+                num8 *= 2f;
+                num10 *= 2f;
+                float num13 = Mathf.Sqrt(Mathf.Max(kx / num3, 0f));
+                return (num8 + num10) * (1f + num11 * Mathf.Cos(2f * num12)) / (PI_2 * num3 * num3 * num3 * num3) * num13;
+        }
+}
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. SPECTRUM SELECTION & CONDITION CHAIN ==="
+=== 2. SPECTRUM SELECTION & CONDITION CHAIN ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat "$CLEAN_OUT/CSharp_Scripts/Ceto/SPECTRUM_TYPE.cs"
+namespace Ceto;
+                                                                                                                                                             public enum SPECTRUM_TYPE
+{
+        UNIFIED,
+        PHILLIPS,
+        UNIFIED_PHILLIPS,
+        CUSTOM
+}
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat "$CLEAN_OUT/CSharp_Scripts/Ceto/UnifiedSpectrumCondition.cs"
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+public class UnifiedSpectrumCondition : WaveSpectrumCondition
+{
+        public UnifiedSpectrumCondition(int size, float windSpeed, float windDir, float waveAge, int numGrids)
+                : base(size, numGrids)
+        {
+                if (numGrids < 1 || numGrids > 4)
+                {
+                        throw new ArgumentException("UnifiedSpectrumCondition must have 1 to 4 grids not " + numGrids);
+                }
+                Key = new UnifiedSpectrumConditionKey(windSpeed, waveAge, size, windDir, SPECTRUM_TYPE.UNIFIED, numGrids);
+                switch (numGrids)
+                {
+                case 1:
+                        GridSizes = new Vector4(772f, 1f, 1f, 1f);
+                        Choppyness = new Vector4(2.3f, 1f, 1f, 1f);
+                        WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+                        break;
+                case 2:
+                        GridSizes = new Vector4(772f, 57f, 1f, 1f);
+                        Choppyness = new Vector4(2.3f, 2.1f, 1f, 1f);
+                        WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+                        break;
+                case 3:
+                        GridSizes = new Vector4(1372f, 392f, 28f, 1f);
+                        Choppyness = new Vector4(2.3f, 2.1f, 1.6f, 1f);
+                        WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+                        break;
+                case 4:
+                        GridSizes = new Vector4(1372f, 392f, 28f, 4f);
+                        Choppyness = new Vector4(2.3f, 2.1f, 1.6f, 0.9f);
+                        WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+                        break;
+                }
+        }
+
+        public override SpectrumTask GetCreateSpectrumConditionTask()
+        {
+                UnifiedSpectrumConditionKey unifiedSpectrumConditionKey = Key as UnifiedSpectrumConditionKey;
+                UnifiedSpectrum unifiedSpectrum = new UnifiedSpectrum(unifiedSpectrumConditionKey.WindSpeed, unifiedSpectrumConditionKey.WindDir, unifiedSpectrumConditionKey.WaveAge);
+                return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, unifiedSpectrum, unifiedSpectrum, unifiedSpectrum });
+        }
+}
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat "$CLEAN_OUT/CSharp_Scripts/Ceto/PhillipsSpectrumCondition.cs"
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+public class PhillipsSpectrumCondition : WaveSpectrumCondition
+{
+        public PhillipsSpectrumCondition(int size, float windSpeed, float windDir, float waveAge, int numGrids)
+                : base(size, numGrids)
+        {
+                if (numGrids < 1 || numGrids > 4)
+                {
+                        throw new ArgumentException("PhillipsSpectrumCondition must have 1 to 4 grids not " + numGrids);
+                }
+                Key = new PhillipsSpectrumConditionKey(windSpeed, size, windDir, SPECTRUM_TYPE.PHILLIPS, numGrids);
+                switch (numGrids)
+                {
+                case 1:
+                        GridSizes = new Vector4(217f, 1f, 1f, 1f);
+                        Choppyness = new Vector4(1.5f, 1f, 1f, 1f);
+                        WaveAmps = new Vector4(0.5f, 1f, 1f, 1f);
+                        break;
+                case 2:
+                        GridSizes = new Vector4(217f, 97f, 1f, 1f);
+                        Choppyness = new Vector4(1.5f, 1.2f, 1f, 1f);
+                        WaveAmps = new Vector4(0.5f, 1f, 1f, 1f);
+                        break;
+                case 3:
+                        GridSizes = new Vector4(217f, 97f, 31f, 1f);
+                        Choppyness = new Vector4(1.5f, 1.2f, 1f, 1f);
+                        WaveAmps = new Vector4(0.5f, 1f, 1f, 1f);
+                        break;
+                case 4:
+                        GridSizes = new Vector4(1372f, 217f, 97f, 31f);
+                        Choppyness = new Vector4(1.5f, 1.2f, 1f, 1f);
+                        WaveAmps = new Vector4(0.25f, 0.5f, 1f, 1f);
+                        break;
+                }
+        }
+
+        public override SpectrumTask GetCreateSpectrumConditionTask()
+        {
+                PhillipsSpectrumConditionKey phillipsSpectrumConditionKey = Key as PhillipsSpectrumConditionKey;
+                PhillipsSpectrum phillipsSpectrum = new PhillipsSpectrum(phillipsSpectrumConditionKey.WindSpeed, phillipsSpectrumConditionKey.WindDir);
+                return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { phillipsSpectrum, phillipsSpectrum, phillipsSpectrum, phillipsSpectrum });
+        }
+}
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "SPECTRUM_TYPE|CreateWaveSpectrumCondition|GetCreateSpectrumConditionTask" "$CLEAN_OUT/CSharp_Scripts/Ceto/WaveSpectrum.cs" -n -C 5                                                                                                         53-
+54-     public const float MIN_FOAM_SMOOTHING = 1f;
+55-
+56-     public FOURIER_SIZE fourierSize = FOURIER_SIZE.MEDIUM_64_CPU;
+57-
+58:     public SPECTRUM_TYPE spectrumType;
+59-
+60-     [Range(1f, 4f)]
+61-     public int numberOfGrids = 4;
+62-
+63-     public bool disableReadBack = true;
+--
+776-                    {
+777-                            m_conditions[0] = m_conditionCache[waveSpectrumConditionKey];
+778-                            return;
+779-                    }
+780-                    m_conditions[0] = NewSpectrumCondition(size, windSpeed, m_ocean.windDir, waveAge);
+781:                    SpectrumTask createSpectrumConditionTask = m_conditions[0].GetCreateSpectrumConditionTask();
+782-                    ((IThreadedTask)createSpectrumConditionTask).Start();
+783-                    ((IThreadedTask)createSpectrumConditionTask).Run();
+784-                    ((IThreadedTask)createSpectrumConditionTask).End();
+785-                    CacheCondition(m_conditions[0]);
+786-            }
+--
+796-                    {
+797-                            m_conditions[0] = m_conditionCache[waveSpectrumConditionKey];
+798-                            return;
+799-                    }
+800-                    m_conditions[1] = NewSpectrumCondition(size, windSpeed, m_ocean.windDir, waveAge);
+801:                    IThreadedTask createSpectrumConditionTask2 = m_conditions[1].GetCreateSpectrumConditionTask();
+802-                    m_scheduler.Add(createSpectrumConditionTask2);
+803-            }
+804-    }
+805-
+806-    private void CacheCondition(WaveSpectrumCondition condition)
+--
+832-                    return;
+833-            }
+834-            WaveSpectrumCondition waveSpectrumCondition = NewSpectrumCondition(fourierSize, windSpeed, windDir, waveAge);                                835-            if (!m_conditionCache.ContainsKey(waveSpectrumCondition.Key))
+836-            {
+837:                    SpectrumTask createSpectrumConditionTask = waveSpectrumCondition.GetCreateSpectrumConditionTask();
+838-                    ((IThreadedTask)createSpectrumConditionTask).Start();
+839-                    ((IThreadedTask)createSpectrumConditionTask).Run();
+840-                    ((IThreadedTask)createSpectrumConditionTask).End();
+841-                    m_conditionCache.AddFirst(waveSpectrumCondition.Key, waveSpectrumCondition);
+842-            }
+--
+845-    private WaveSpectrumCondition NewSpectrumCondition(int fourierSize, float windSpeed, float windDir, float waveAge)
+846-    {
+847-            WaveSpectrumCondition waveSpectrumCondition = null;
+848-            switch (spectrumType)
+849-            {
+850:            case SPECTRUM_TYPE.UNIFIED:
+851-                    return new UnifiedSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+852:            case SPECTRUM_TYPE.UNIFIED_PHILLIPS:
+853-                    return new UnifiedPhillipsSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+854:            case SPECTRUM_TYPE.PHILLIPS:
+855-                    return new PhillipsSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+856:            case SPECTRUM_TYPE.CUSTOM:
+857-                    if (CustomWaveSpectrum == null)
+858-                    {                                                                                                                                    859-                            Ocean.LogWarning("Custom spectrum type selected but no custom spectrum interface has been added to the wave spectrum. Defaulting to Unified Spectrum");
+860:                            spectrumType = SPECTRUM_TYPE.UNIFIED;
+861-                            return new UnifiedSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+862-                    }
+863-                    return new CustomWaveSpectrumCondition(CustomWaveSpectrum, fourierSize, windDir, numberOfGrids);
+864-            default:
+865-                    throw new InvalidOperationException("Invalid spectrum type = " + spectrumType);
+--
+869-    private WaveSpectrumConditionKey NewSpectrumConditionKey(int fourierSize, float windSpeed, float windDir, float waveAge)
+870-    {
+871-            WaveSpectrumConditionKey waveSpectrumConditionKey = null;
+872-            switch (spectrumType)
+873-            {
+874:            case SPECTRUM_TYPE.UNIFIED:
+875-                    return new UnifiedSpectrumConditionKey(windSpeed, waveAge, fourierSize, windDir, spectrumType, numberOfGrids);
+876:            case SPECTRUM_TYPE.UNIFIED_PHILLIPS:
+877-                    return new UnifiedSpectrumConditionKey(windSpeed, waveAge, fourierSize, windDir, spectrumType, numberOfGrids);
+878:            case SPECTRUM_TYPE.PHILLIPS:
+879-                    return new PhillipsSpectrumConditionKey(windSpeed, fourierSize, windDir, spectrumType, numberOfGrids);
+880:            case SPECTRUM_TYPE.CUSTOM:
+881-                    if (CustomWaveSpectrum == null)
+882-                    {
+883-                            Ocean.LogWarning("Custom spectrum type selected but no custom spectrum interface has been added to the wave spectrum. Defaulting to Unified Spectrum");
+884:                            spectrumType = SPECTRUM_TYPE.UNIFIED;
+885-                            return new UnifiedSpectrumConditionKey(windSpeed, waveAge, fourierSize, windDir, spectrumType, numberOfGrids);
+886-                    }
+887-                    return CustomWaveSpectrum.CreateKey(fourierSize, windDir, spectrumType, numberOfGrids);
+888-            default:
+889-                    throw new InvalidOperationException("Invalid spectrum type = " + spectrumType);
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-----------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN_OUT="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. FULL FOURIERCPU.CS (DIRECTION, NORMALIZATION, PING-PONG) ==="
+=== 1. FULL FOURIERCPU.CS (DIRECTION, NORMALIZATION, PING-PONG) ===                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CLEAN_OUT/CSharp_Scripts/Ceto/FourierCPU.cs"
+     1  using System;
+     2  using System.Collections.Generic;
+     3  using Ceto.Common.Threading.Tasks;
+     4  using UnityEngine;
+     5
+     6  namespace Ceto;
+     7
+     8  public class FourierCPU
+     9  {
+    10          private struct LookUp
+    11          {
+    12                  public int j1;
+    13
+    14                  public int j2;
+    15
+    16                  public float wr;
+    17
+    18                  public float wi;
+    19          }
+    20
+    21          private int m_size;
+    22
+    23          private float m_fsize;
+    24
+    25          private int m_passes;
+    26
+    27          private LookUp[] m_butterflyLookupTable;
+    28
+    29          public int size => m_size;
+    30
+    31          public int passes => m_passes;
+    32
+    33          public FourierCPU(int size)
+    34          {
+    35                  if (!Mathf.IsPowerOfTwo(size))
+    36                  {
+    37                          throw new ArgumentException("Fourier grid size must be pow2 number");
+    38                  }
+    39                  m_size = size;
+    40                  m_fsize = m_size;
+    41                  m_passes = (int)(Mathf.Log(m_fsize) / Mathf.Log(2f));
+    42                  ComputeButterflyLookupTable();
+    43          }
+    44
+    45          private int BitReverse(int i)
+    46          {
+    47                  int num = i;
+    48                  int num2 = 0;
+    49                  int num3 = 1;
+    50                  for (int num4 = m_size / 2; num4 != 0; num4 /= 2)
+    51                  {
+    52                          num = (((i & num4) > num4 - 1) ? 1 : 0);
+    53                          num2 += num * num3;
+    54                          num3 *= 2;
+    55                  }
+    56                  return num2;
+    57          }
+    58
+    59          private void ComputeButterflyLookupTable()
+    60          {
+    61                  m_butterflyLookupTable = new LookUp[m_size * m_passes];
+    62                  for (int i = 0; i < m_passes; i++)
+    63                  {
+    64                          int num = (int)Mathf.Pow(2f, m_passes - 1 - i);
+    65                          int num2 = (int)Mathf.Pow(2f, i);
+    66                          for (int j = 0; j < num; j++)
+    67                          {
+    68                                  for (int k = 0; k < num2; k++)
+    69                                  {
+    70                                          int num3;
+    71                                          int num4;
+    72                                          int j2;
+    73                                          int j3;
+    74                                          if (i == 0)
+    75                                          {
+    76                                                  num3 = j * num2 * 2 + k;
+    77                                                  num4 = j * num2 * 2 + num2 + k;
+    78                                                  j2 = BitReverse(num3);
+    79                                                  j3 = BitReverse(num4);
+    80                                          }
+    81                                          else
+    82                                          {
+    83                                                  num3 = j * num2 * 2 + k;
+    84                                                  num4 = j * num2 * 2 + num2 + k;
+    85                                                  j2 = num3;
+    86                                                  j3 = num4;
+    87                                          }
+    88                                          float num5 = Mathf.Cos(MathF.PI * 2f * (float)(k * num) / m_fsize);
+    89                                          float num6 = Mathf.Sin(MathF.PI * 2f * (float)(k * num) / m_fsize);
+    90                                          int num7 = num3 + i * m_size;
+    91                                          m_butterflyLookupTable[num7].j1 = j2;
+    92                                          m_butterflyLookupTable[num7].j2 = j3;
+    93                                          m_butterflyLookupTable[num7].wr = num5;
+    94                                          m_butterflyLookupTable[num7].wi = num6;
+    95                                          int num8 = num4 + i * m_size;
+    96                                          m_butterflyLookupTable[num8].j1 = j2;
+    97                                          m_butterflyLookupTable[num8].j2 = j3;
+    98                                          m_butterflyLookupTable[num8].wr = 0f - num5;
+    99                                          m_butterflyLookupTable[num8].wi = 0f - num6;
+   100                                  }
+   101                          }
+   102                  }
+   103          }
+   104
+   105          private Vector4 FFT(Vector2 w, Vector4 input1, Vector4 input2)
+   106          {
+   107                  input1.x += w.x * input2.x - w.y * input2.y;                                                                                            108                  input1.y += w.y * input2.x + w.x * input2.y;
+   109                  input1.z += w.x * input2.z - w.y * input2.w;
+   110                  input1.w += w.y * input2.z + w.x * input2.w;
+   111                  return input1;
+   112          }
+   113
+   114          private Vector2 FFT(Vector2 w, Vector2 input1, Vector2 input2)
+   115          {
+   116                  input1.x += w.x * input2.x - w.y * input2.y;
+   117                  input1.y += w.y * input2.x + w.x * input2.y;
+   118                  return input1;
+   119          }
+   120
+   121          public int PeformFFT_SinglePacked(int startIdx, IList<Vector4[]> data0, ICancelToken token)
+   122          {
+   123                  int num = 0;
+   124                  int num2 = startIdx;
+   125                  int num3 = 0;
+   126                  while (num3 < m_passes)
+   127                  {
+   128                          num = num2 % 2;
+   129                          int index = (num2 + 1) % 2;
+   130                          Vector4[] array = data0[num];
+   131                          Vector4[] array2 = data0[index];
+   132                          int num4 = num3 * m_size;
+   133                          for (int i = 0; i < m_size; i++)
+   134                          {
+   135                                  int num5 = i + num4;
+   136                                  int j = m_butterflyLookupTable[num5].j1;
+   137                                  int j2 = m_butterflyLookupTable[num5].j2;
+   138                                  float wr = m_butterflyLookupTable[num5].wr;
+   139                                  float wi = m_butterflyLookupTable[num5].wi;
+   140                                  for (int k = 0; k < m_size; k++)
+   141                                  {
+   142                                          if (token.Cancelled)
+   143                                          {
+   144                                                  return -1;
+   145                                          }
+   146                                          int num6 = k * m_size;                                                                                          147                                          int num7 = i + num6;
+   148                                          int num8 = j + num6;
+   149                                          int num9 = j2 + num6;
+   150                                          array[num7].x = array2[num8].x + wr * array2[num9].x - wi * array2[num9].y;
+   151                                          array[num7].y = array2[num8].y + wi * array2[num9].x + wr * array2[num9].y;
+   152                                  }
+   153                          }
+   154                          num3++;
+   155                          num2++;
+   156                  }
+   157                  num3 = 0;
+   158                  while (num3 < m_passes)
+   159                  {
+   160                          num = num2 % 2;
+   161                          int index = (num2 + 1) % 2;
+   162                          Vector4[] array3 = data0[num];
+   163                          Vector4[] array4 = data0[index];
+   164                          int num4 = num3 * m_size;
+   165                          for (int k = 0; k < m_size; k++)
+   166                          {
+   167                                  int num5 = k + num4;
+   168                                  int j = m_butterflyLookupTable[num5].j1 * m_size;
+   169                                  int j2 = m_butterflyLookupTable[num5].j2 * m_size;
+   170                                  float wr = m_butterflyLookupTable[num5].wr;
+   171                                  float wi = m_butterflyLookupTable[num5].wi;
+   172                                  for (int i = 0; i < m_size; i++)
+   173                                  {
+   174                                          if (token.Cancelled)
+   175                                          {
+   176                                                  return -1;
+   177                                          }
+   178                                          int num7 = i + k * m_size;
+   179                                          int num8 = i + j;
+   180                                          int num9 = i + j2;
+   181                                          array3[num7].x = array4[num8].x + wr * array4[num9].x - wi * array4[num9].y;
+   182                                          array3[num7].y = array4[num8].y + wi * array4[num9].x + wr * array4[num9].y;
+   183                                  }
+   184                          }
+   185                          num3++;
+   186                          num2++;
+   187                  }
+   188                  return num;
+   189          }
+   190
+   191          public int PeformFFT_DoublePacked(int startIdx, IList<Vector4[]> data0, ICancelToken token)
+   192          {
+   193                  int num = 0;
+   194                  int num2 = startIdx;
+   195                  int num3 = 0;
+   196                  while (num3 < m_passes)
+   197                  {
+   198                          num = num2 % 2;
+   199                          int index = (num2 + 1) % 2;
+   200                          Vector4[] array = data0[num];
+   201                          Vector4[] array2 = data0[index];
+   202                          int num4 = num3 * m_size;
+   203                          for (int i = 0; i < m_size; i++)
+   204                          {
+   205                                  int num5 = i + num4;
+   206                                  int j = m_butterflyLookupTable[num5].j1;
+   207                                  int j2 = m_butterflyLookupTable[num5].j2;
+   208                                  float wr = m_butterflyLookupTable[num5].wr;
+   209                                  float wi = m_butterflyLookupTable[num5].wi;
+   210                                  for (int k = 0; k < m_size; k++)
+   211                                  {
+   212                                          if (token.Cancelled)
+   213                                          {
+   214                                                  return -1;
+   215                                          }
+   216                                          int num6 = k * m_size;
+   217                                          int num7 = i + num6;
+   218                                          int num8 = j + num6;
+   219                                          int num9 = j2 + num6;
+   220                                          array[num7].x = array2[num8].x + wr * array2[num9].x - wi * array2[num9].y;
+   221                                          array[num7].y = array2[num8].y + wi * array2[num9].x + wr * array2[num9].y;
+   222                                          array[num7].z = array2[num8].z + wr * array2[num9].z - wi * array2[num9].w;                                     223                                          array[num7].w = array2[num8].w + wi * array2[num9].z + wr * array2[num9].w;
+   224                                  }
+   225                          }
+   226                          num3++;
+   227                          num2++;
+   228                  }
+   229                  num3 = 0;
+   230                  while (num3 < m_passes)
+   231                  {
+   232                          num = num2 % 2;
+   233                          int index = (num2 + 1) % 2;
+   234                          Vector4[] array3 = data0[num];
+   235                          Vector4[] array4 = data0[index];
+   236                          int num4 = num3 * m_size;
+   237                          for (int k = 0; k < m_size; k++)
+   238                          {
+   239                                  int num5 = k + num4;
+   240                                  int j = m_butterflyLookupTable[num5].j1 * m_size;
+   241                                  int j2 = m_butterflyLookupTable[num5].j2 * m_size;
+   242                                  float wr = m_butterflyLookupTable[num5].wr;
+   243                                  float wi = m_butterflyLookupTable[num5].wi;
+   244                                  for (int i = 0; i < m_size; i++)
+   245                                  {
+   246                                          if (token.Cancelled)
+   247                                          {
+   248                                                  return -1;
+   249                                          }
+   250                                          int num7 = i + k * m_size;
+   251                                          int num8 = i + j;
+   252                                          int num9 = i + j2;
+   253                                          array3[num7].x = array4[num8].x + wr * array4[num9].x - wi * array4[num9].y;
+   254                                          array3[num7].y = array4[num8].y + wi * array4[num9].x + wr * array4[num9].y;
+   255                                          array3[num7].z = array4[num8].z + wr * array4[num9].z - wi * array4[num9].w;
+   256                                          array3[num7].w = array4[num8].w + wi * array4[num9].z + wr * array4[num9].w;
+   257                                  }
+   258                          }
+   259                          num3++;
+   260                          num2++;
+   261                  }
+   262                  return num;
+   263          }
+   264  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. FULL FOURIERGPU.CS (PASSES 0-7, BUTTERFLY LOOKUP, BUFFER SWITCHING) ==="
+=== 2. FULL FOURIERGPU.CS (PASSES 0-7, BUTTERFLY LOOKUP, BUFFER SWITCHING) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CLEAN_OUT/CSharp_Scripts/Ceto/FourierGPU.cs"
+     1  using System;
+     2  using Ceto.Common.Unity.Utility;                                                                                                                          3  using UnityEngine;
+     4
+     5  namespace Ceto;
+     6
+     7  public class FourierGPU
+     8  {
+     9          private const int PASS_X_1 = 0;
+    10
+    11          private const int PASS_Y_1 = 1;
+    12
+    13          private const int PASS_X_2 = 2;
+    14
+    15          private const int PASS_Y_2 = 3;
+    16
+    17          private const int PASS_X_3 = 4;
+    18
+    19          private const int PASS_Y_3 = 5;
+    20
+    21          private const int PASS_X_4 = 6;
+    22
+    23          private const int PASS_Y_4 = 7;
+    24
+    25          private int m_size;
+    26
+    27          private float m_fsize;
+    28
+    29          private int m_passes;
+    30
+    31          private Texture2D[] m_butterflyLookupTable;
+    32
+    33          private Material m_fourier;
+    34
+    35          private RenderBuffer[] m_pass0RT2;
+    36
+    37          private RenderBuffer[] m_pass1RT2;
+    38
+    39          private RenderBuffer[] m_pass0RT3;
+    40
+    41          private RenderBuffer[] m_pass1RT3;
+    42
+    43          private RenderBuffer[] m_pass0RT4;
+    44
+    45          private RenderBuffer[] m_pass1RT4;
+    46
+    47          public int size => m_size;
+    48
+    49          public int passes => m_passes;
+    50
+    51          public FourierGPU(int size, Shader sdr)
+    52          {
+    53                  if (!Mathf.IsPowerOfTwo(size))
+    54                  {
+    55                          throw new ArgumentException("Fourier grid size must be pow2 number");
+    56                  }
+    57                  m_fourier = new Material(sdr);
+    58                  m_size = size;
+    59                  m_fsize = m_size;
+    60                  m_passes = (int)(Mathf.Log(m_fsize) / Mathf.Log(2f));
+    61                  m_butterflyLookupTable = new Texture2D[m_passes];
+    62                  ComputeButterflyLookupTable();
+    63                  m_fourier.SetFloat("Ceto_FourierSize", m_fsize);
+    64                  m_pass0RT2 = new RenderBuffer[2];
+    65                  m_pass1RT2 = new RenderBuffer[2];
+    66                  m_pass0RT3 = new RenderBuffer[3];
+    67                  m_pass1RT3 = new RenderBuffer[3];
+    68                  m_pass0RT4 = new RenderBuffer[4];
+    69                  m_pass1RT4 = new RenderBuffer[4];
+    70          }
+    71
+    72          public void Release()
+    73          {
+    74                  int num = m_butterflyLookupTable.Length;
+    75                  for (int i = 0; i < num; i++)
+    76                  {
+    77                          UnityEngine.Object.Destroy(m_butterflyLookupTable[i]);
+    78                  }
+    79                  m_butterflyLookupTable = null;
+    80          }
+    81
+    82          private int BitReverse(int i)
+    83          {
+    84                  int num = i;
+    85                  int num2 = 0;
+    86                  int num3 = 1;
+    87                  for (int num4 = m_size / 2; num4 != 0; num4 /= 2)
+    88                  {
+    89                          num = (((i & num4) > num4 - 1) ? 1 : 0);
+    90                          num2 += num * num3;
+    91                          num3 *= 2;
+    92                  }
+    93                  return num2;
+    94          }
+    95
+    96          private Texture2D Make1DTex(int i)
+    97          {
+    98                  return new Texture2D(m_size, 1, TextureFormat.RGBAFloat, mipChain: false, linear: true)
+    99                  {
+   100                          filterMode = FilterMode.Point,
+   101                          wrapMode = TextureWrapMode.Clamp,
+   102                          hideFlags = HideFlags.HideAndDontSave,                                                                                          103                          name = "Ceto Fouier GPU Butterfly Lookup"
+   104                  };
+   105          }
+   106
+   107          private void ComputeButterflyLookupTable()
+   108          {
+   109                  float num = m_size;
+   110                  float num2 = m_size - 1;
+   111                  for (int i = 0; i < m_passes; i++)
+   112                  {
+   113                          int num3 = (int)Mathf.Pow(2f, m_passes - 1 - i);
+   114                          int num4 = (int)Mathf.Pow(2f, i);
+   115                          m_butterflyLookupTable[i] = Make1DTex(i);
+   116                          for (int j = 0; j < num3; j++)
+   117                          {
+   118                                  for (int k = 0; k < num4; k++)
+   119                                  {
+   120                                          int num5;
+   121                                          int num6;
+   122                                          int num7;
+   123                                          int num8;
+   124                                          if (i == 0)
+   125                                          {
+   126                                                  num5 = j * num4 * 2 + k;
+   127                                                  num6 = j * num4 * 2 + num4 + k;
+   128                                                  num7 = BitReverse(num5);
+   129                                                  num8 = BitReverse(num6);
+   130                                          }
+   131                                          else
+   132                                          {
+   133                                                  num5 = j * num4 * 2 + k;
+   134                                                  num6 = j * num4 * 2 + num4 + k;
+   135                                                  num7 = num5;
+   136                                                  num8 = num6;
+   137                                          }
+   138                                          float num9 = Mathf.Cos(MathF.PI * 2f * (float)(k * num3) / num);
+   139                                          float num10 = Mathf.Sin(MathF.PI * 2f * (float)(k * num3) / num);
+   140                                          m_butterflyLookupTable[i].SetPixel(num5, 0, new Color((float)num7 / num2, (float)num8 / num2, num9, num10));
+   141                                          m_butterflyLookupTable[i].SetPixel(num6, 0, new Color((float)num7 / num2, (float)num8 / num2, 0f - num9, 0f - num10));
+   142                                  }
+   143                          }
+   144                          m_butterflyLookupTable[i].Apply();
+   145                  }
+   146          }
+   147
+   148          public int PeformFFT(RenderTexture[] data0)
+   149          {
+   150                  if (m_butterflyLookupTable == null)
+   151                  {
+   152                          return -1;
+   153                  }
+   154                  RenderTexture dest = data0[0];
+   155                  RenderTexture dest2 = data0[1];
+   156                  int num = 0;
+   157                  int num2 = 0;
+   158                  int num3 = 0;
+   159                  while (num3 < m_passes)
+   160                  {
+   161                          num = num2 % 2;
+   162                          int num4 = (num2 + 1) % 2;
+   163                          m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+   164                          m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+   165                          if (num == 0)
+   166                          {
+   167                                  Graphics.Blit(null, dest, m_fourier, 0);
+   168                          }
+   169                          else
+   170                          {
+   171                                  Graphics.Blit(null, dest2, m_fourier, 0);
+   172                          }
+   173                          num3++;
+   174                          num2++;
+   175                  }
+   176                  num3 = 0;
+   177                  while (num3 < m_passes)
+   178                  {
+   179                          num = num2 % 2;
+   180                          int num4 = (num2 + 1) % 2;
+   181                          m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+   182                          m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+   183                          if (num == 0)
+   184                          {
+   185                                  Graphics.Blit(null, dest, m_fourier, 1);
+   186                          }
+   187                          else
+   188                          {
+   189                                  Graphics.Blit(null, dest2, m_fourier, 1);
+   190                          }
+   191                          num3++;
+   192                          num2++;
+   193                  }
+   194                  return num;
+   195          }
+   196
+   197          public int PeformFFT(RenderTexture[] data0, RenderTexture[] data1)
+   198          {
+   199                  if (m_butterflyLookupTable == null)
+   200                  {
+   201                          return -1;
+   202                  }
+   203                  if (SystemInfo.supportedRenderTargetCount < 2)
+   204                  {
+   205                          throw new InvalidOperationException("System does not support at least 2 render targets");
+   206                  }
+   207                  m_pass0RT2[0] = data0[0].colorBuffer;
+   208                  m_pass0RT2[1] = data1[0].colorBuffer;
+   209                  m_pass1RT2[0] = data0[1].colorBuffer;
+   210                  m_pass1RT2[1] = data1[1].colorBuffer;
+   211                  RenderBuffer depthBuffer = data0[0].depthBuffer;
+   212                  RenderBuffer depthBuffer2 = data0[1].depthBuffer;
+   213                  int num = 0;
+   214                  int num2 = 0;
+   215                  int num3 = 0;
+   216                  while (num3 < m_passes)
+   217                  {
+   218                          num = num2 % 2;
+   219                          int num4 = (num2 + 1) % 2;
+   220                          m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+   221                          m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+   222                          m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+   223                          if (num == 0)
+   224                          {
+   225                                  RTUtility.MultiTargetBlit(m_pass0RT2, depthBuffer, m_fourier, 2);
+   226                          }
+   227                          else
+   228                          {
+   229                                  RTUtility.MultiTargetBlit(m_pass1RT2, depthBuffer2, m_fourier, 2);
+   230                          }
+   231                          num3++;
+   232                          num2++;
+   233                  }
+   234                  num3 = 0;
+   235                  while (num3 < m_passes)
+   236                  {
+   237                          num = num2 % 2;
+   238                          int num4 = (num2 + 1) % 2;
+   239                          m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+   240                          m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+   241                          m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+   242                          if (num == 0)
+   243                          {
+   244                                  RTUtility.MultiTargetBlit(m_pass0RT2, depthBuffer, m_fourier, 3);
+   245                          }
+   246                          else
+   247                          {
+   248                                  RTUtility.MultiTargetBlit(m_pass1RT2, depthBuffer2, m_fourier, 3);
+   249                          }
+   250                          num3++;
+   251                          num2++;
+   252                  }
+   253                  return num;
+   254          }
+   255
+   256          public int PeformFFT(RenderTexture[] data0, RenderTexture[] data1, RenderTexture[] data2)
+   257          {
+   258                  if (m_butterflyLookupTable == null)
+   259                  {
+   260                          return -1;
+   261                  }
+   262                  if (SystemInfo.supportedRenderTargetCount < 3)
+   263                  {
+   264                          throw new InvalidOperationException("System does not support at least 3 render targets");
+   265                  }
+   266                  m_pass0RT3[0] = data0[0].colorBuffer;
+   267                  m_pass0RT3[1] = data1[0].colorBuffer;
+   268                  m_pass0RT3[2] = data2[0].colorBuffer;
+   269                  m_pass1RT3[0] = data0[1].colorBuffer;
+   270                  m_pass1RT3[1] = data1[1].colorBuffer;
+   271                  m_pass1RT3[2] = data2[1].colorBuffer;
+   272                  RenderBuffer depthBuffer = data0[0].depthBuffer;
+   273                  RenderBuffer depthBuffer2 = data0[1].depthBuffer;
+   274                  int num = 0;
+   275                  int num2 = 0;
+   276                  int num3 = 0;
+   277                  while (num3 < m_passes)
+   278                  {
+   279                          num = num2 % 2;
+   280                          int num4 = (num2 + 1) % 2;
+   281                          m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+   282                          m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+   283                          m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+   284                          m_fourier.SetTexture("Ceto_ReadBuffer2", data2[num4]);
+   285                          if (num == 0)
+   286                          {
+   287                                  RTUtility.MultiTargetBlit(m_pass0RT3, depthBuffer, m_fourier, 4);
+   288                          }
+   289                          else
+   290                          {
+   291                                  RTUtility.MultiTargetBlit(m_pass1RT3, depthBuffer2, m_fourier, 4);
+   292                          }
+   293                          num3++;
+   294                          num2++;
+   295                  }
+   296                  num3 = 0;
+   297                  while (num3 < m_passes)
+   298                  {
+   299                          num = num2 % 2;
+   300                          int num4 = (num2 + 1) % 2;
+   301                          m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+   302                          m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+   303                          m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+   304                          m_fourier.SetTexture("Ceto_ReadBuffer2", data2[num4]);
+   305                          if (num == 0)
+   306                          {
+   307                                  RTUtility.MultiTargetBlit(m_pass0RT3, depthBuffer, m_fourier, 5);
+   308                          }
+   309                          else
+   310                          {
+   311                                  RTUtility.MultiTargetBlit(m_pass1RT3, depthBuffer2, m_fourier, 5);
+   312                          }
+   313                          num3++;
+   314                          num2++;
+   315                  }
+   316                  return num;
+   317          }
+   318
+   319          public int PeformFFT(RenderTexture[] data0, RenderTexture[] data1, RenderTexture[] data2, RenderTexture[] data3)
+   320          {
+   321                  if (m_butterflyLookupTable == null)
+   322                  {
+   323                          return -1;
+   324                  }
+   325                  if (SystemInfo.supportedRenderTargetCount < 4)
+   326                  {
+   327                          throw new InvalidOperationException("System does not support at least 4 render targets");
+   328                  }
+   329                  m_pass0RT4[0] = data0[0].colorBuffer;
+   330                  m_pass0RT4[1] = data1[0].colorBuffer;
+   331                  m_pass0RT4[2] = data2[0].colorBuffer;
+   332                  m_pass0RT4[3] = data3[0].colorBuffer;
+   333                  m_pass1RT4[0] = data0[1].colorBuffer;
+   334                  m_pass1RT4[1] = data1[1].colorBuffer;
+   335                  m_pass1RT4[2] = data2[1].colorBuffer;
+   336                  m_pass1RT4[3] = data3[1].colorBuffer;
+   337                  RenderBuffer depthBuffer = data0[0].depthBuffer;
+   338                  RenderBuffer depthBuffer2 = data0[1].depthBuffer;
+   339                  int num = 0;
+   340                  int num2 = 0;
+   341                  int num3 = 0;
+   342                  while (num3 < m_passes)
+   343                  {
+   344                          num = num2 % 2;
+   345                          int num4 = (num2 + 1) % 2;
+   346                          m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+   347                          m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+   348                          m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+   349                          m_fourier.SetTexture("Ceto_ReadBuffer2", data2[num4]);
+   350                          m_fourier.SetTexture("Ceto_ReadBuffer3", data3[num4]);
+   351                          if (num == 0)
+   352                          {
+   353                                  RTUtility.MultiTargetBlit(m_pass0RT4, depthBuffer, m_fourier, 6);
+   354                          }
+   355                          else
+   356                          {
+   357                                  RTUtility.MultiTargetBlit(m_pass1RT4, depthBuffer2, m_fourier, 6);
+   358                          }
+   359                          num3++;
+   360                          num2++;
+   361                  }
+   362                  num3 = 0;
+   363                  while (num3 < m_passes)
+   364                  {
+   365                          num = num2 % 2;
+   366                          int num4 = (num2 + 1) % 2;
+   367                          m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+   368                          m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+   369                          m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+   370                          m_fourier.SetTexture("Ceto_ReadBuffer2", data2[num4]);
+   371                          m_fourier.SetTexture("Ceto_ReadBuffer3", data3[num4]);
+   372                          if (num == 0)
+   373                          {
+   374                                  RTUtility.MultiTargetBlit(m_pass0RT4, depthBuffer, m_fourier, 7);
+   375                          }                                                                                                                               376                          else
+   377                          {
+   378                                  RTUtility.MultiTargetBlit(m_pass1RT4, depthBuffer2, m_fourier, 7);
+   379                          }
+   380                          num3++;
+   381                          num2++;
+   382                  }
+   383                  return num;
+   384          }
+   385  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+------------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. GPU SHADERS: INITDISPLACEMENT, INITSLOPE, INITJACOBIANS GLSL ==="
+=== 2. GPU SHADERS: INITDISPLACEMENT, INITSLOPE, INITJACOBIANS GLSL ===                                                                                      root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")                                                    > e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>                                                                                                                                                            > targets = ("Ceto/InitDisplacement", "Ceto/InitSlope", "Ceto/InitJacobians")
+> for obj in e0.objects:
+>     if obj.type.name == "Shader":
+>         sh = obj.read()
+>         pf = getattr(sh, "m_ParsedForm", None)                                                                                                             >         name = getattr(pf, "m_Name", "") if pf else ""
+>         if name in targets:
+>             print(f"\n==================== {name} (pid={obj.path_id}) ====================")
+>             p_idx = list(sh.platforms).index(15)
+>             off = sh.offsets[p_idx][0]                                                                                                                     >             clen = sh.compressedLengths[p_idx][0]
+>             dlen = sh.decompressedLengths[p_idx][0]                                                                                                        >             dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")
+>             frags = [s for s in re.findall(r"(#version[\s\S]*?\n\})", dec) if "SV_Target" in s or "gl_FragData" in s]
+>             for fi, f in enumerate(frags):
+>                 print(f"--- Pass[{fi}] Fragment GLSL ---")
+>                 print(f.strip())                                                                                                                           > EOF
+                                                                                                                                                             ==================== Ceto/InitDisplacement (pid=154) ====================
+--- Pass[0] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding                                                                                                                            #extension GL_ARB_shader_bit_encoding : enable
+#endif                                                                                                                                                       
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1                                                                                                                      #if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM                                                                                                                                        #else
+#define UNITY_UNIFORM uniform                                                                                                                                #endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1                                                                                                                    #if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec2 u_xlat0;
+bvec2 u_xlatb0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+float u_xlat3;
+vec2 u_xlat4;
+bool u_xlatb5;
+vec2 u_xlat10;
+float u_xlat11;
+float u_xlat15;
+void main()
+{
+    u_xlatb0.xy = lessThan(vec4(0.5, 0.5, 0.0, 0.0), vs_TEXCOORD0.xyxx).xy;
+    u_xlat10.xy = vs_TEXCOORD0.xy + vec2(-1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat10.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat10.y : vs_TEXCOORD0.y;
+    u_xlat0.xy = u_xlat0.xy * Ceto_InverseGridSizes.xx;
+    u_xlat10.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat1 = textureLod(Ceto_Spectrum01, u_xlat10.xy, 0.0);
+    u_xlat2 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat10.xy = u_xlat1.xy + u_xlat2.xy;
+    u_xlat1.xy = (-u_xlat1.xy) + u_xlat2.xy;
+    u_xlat2 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat11 = u_xlat2.x * Ceto_Time;
+    u_xlat2.x = sin(u_xlat11);
+    u_xlat3 = cos(u_xlat11);
+    u_xlat15 = u_xlat10.y * u_xlat2.x;
+    u_xlat4.x = u_xlat10.x * u_xlat3 + (-u_xlat15);
+    u_xlat10.x = u_xlat1.y * u_xlat3;
+    u_xlat4.y = u_xlat1.x * u_xlat2.x + u_xlat10.x;
+    u_xlat1.xy = u_xlat0.xx * u_xlat4.xy;
+    u_xlat1.z = (-u_xlat1.y);
+    u_xlat10.xy = (-u_xlat0.yy) * u_xlat4.xy + u_xlat1.zx;
+    u_xlat0.x = dot(u_xlat0.xy, u_xlat0.xy);
+    u_xlat0.x = sqrt(u_xlat0.x);
+    SV_Target0.xy = u_xlat4.xy;
+    u_xlatb5 = u_xlat0.x==0.0;
+    u_xlat0.x = float(1.0) / u_xlat0.x;
+    u_xlat0.x = (u_xlatb5) ? 0.0 : u_xlat0.x;
+    SV_Target0.zw = u_xlat0.xx * u_xlat10.xy;
+    return;
+}
+--- Pass[1] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform                                                                                                                                #endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1                                                                                                                    #if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;                                                                                                                             UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+vec4 u_xlat0;
+vec4 u_xlat1;
+bvec4 u_xlatb1;
+vec4 u_xlat2;
+float u_xlat3;
+float u_xlat4;
+float u_xlat5;                                                                                                                                               vec3 u_xlat6;
+float u_xlat7;
+float u_xlat8;
+bool u_xlatb15;
+float u_xlat21;
+void main()
+{
+    u_xlat0.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat0 = textureLod(Ceto_Spectrum01, u_xlat0.xy, 0.0);
+    u_xlat1 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat2 = (-u_xlat0) + u_xlat1;                                                                                                                              u_xlat0 = u_xlat0 + u_xlat1;
+    u_xlat1 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat1.xy = u_xlat1.xy * vec2(Ceto_Time);
+    u_xlat3 = sin(u_xlat1.y);
+    u_xlat4 = cos(u_xlat1.y);
+    u_xlat5 = cos(u_xlat1.x);
+    u_xlat1.x = sin(u_xlat1.x);
+    u_xlat8 = u_xlat2.w * u_xlat4;
+    u_xlat6.z = u_xlat2.z * u_xlat3 + u_xlat8;
+    u_xlat6.x = (-u_xlat6.z);
+    u_xlat7 = u_xlat0.y * u_xlat1.x;
+    u_xlat0.x = u_xlat0.x * u_xlat5 + (-u_xlat7);
+    u_xlat8 = u_xlat2.y * u_xlat5;
+    u_xlat0.y = u_xlat2.x * u_xlat1.x + u_xlat8;
+    u_xlat21 = u_xlat0.w * u_xlat3;
+    u_xlat6.y = u_xlat0.z * u_xlat4 + (-u_xlat21);
+    SV_Target0.xy = u_xlat0.xy + u_xlat6.xy;
+    SV_Target0.zw = vec2(0.0, 0.0);
+    u_xlatb1 = lessThan(vec4(0.5, 0.5, 0.5, 0.5), vs_TEXCOORD0.xyxy);
+    u_xlat2 = vs_TEXCOORD0.xyxy + vec4(-1.0, -1.0, -1.0, -1.0);
+    u_xlat1.x = (u_xlatb1.x) ? u_xlat2.x : vs_TEXCOORD0.x;
+    u_xlat1.y = (u_xlatb1.y) ? u_xlat2.y : vs_TEXCOORD0.y;
+    u_xlat1.z = (u_xlatb1.z) ? u_xlat2.z : vs_TEXCOORD0.x;
+    u_xlat1.w = (u_xlatb1.w) ? u_xlat2.w : vs_TEXCOORD0.y;
+    u_xlat1 = u_xlat1 * Ceto_InverseGridSizes.xxyy;
+    u_xlat2.xy = u_xlat0.xy * u_xlat1.xx;
+    u_xlat2.z = (-u_xlat2.y);
+    u_xlat0.xy = (-u_xlat1.yy) * u_xlat0.xy + u_xlat2.zx;
+    u_xlat2.xy = u_xlat6.yz * u_xlat1.zz;
+    u_xlat2.z = (-u_xlat2.y);
+    u_xlat0.zw = (-u_xlat1.ww) * u_xlat6.yz + u_xlat2.zx;
+    u_xlat1.x = dot(u_xlat1.xy, u_xlat1.xy);
+    u_xlat1.y = dot(u_xlat1.zw, u_xlat1.zw);
+    u_xlat1.xy = sqrt(u_xlat1.xy);                                                                                                                               u_xlatb15 = u_xlat1.x==0.0;
+    u_xlat1.x = float(1.0) / u_xlat1.x;                                                                                                                          u_xlat2.xy = (bool(u_xlatb15)) ? vec2(0.0, 0.0) : u_xlat1.xx;
+    u_xlatb1.x = u_xlat1.y==0.0;
+    u_xlat8 = float(1.0) / u_xlat1.y;
+    u_xlat2.zw = (u_xlatb1.x) ? vec2(0.0, 0.0) : vec2(u_xlat8);                                                                                                  SV_Target1 = u_xlat0 * u_xlat2;
+    return;                                                                                                                                                  }
+--- Pass[2] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif                                                                                                                                                       
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else                                                                                                                                                        #define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION                                                                                                                          #define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)                                                                                                         #else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;                                                                                                                            uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_Spectrum23;                                                                                                        UNITY_LOCATION(2) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;                                                                                                                    layout(location = 2) out vec4 SV_Target2;
+vec4 u_xlat0;
+bool u_xlatb0;                                                                                                                                               vec4 u_xlat1;
+bvec2 u_xlatb1;                                                                                                                                              vec4 u_xlat2;
+vec4 u_xlat3;
+vec3 u_xlat4;                                                                                                                                                float u_xlat5;
+vec3 u_xlat6;
+float u_xlat7;
+float u_xlat8;                                                                                                                                               float u_xlat9;
+float u_xlat10;                                                                                                                                              float u_xlat11;
+vec2 u_xlat20;
+vec2 u_xlat21;
+bool u_xlatb21;
+float u_xlat30;                                                                                                                                              bool u_xlatb30;
+void main()
+{
+    u_xlat0 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat1.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;                                                                                                            u_xlat2 = textureLod(Ceto_Spectrum01, u_xlat1.xy, 0.0);
+    u_xlat1 = textureLod(Ceto_Spectrum23, u_xlat1.xy, 0.0);                                                                                                      u_xlat3 = u_xlat0 + (-u_xlat2);
+    u_xlat0 = u_xlat0 + u_xlat2;
+    u_xlat2 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat2.xyz = u_xlat2.xyz * vec3(Ceto_Time);
+    u_xlat4.x = sin(u_xlat2.y);                                                                                                                                  u_xlat5 = cos(u_xlat2.y);
+    u_xlat21.x = u_xlat3.w * u_xlat5;
+    u_xlat6.z = u_xlat3.z * u_xlat4.x + u_xlat21.x;
+    u_xlat6.x = (-u_xlat6.z);
+    u_xlat7 = cos(u_xlat2.x);                                                                                                                                    u_xlat2.x = sin(u_xlat2.x);
+    u_xlat8 = sin(u_xlat2.z);                                                                                                                                    u_xlat9 = cos(u_xlat2.z);
+    u_xlat10 = u_xlat0.y * u_xlat2.x;
+    u_xlat0.x = u_xlat0.x * u_xlat7 + (-u_xlat10);
+    u_xlat21.x = u_xlat3.y * u_xlat7;
+    u_xlat0.y = u_xlat3.x * u_xlat2.x + u_xlat21.x;                                                                                                              u_xlat30 = u_xlat0.w * u_xlat4.x;
+    u_xlat6.y = u_xlat0.z * u_xlat5 + (-u_xlat30);
+    SV_Target0.xy = u_xlat0.xy + u_xlat6.xy;
+    u_xlat2 = textureLod(Ceto_Spectrum23, vs_TEXCOORD0.xy, 0.0);
+    u_xlat20.xy = u_xlat1.xy + u_xlat2.xy;
+    u_xlat1.xy = (-u_xlat1.xy) + u_xlat2.xy;
+    u_xlat30 = u_xlat8 * u_xlat20.y;                                                                                                                             u_xlat20.x = u_xlat20.x * u_xlat9 + (-u_xlat30);
+    u_xlat11 = u_xlat9 * u_xlat1.y;                                                                                                                              u_xlat20.y = u_xlat1.x * u_xlat8 + u_xlat11;
+    SV_Target0.zw = u_xlat20.xy;                                                                                                                                 u_xlatb1.xy = lessThan(vec4(0.5, 0.5, 0.0, 0.0), vs_TEXCOORD0.xyxx).xy;
+    u_xlat21.xy = vs_TEXCOORD0.xy + vec2(-1.0, -1.0);                                                                                                            u_xlat1.x = (u_xlatb1.x) ? u_xlat21.x : vs_TEXCOORD0.x;
+    u_xlat1.y = (u_xlatb1.y) ? u_xlat21.y : vs_TEXCOORD0.y;                                                                                                      u_xlat2 = u_xlat1.xyxy * Ceto_InverseGridSizes.xxyy;
+    u_xlat1.xy = u_xlat1.xy * Ceto_InverseGridSizes.zz;                                                                                                          u_xlat3.xy = u_xlat0.xy * u_xlat2.xx;
+    u_xlat3.z = (-u_xlat3.y);
+    u_xlat3.xy = (-u_xlat2.yy) * u_xlat0.xy + u_xlat3.zx;
+    u_xlat4.xy = u_xlat6.yz * u_xlat2.zz;
+    u_xlat4.z = (-u_xlat4.y);
+    u_xlat3.zw = (-u_xlat2.ww) * u_xlat6.yz + u_xlat4.zx;
+    u_xlat0.x = dot(u_xlat2.xy, u_xlat2.xy);
+    u_xlat0.y = dot(u_xlat2.zw, u_xlat2.zw);
+    u_xlat0.xy = sqrt(u_xlat0.xy);                                                                                                                               u_xlatb21 = u_xlat0.x==0.0;
+    u_xlat0.x = float(1.0) / u_xlat0.x;
+    u_xlat2.xy = (bool(u_xlatb21)) ? vec2(0.0, 0.0) : u_xlat0.xx;
+    u_xlatb0 = u_xlat0.y==0.0;
+    u_xlat10 = float(1.0) / u_xlat0.y;
+    u_xlat2.zw = (bool(u_xlatb0)) ? vec2(0.0, 0.0) : vec2(u_xlat10);
+    SV_Target1 = u_xlat2 * u_xlat3;
+    u_xlat2.xy = u_xlat20.xy * u_xlat1.xx;
+    u_xlat2.z = (-u_xlat2.y);
+    u_xlat0.xy = (-u_xlat1.yy) * u_xlat20.xy + u_xlat2.zx;
+    u_xlat20.x = dot(u_xlat1.xy, u_xlat1.xy);                                                                                                                    u_xlat20.x = sqrt(u_xlat20.x);
+    u_xlatb30 = u_xlat20.x==0.0;
+    u_xlat20.x = float(1.0) / u_xlat20.x;
+    u_xlat20.x = (u_xlatb30) ? 0.0 : u_xlat20.x;
+    SV_Target2.xy = u_xlat20.xx * u_xlat0.xy;
+    SV_Target2.zw = vec2(0.0, 0.0);
+    return;
+}
+--- Pass[3] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_Spectrum23;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+layout(location = 2) out vec4 SV_Target2;
+vec4 u_xlat0;
+vec4 u_xlat1;
+bool u_xlatb1;
+vec4 u_xlat2;
+bvec4 u_xlatb2;
+vec4 u_xlat3;
+bool u_xlatb3;
+vec4 u_xlat4;
+float u_xlat5;                                                                                                                                               vec3 u_xlat6;
+vec3 u_xlat7;                                                                                                                                                float u_xlat8;
+float u_xlat9;
+float u_xlat10;
+float u_xlat16;
+vec2 u_xlat17;
+bool u_xlatb17;
+float u_xlat24;
+float u_xlat25;
+void main()
+{                                                                                                                                                                u_xlat0 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat1.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;                                                                                                            u_xlat2 = textureLod(Ceto_Spectrum01, u_xlat1.xy, 0.0);
+    u_xlat1 = textureLod(Ceto_Spectrum23, u_xlat1.xy, 0.0);                                                                                                      u_xlat3 = u_xlat0 + (-u_xlat2);
+    u_xlat0 = u_xlat0 + u_xlat2;
+    u_xlat2 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat2 = u_xlat2 * vec4(Ceto_Time);
+    u_xlat4.x = sin(u_xlat2.y);
+    u_xlat5 = cos(u_xlat2.y);
+    u_xlat10 = u_xlat3.w * u_xlat5;                                                                                                                              u_xlat6.z = u_xlat3.z * u_xlat4.x + u_xlat10;                                                                                                                u_xlat6.x = (-u_xlat6.z);
+    u_xlat7.x = cos(u_xlat2.x);
+    u_xlat2.x = sin(u_xlat2.x);
+    u_xlat8 = u_xlat0.y * u_xlat2.x;
+    u_xlat0.x = u_xlat0.x * u_xlat7.x + (-u_xlat8);
+    u_xlat10 = u_xlat3.y * u_xlat7.x;
+    u_xlat0.y = u_xlat3.x * u_xlat2.x + u_xlat10;
+    u_xlat24 = u_xlat0.w * u_xlat4.x;
+    u_xlat6.y = u_xlat0.z * u_xlat5 + (-u_xlat24);
+    SV_Target0.xy = u_xlat0.xy + u_xlat6.xy;
+    u_xlat3 = textureLod(Ceto_Spectrum23, vs_TEXCOORD0.xy, 0.0);                                                                                                 u_xlat4 = (-u_xlat1) + u_xlat3;
+    u_xlat1 = u_xlat1 + u_xlat3;
+    u_xlat3.x = cos(u_xlat2.w);
+    u_xlat2.x = sin(u_xlat2.w);
+    u_xlat5 = sin(u_xlat2.z);
+    u_xlat6.x = cos(u_xlat2.z);
+    u_xlat16 = u_xlat3.x * u_xlat4.w;
+    u_xlat7.z = u_xlat4.z * u_xlat2.x + u_xlat16;
+    u_xlat7.x = (-u_xlat7.z);
+    u_xlat16 = u_xlat1.y * u_xlat5;
+    u_xlat1.x = u_xlat1.x * u_xlat6.x + (-u_xlat16);
+    u_xlat16 = u_xlat4.y * u_xlat6.x;
+    u_xlat1.y = u_xlat4.x * u_xlat5 + u_xlat16;
+    u_xlat16 = u_xlat1.w * u_xlat2.x;
+    u_xlat7.y = u_xlat1.z * u_xlat3.x + (-u_xlat16);
+    SV_Target0.zw = u_xlat1.xy + u_xlat7.xy;
+    u_xlatb2 = lessThan(vec4(0.5, 0.5, 0.5, 0.5), vs_TEXCOORD0.xyxy);
+    u_xlat3 = vs_TEXCOORD0.xyxy + vec4(-1.0, -1.0, -1.0, -1.0);
+    u_xlat2.x = (u_xlatb2.x) ? u_xlat3.x : vs_TEXCOORD0.x;
+    u_xlat2.y = (u_xlatb2.y) ? u_xlat3.y : vs_TEXCOORD0.y;
+    u_xlat2.z = (u_xlatb2.z) ? u_xlat3.z : vs_TEXCOORD0.x;
+    u_xlat2.w = (u_xlatb2.w) ? u_xlat3.w : vs_TEXCOORD0.y;
+    u_xlat3 = u_xlat2.zwzw * Ceto_InverseGridSizes.xxyy;
+    u_xlat2 = u_xlat2 * Ceto_InverseGridSizes.zzww;
+    u_xlat4.xy = u_xlat0.xy * u_xlat3.xx;
+    u_xlat4.z = (-u_xlat4.y);                                                                                                                                    u_xlat0.xy = (-u_xlat3.yy) * u_xlat0.xy + u_xlat4.zx;
+    u_xlat4.xy = u_xlat6.yz * u_xlat3.zz;
+    u_xlat4.z = (-u_xlat4.y);
+    u_xlat0.zw = (-u_xlat3.ww) * u_xlat6.yz + u_xlat4.zx;
+    u_xlat17.x = dot(u_xlat3.xy, u_xlat3.xy);                                                                                                                    u_xlat17.y = dot(u_xlat3.zw, u_xlat3.zw);
+    u_xlat17.xy = sqrt(u_xlat17.xy);
+    u_xlatb3 = u_xlat17.x==0.0;
+    u_xlat17.x = float(1.0) / u_xlat17.x;
+    u_xlat3.xy = (bool(u_xlatb3)) ? vec2(0.0, 0.0) : u_xlat17.xx;
+    u_xlatb17 = u_xlat17.y==0.0;                                                                                                                                 u_xlat25 = float(1.0) / u_xlat17.y;
+    u_xlat3.zw = (bool(u_xlatb17)) ? vec2(0.0, 0.0) : vec2(u_xlat25);
+    SV_Target1 = u_xlat0 * u_xlat3;
+    u_xlat0.xy = u_xlat1.xy * u_xlat2.xx;
+    u_xlat0.z = (-u_xlat0.y);
+    u_xlat0.xy = (-u_xlat2.yy) * u_xlat1.xy + u_xlat0.zx;
+    u_xlat1.xy = u_xlat7.yz * u_xlat2.zz;
+    u_xlat1.z = (-u_xlat1.y);
+    u_xlat0.zw = (-u_xlat2.ww) * u_xlat7.yz + u_xlat1.zx;
+    u_xlat1.x = dot(u_xlat2.xy, u_xlat2.xy);
+    u_xlat1.y = dot(u_xlat2.zw, u_xlat2.zw);
+    u_xlat1.xy = sqrt(u_xlat1.xy);
+    u_xlatb17 = u_xlat1.x==0.0;
+    u_xlat1.x = float(1.0) / u_xlat1.x;
+    u_xlat2.xy = (bool(u_xlatb17)) ? vec2(0.0, 0.0) : u_xlat1.xx;
+    u_xlatb1 = u_xlat1.y==0.0;
+    u_xlat9 = float(1.0) / u_xlat1.y;
+    u_xlat2.zw = (bool(u_xlatb1)) ? vec2(0.0, 0.0) : vec2(u_xlat9);
+    SV_Target2 = u_xlat0 * u_xlat2;
+    return;
+}
+
+==================== Ceto/InitJacobians (pid=159) ====================
+--- Pass[0] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require                                                                                                         #ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)                                                                                                               #define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif                                                                                                                                                       uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;                                                                                                                  uniform         float Ceto_FoamAmount;
+uniform         float Ceto_Time;                                                                                                                             UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_WTable;                                                                                                            in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;                                                                                                                    vec4 u_xlat0;
+bvec3 u_xlatb0;                                                                                                                                              vec4 u_xlat1;                                                                                                                                                bool u_xlatb1;                                                                                                                                               vec4 u_xlat2;
+float u_xlat3;                                                                                                                                               float u_xlat5;
+float u_xlat9;                                                                                                                                               float u_xlat12;
+void main()                                                                                                                                                  {
+    u_xlatb0.xyz = lessThan(vec4(0.5, 0.5, 0.5, 0.0), vs_TEXCOORD0.xyxx).xyz;                                                                                    u_xlat1.xyz = vs_TEXCOORD0.xyx + vec3(-1.0, -1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat1.x : vs_TEXCOORD0.x;                                                                                                       u_xlat0.y = (u_xlatb0.y) ? u_xlat1.y : vs_TEXCOORD0.y;
+    u_xlat0.z = (u_xlatb0.z) ? u_xlat1.z : vs_TEXCOORD0.x;                                                                                                       u_xlat0.xyz = u_xlat0.xyz * Ceto_InverseGridSizes.xxx;                                                                                                       u_xlat12 = dot(u_xlat0.yz, u_xlat0.yz);                                                                                                                      u_xlat0.xyz = u_xlat0.xyy * u_xlat0.xyz;                                                                                                                     u_xlat12 = sqrt(u_xlat12);                                                                                                                                   u_xlatb1 = u_xlat12==0.0;
+    u_xlat12 = float(1.0) / u_xlat12;                                                                                                                            u_xlat12 = (u_xlatb1) ? 0.0 : u_xlat12;
+    u_xlat0.xyz = vec3(u_xlat12) * u_xlat0.xyz;                                                                                                                  u_xlat1.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat1 = textureLod(Ceto_Spectrum01, u_xlat1.xy, 0.0);                                                                                                      u_xlat1.xy = u_xlat1.xy * vec2(Ceto_FoamAmount);
+    u_xlat2 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);                                                                                                 u_xlat1.xy = u_xlat2.xy * vec2(Ceto_FoamAmount) + u_xlat1.xy;                                                                                                u_xlat2 = texture(Ceto_WTable, vs_TEXCOORD0.xy);                                                                                                             u_xlat9 = u_xlat2.x * Ceto_Time;
+    u_xlat2.x = sin(u_xlat9);                                                                                                                                    u_xlat3 = cos(u_xlat9);
+    u_xlat5 = u_xlat1.y * u_xlat2.x;                                                                                                                             u_xlat1.x = u_xlat1.x * u_xlat3 + (-u_xlat5);
+    u_xlat0.w = 0.0;                                                                                                                                             SV_Target0 = u_xlat0 * (-u_xlat1.xxxx);
+    return;                                                                                                                                                  }
+--- Pass[1] Fragment GLSL ---                                                                                                                                #version 150
+#extension GL_ARB_explicit_attrib_location : require                                                                                                         #ifdef GL_ARB_shader_bit_encoding                                                                                                                            #extension GL_ARB_shader_bit_encoding : enable                                                                                                               #endif                                                                                                                                                                                                                                                                                                                    #define HLSLCC_ENABLE_UNIFORM_BUFFERS 1                                                                                                                      #if HLSLCC_ENABLE_UNIFORM_BUFFERS                                                                                                                            #define UNITY_UNIFORM                                                                                                                                        #else                                                                                                                                                        #define UNITY_UNIFORM uniform
+#endif                                                                                                                                                       #define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION                                                                                                                          #define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)                                                                                                         #else
+#define UNITY_LOCATION(x)                                                                                                                                    #define UNITY_BINDING(x) layout(std140)
+#endif                                                                                                                                                       uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;                                                                                                                  uniform         float Ceto_FoamAmount;                                                                                                                       uniform         float Ceto_Time;                                                                                                                             UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;                                                                                                        UNITY_LOCATION(1) uniform  sampler2D Ceto_WTable;                                                                                                            in  vec2 vs_TEXCOORD0;                                                                                                                                       layout(location = 0) out vec4 SV_Target0;                                                                                                                    layout(location = 1) out vec4 SV_Target1;                                                                                                                    vec4 u_xlat0;                                                                                                                                                bvec4 u_xlatb0;                                                                                                                                              vec4 u_xlat1;                                                                                                                                                vec4 u_xlat2;                                                                                                                                                vec4 u_xlat3;                                                                                                                                                float u_xlat4;                                                                                                                                               float u_xlat5;                                                                                                                                               float u_xlat6;
+bool u_xlatb8;                                                                                                                                               bool u_xlatb9;
+vec2 u_xlat14;                                                                                                                                               void main()
+{                                                                                                                                                                u_xlatb0 = lessThan(vec4(0.5, 0.5, 0.5, 0.5), vs_TEXCOORD0.xxyy);
+    u_xlat1 = vs_TEXCOORD0.xxyy + vec4(-1.0, -1.0, -1.0, -1.0);                                                                                                  u_xlat0.x = (u_xlatb0.x) ? u_xlat1.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat1.y : vs_TEXCOORD0.x;                                                                                                       u_xlat0.z = (u_xlatb0.z) ? u_xlat1.z : vs_TEXCOORD0.y;
+    u_xlat0.w = (u_xlatb0.w) ? u_xlat1.w : vs_TEXCOORD0.y;                                                                                                       u_xlat0 = u_xlat0 * Ceto_InverseGridSizes.xyxy;                                                                                                              u_xlat1.x = dot(u_xlat0.xz, u_xlat0.xz);                                                                                                                     u_xlat1.x = sqrt(u_xlat1.x);
+    u_xlatb8 = u_xlat1.x==0.0;                                                                                                                                   u_xlat1.x = float(1.0) / u_xlat1.x;                                                                                                                          u_xlat1.x = (u_xlatb8) ? 0.0 : u_xlat1.x;
+    u_xlat2.x = dot(u_xlat0.yw, u_xlat0.yw);                                                                                                                     u_xlat2.x = sqrt(u_xlat2.x);
+    u_xlatb9 = u_xlat2.x==0.0;                                                                                                                                   u_xlat2.x = float(1.0) / u_xlat2.x;
+    u_xlat1.y = (u_xlatb9) ? 0.0 : u_xlat2.x;
+    u_xlat1.z = float(0.0);
+    u_xlat1.w = float(0.0);
+    u_xlat2 = u_xlat0 * u_xlat0;
+    u_xlat0.xy = u_xlat0.zw * u_xlat0.xy;
+    u_xlat0.xy = u_xlat1.xy * u_xlat0.xy;
+    u_xlat1 = u_xlat1 * u_xlat2;
+    u_xlat14.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat2 = textureLod(Ceto_Spectrum01, u_xlat14.xy, 0.0);
+    u_xlat2 = u_xlat2 * vec4(Ceto_FoamAmount);
+    u_xlat3 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat2 = u_xlat3 * vec4(Ceto_FoamAmount) + u_xlat2;
+    u_xlat3 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat14.xy = u_xlat3.xy * vec2(vec2(Ceto_Time, Ceto_Time));
+    u_xlat3.x = sin(u_xlat14.x);
+    u_xlat4 = cos(u_xlat14.x);
+    u_xlat5 = sin(u_xlat14.y);
+    u_xlat6 = cos(u_xlat14.y);
+    u_xlat14.x = u_xlat2.y * u_xlat3.x;
+    u_xlat2.x = u_xlat2.x * u_xlat4 + (-u_xlat14.x);
+    u_xlat14.x = u_xlat2.w * u_xlat5;
+    u_xlat2.y = u_xlat2.z * u_xlat6 + (-u_xlat14.x);
+    SV_Target0 = u_xlat1 * (-u_xlat2.xyxy);
+    SV_Target1.xy = u_xlat0.xy * (-u_xlat2.xy);
+    SV_Target1.zw = vec2(0.0, 0.0);
+    return;
+}
+--- Pass[2] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+                                                                                                                                                             #define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_FoamAmount;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_Spectrum23;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+layout(location = 2) out vec4 SV_Target2;
+vec4 u_xlat0;
+bvec3 u_xlatb0;
+vec4 u_xlat1;
+vec3 u_xlat2;
+bool u_xlatb2;
+vec3 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+vec4 u_xlat6;
+vec4 u_xlat7;
+float u_xlat8;
+float u_xlat9;
+vec4 u_xlat10;
+float u_xlat33;
+float u_xlat34;
+bool u_xlatb35;
+void main()
+{
+    u_xlatb0.xyz = lessThan(vec4(0.5, 0.5, 0.5, 0.0), vs_TEXCOORD0.xyxx).xyz;
+    u_xlat1.xyz = vs_TEXCOORD0.xyx + vec3(-1.0, -1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat1.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat1.y : vs_TEXCOORD0.y;
+    u_xlat0.z = (u_xlatb0.z) ? u_xlat1.z : vs_TEXCOORD0.x;
+    u_xlat1.xyz = u_xlat0.xyz * Ceto_InverseGridSizes.zzz;
+    u_xlat0 = u_xlat0.zyzy * Ceto_InverseGridSizes.xxyy;
+    u_xlat34 = dot(u_xlat1.yz, u_xlat1.yz);
+    u_xlat1.xyz = u_xlat1.xyy * u_xlat1.xyz;                                                                                                                     u_xlat34 = sqrt(u_xlat34);
+    u_xlatb2 = u_xlat34==0.0;                                                                                                                                    u_xlat34 = float(1.0) / u_xlat34;
+    u_xlat2.z = (u_xlatb2) ? 0.0 : u_xlat34;
+    u_xlat34 = dot(u_xlat0.xy, u_xlat0.xy);
+    u_xlat34 = sqrt(u_xlat34);
+    u_xlatb35 = u_xlat34==0.0;
+    u_xlat34 = float(1.0) / u_xlat34;
+    u_xlat2.x = (u_xlatb35) ? 0.0 : u_xlat34;
+    u_xlat34 = dot(u_xlat0.zw, u_xlat0.zw);
+    u_xlat34 = sqrt(u_xlat34);
+    u_xlatb35 = u_xlat34==0.0;
+    u_xlat34 = float(1.0) / u_xlat34;
+    u_xlat2.y = (u_xlatb35) ? 0.0 : u_xlat34;
+    u_xlat3.z = u_xlat1.x;
+    u_xlat4 = u_xlat0.ywxz * u_xlat0.ywxz;
+    u_xlat0.xy = u_xlat0.yw * u_xlat0.xz;
+    u_xlat3.xy = u_xlat4.zw;
+    u_xlat3.xyz = u_xlat2.xyz * u_xlat3.xyz;
+    u_xlat5 = textureLod(Ceto_Spectrum23, vs_TEXCOORD0.xy, 0.0);
+    u_xlat1.xw = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat6 = textureLod(Ceto_Spectrum23, u_xlat1.xw, 0.0);
+    u_xlat7 = textureLod(Ceto_Spectrum01, u_xlat1.xw, 0.0);
+    u_xlat7 = u_xlat7 * vec4(Ceto_FoamAmount);
+    u_xlat1.xw = u_xlat6.xy * vec2(Ceto_FoamAmount);
+    u_xlat1.xw = u_xlat5.xy * vec2(Ceto_FoamAmount) + u_xlat1.xw;
+    u_xlat5 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat5.xyz = u_xlat5.xyz * vec3(vec3(Ceto_Time, Ceto_Time, Ceto_Time));
+    u_xlat6.x = sin(u_xlat5.z);
+    u_xlat8 = cos(u_xlat5.z);
+    u_xlat33 = u_xlat1.w * u_xlat6.x;
+    u_xlat6.z = u_xlat1.x * u_xlat8 + (-u_xlat33);
+    u_xlat1.x = sin(u_xlat5.x);
+    u_xlat5.x = cos(u_xlat5.x);
+    u_xlat8 = sin(u_xlat5.y);
+    u_xlat9 = cos(u_xlat5.y);
+    u_xlat10 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat7 = u_xlat10 * vec4(Ceto_FoamAmount) + u_xlat7;
+    u_xlat33 = u_xlat1.x * u_xlat7.y;
+    u_xlat6.x = u_xlat7.x * u_xlat5.x + (-u_xlat33);
+    u_xlat33 = u_xlat8 * u_xlat7.w;
+    u_xlat6.y = u_xlat7.z * u_xlat9 + (-u_xlat33);
+    SV_Target0.xyz = u_xlat3.xyz * (-u_xlat6.xyz);
+    SV_Target0.w = 0.0;
+    u_xlat4.z = u_xlat1.y;
+    u_xlat0.z = u_xlat1.z;
+    u_xlat0.xyz = u_xlat2.xyz * u_xlat0.xyz;
+    u_xlat1.xyz = u_xlat2.xyz * u_xlat4.xyz;
+    SV_Target1.xyz = (-u_xlat6.xyz) * u_xlat1.xyz;
+    SV_Target2.xyz = (-u_xlat6.xyz) * u_xlat0.xyz;
+    SV_Target1.w = 0.0;                                                                                                                                          SV_Target2.w = 0.0;
+    return;
+}
+--- Pass[3] Fragment GLSL ---                                                                                                                                #version 150                                                                                                                                                 #extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_FoamAmount;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_Spectrum23;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+layout(location = 2) out vec4 SV_Target2;
+vec4 u_xlat0;
+bvec4 u_xlatb0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+vec4 u_xlat6;
+float u_xlat7;                                                                                                                                               float u_xlat8;
+vec4 u_xlat9;
+bool u_xlatb12;
+float u_xlat13;
+bool u_xlatb13;
+void main()
+{
+    u_xlatb0 = lessThan(vec4(0.5, 0.5, 0.5, 0.5), vs_TEXCOORD0.xyxy);
+    u_xlat1 = vs_TEXCOORD0.xyxy + vec4(-1.0, -1.0, -1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat1.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat1.y : vs_TEXCOORD0.y;
+    u_xlat0.z = (u_xlatb0.z) ? u_xlat1.z : vs_TEXCOORD0.x;
+    u_xlat0.w = (u_xlatb0.w) ? u_xlat1.w : vs_TEXCOORD0.y;
+    u_xlat1 = u_xlat0.zwzw * Ceto_InverseGridSizes.xxyy;
+    u_xlat0 = u_xlat0 * Ceto_InverseGridSizes.zzww;
+    u_xlat2.x = dot(u_xlat1.xy, u_xlat1.xy);
+    u_xlat2.x = sqrt(u_xlat2.x);
+    u_xlatb12 = u_xlat2.x==0.0;
+    u_xlat2.x = float(1.0) / u_xlat2.x;
+    u_xlat2.x = (u_xlatb12) ? 0.0 : u_xlat2.x;
+    u_xlat3.x = dot(u_xlat1.zw, u_xlat1.zw);
+    u_xlat3.x = sqrt(u_xlat3.x);
+    u_xlatb13 = u_xlat3.x==0.0;                                                                                                                                  u_xlat3.x = float(1.0) / u_xlat3.x;                                                                                                                          u_xlat2.y = (u_xlatb13) ? 0.0 : u_xlat3.x;
+    u_xlat3.x = dot(u_xlat0.xy, u_xlat0.xy);
+    u_xlat3.x = sqrt(u_xlat3.x);
+    u_xlatb13 = u_xlat3.x==0.0;
+    u_xlat3.x = float(1.0) / u_xlat3.x;
+    u_xlat2.z = (u_xlatb13) ? 0.0 : u_xlat3.x;
+    u_xlat3.x = dot(u_xlat0.zw, u_xlat0.zw);
+    u_xlat3.x = sqrt(u_xlat3.x);
+    u_xlatb13 = u_xlat3.x==0.0;
+    u_xlat3.x = float(1.0) / u_xlat3.x;
+    u_xlat2.w = (u_xlatb13) ? 0.0 : u_xlat3.x;
+    u_xlat3 = u_xlat1.ywxz * u_xlat1.ywxz;
+    u_xlat1.xy = u_xlat1.yw * u_xlat1.xz;
+    u_xlat4.xy = u_xlat3.zw;
+    u_xlat5 = u_xlat0 * u_xlat0;
+    u_xlat1.zw = u_xlat0.yw * u_xlat0.xz;
+    u_xlat0 = u_xlat2 * u_xlat1;
+    u_xlat4.zw = u_xlat5.xz;
+    u_xlat3.zw = u_xlat5.yw;
+    u_xlat1 = u_xlat2 * u_xlat3;
+    u_xlat2 = u_xlat2 * u_xlat4;
+    u_xlat3 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat4.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;                                                                                                            u_xlat5 = textureLod(Ceto_Spectrum01, u_xlat4.xy, 0.0);
+    u_xlat4 = textureLod(Ceto_Spectrum23, u_xlat4.xy, 0.0);
+    u_xlat4 = u_xlat4 * vec4(Ceto_FoamAmount);
+    u_xlat5 = u_xlat5 * vec4(Ceto_FoamAmount);
+    u_xlat3 = u_xlat3 * vec4(Ceto_FoamAmount) + u_xlat5;
+    u_xlat5 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat5 = u_xlat5 * vec4(vec4(Ceto_Time, Ceto_Time, Ceto_Time, Ceto_Time));
+    u_xlat6.x = cos(u_xlat5.x);
+    u_xlat5.x = sin(u_xlat5.x);
+    u_xlat13 = u_xlat3.y * u_xlat5.x;
+    u_xlat6.x = u_xlat3.x * u_xlat6.x + (-u_xlat13);
+    u_xlat3.x = sin(u_xlat5.y);
+    u_xlat5.x = cos(u_xlat5.y);
+    u_xlat3.x = u_xlat3.x * u_xlat3.w;
+    u_xlat6.y = u_xlat3.z * u_xlat5.x + (-u_xlat3.x);
+    u_xlat3.x = sin(u_xlat5.z);
+    u_xlat5.x = cos(u_xlat5.z);                                                                                                                                  u_xlat7 = sin(u_xlat5.w);
+    u_xlat8 = cos(u_xlat5.w);
+    u_xlat9 = textureLod(Ceto_Spectrum23, vs_TEXCOORD0.xy, 0.0);
+    u_xlat4 = u_xlat9 * vec4(Ceto_FoamAmount) + u_xlat4;
+    u_xlat3.x = u_xlat3.x * u_xlat4.y;
+    u_xlat6.z = u_xlat4.x * u_xlat5.x + (-u_xlat3.x);
+    u_xlat3.x = u_xlat7 * u_xlat4.w;
+    u_xlat6.w = u_xlat4.z * u_xlat8 + (-u_xlat3.x);
+    SV_Target0 = u_xlat2 * (-u_xlat6);
+    SV_Target1 = u_xlat1 * (-u_xlat6);
+    SV_Target2 = u_xlat0 * (-u_xlat6);
+    return;
+}
+
+==================== Ceto/InitSlope (pid=176) ====================
+--- Pass[0] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec2 u_xlat0;
+bvec2 u_xlatb0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+float u_xlat3;
+vec2 u_xlat4;
+vec2 u_xlat10;
+float u_xlat11;
+float u_xlat15;
+void main()
+{
+    u_xlatb0.xy = lessThan(vec4(0.5, 0.5, 0.0, 0.0), vs_TEXCOORD0.xyxx).xy;
+    u_xlat10.xy = vs_TEXCOORD0.xy + vec2(-1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat10.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat10.y : vs_TEXCOORD0.y;
+    u_xlat0.xy = u_xlat0.xy * Ceto_InverseGridSizes.xx;
+    u_xlat10.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat1 = textureLod(Ceto_Spectrum01, u_xlat10.xy, 0.0);
+    u_xlat2 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat10.xy = u_xlat1.xy + u_xlat2.xy;
+    u_xlat1.xy = (-u_xlat1.xy) + u_xlat2.xy;
+    u_xlat2 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat11 = u_xlat2.x * Ceto_Time;
+    u_xlat2.x = sin(u_xlat11);
+    u_xlat3 = cos(u_xlat11);
+    u_xlat15 = u_xlat10.y * u_xlat2.x;
+    u_xlat4.x = u_xlat10.x * u_xlat3 + (-u_xlat15);
+    u_xlat10.x = u_xlat1.y * u_xlat3;
+    u_xlat4.y = u_xlat1.x * u_xlat2.x + u_xlat10.x;
+    u_xlat1.xy = u_xlat0.xx * u_xlat4.xy;
+    u_xlat1.z = (-u_xlat1.y);
+    SV_Target0.xy = (-u_xlat0.yy) * u_xlat4.xy + u_xlat1.zx;
+    SV_Target0.zw = vec2(0.0, 0.0);
+    return;
+}
+--- Pass[1] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+bvec4 u_xlatb0;                                                                                                                                              vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+float u_xlat4;
+float u_xlat5;
+float u_xlat6;
+float u_xlat8;
+float u_xlat9;
+vec2 u_xlat16;
+void main()
+{
+    u_xlatb0 = lessThan(vec4(0.5, 0.5, 0.5, 0.5), vs_TEXCOORD0.xyxy);
+    u_xlat1 = vs_TEXCOORD0.xyxy + vec4(-1.0, -1.0, -1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat1.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat1.y : vs_TEXCOORD0.y;
+    u_xlat0.z = (u_xlatb0.z) ? u_xlat1.z : vs_TEXCOORD0.x;
+    u_xlat0.w = (u_xlatb0.w) ? u_xlat1.w : vs_TEXCOORD0.y;
+    u_xlat0 = u_xlat0 * Ceto_InverseGridSizes.xxyy;
+    u_xlat1.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat1 = textureLod(Ceto_Spectrum01, u_xlat1.xy, 0.0);
+    u_xlat2 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat3 = u_xlat1 + u_xlat2;
+    u_xlat1 = (-u_xlat1) + u_xlat2;
+    u_xlat2 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat2.xy = u_xlat2.xy * vec2(Ceto_Time);
+    u_xlat4 = cos(u_xlat2.x);
+    u_xlat2.x = sin(u_xlat2.x);
+    u_xlat5 = sin(u_xlat2.y);
+    u_xlat6 = cos(u_xlat2.y);
+    u_xlat9 = u_xlat2.x * u_xlat3.y;
+    u_xlat3.x = u_xlat3.x * u_xlat4 + (-u_xlat9);
+    u_xlat8 = u_xlat1.y * u_xlat4;
+    u_xlat3.y = u_xlat1.x * u_xlat2.x + u_xlat8;
+    u_xlat2.xy = u_xlat0.xx * u_xlat3.xy;
+    u_xlat2.z = (-u_xlat2.y);
+    SV_Target0.xy = (-u_xlat0.yy) * u_xlat3.xy + u_xlat2.zx;
+    u_xlat0.x = u_xlat3.w * u_xlat5;
+    u_xlat16.x = u_xlat3.z * u_xlat6 + (-u_xlat0.x);
+    u_xlat0.x = u_xlat1.w * u_xlat6;                                                                                                                             u_xlat16.y = u_xlat1.z * u_xlat5 + u_xlat0.x;
+    u_xlat0.xy = u_xlat0.zz * u_xlat16.xy;
+    u_xlat0.z = (-u_xlat0.y);
+    SV_Target0.zw = (-u_xlat0.ww) * u_xlat16.xy + u_xlat0.zx;
+    return;
+}
+--- Pass[2] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_Spectrum23;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+vec2 u_xlat0;
+bvec2 u_xlatb0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+vec3 u_xlat6;
+float u_xlat8;
+vec2 u_xlat14;
+float u_xlat21;
+void main()
+{
+    u_xlatb0.xy = lessThan(vec4(0.5, 0.5, 0.0, 0.0), vs_TEXCOORD0.xyxx).xy;
+    u_xlat14.xy = vs_TEXCOORD0.xy + vec2(-1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat14.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat14.y : vs_TEXCOORD0.y;
+    u_xlat1 = u_xlat0.xyxy * Ceto_InverseGridSizes.xxyy;
+    u_xlat0.xy = u_xlat0.xy * Ceto_InverseGridSizes.zz;
+    u_xlat2 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat14.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat3 = textureLod(Ceto_Spectrum01, u_xlat14.xy, 0.0);
+    u_xlat4 = textureLod(Ceto_Spectrum23, u_xlat14.xy, 0.0);
+    u_xlat5 = u_xlat2 + u_xlat3;
+    u_xlat2 = u_xlat2 + (-u_xlat3);
+    u_xlat3 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat3.xyz = u_xlat3.xyz * vec3(Ceto_Time);
+    u_xlat6.x = cos(u_xlat3.x);
+    u_xlat3.x = sin(u_xlat3.x);
+    u_xlat14.x = u_xlat3.x * u_xlat5.y;
+    u_xlat5.x = u_xlat5.x * u_xlat6.x + (-u_xlat14.x);
+    u_xlat14.x = u_xlat2.y * u_xlat6.x;
+    u_xlat5.y = u_xlat2.x * u_xlat3.x + u_xlat14.x;
+    u_xlat6.xy = u_xlat1.xx * u_xlat5.xy;
+    u_xlat6.z = (-u_xlat6.y);
+    SV_Target0.xy = (-u_xlat1.yy) * u_xlat5.xy + u_xlat6.zx;
+    u_xlat1.x = sin(u_xlat3.y);
+    u_xlat2.x = cos(u_xlat3.y);
+    u_xlat5.x = cos(u_xlat3.z);
+    u_xlat3.x = sin(u_xlat3.z);                                                                                                                                  u_xlat14.x = u_xlat1.x * u_xlat5.w;
+    u_xlat14.x = u_xlat5.z * u_xlat2.x + (-u_xlat14.x);
+    u_xlat8 = u_xlat2.x * u_xlat2.w;
+    u_xlat14.y = u_xlat2.z * u_xlat1.x + u_xlat8;
+    u_xlat1.xy = u_xlat14.xy * u_xlat1.zz;
+    u_xlat1.z = (-u_xlat1.y);
+    SV_Target0.zw = (-u_xlat1.ww) * u_xlat14.xy + u_xlat1.zx;
+    u_xlat1 = textureLod(Ceto_Spectrum23, vs_TEXCOORD0.xy, 0.0);
+    u_xlat14.xy = u_xlat4.xy + u_xlat1.xy;
+    u_xlat1.xy = (-u_xlat4.xy) + u_xlat1.xy;
+    u_xlat21 = u_xlat3.x * u_xlat14.y;
+    u_xlat2.x = u_xlat14.x * u_xlat5.x + (-u_xlat21);
+    u_xlat14.x = u_xlat5.x * u_xlat1.y;
+    u_xlat2.y = u_xlat1.x * u_xlat3.x + u_xlat14.x;
+    u_xlat1.xy = u_xlat0.xx * u_xlat2.xy;
+    u_xlat1.z = (-u_xlat1.y);
+    SV_Target1.xy = (-u_xlat0.yy) * u_xlat2.xy + u_xlat1.zx;
+    SV_Target1.zw = vec2(0.0, 0.0);
+    return;
+}
+--- Pass[3] Fragment GLSL ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_Offset;
+uniform         vec4 Ceto_InverseGridSizes;
+uniform         float Ceto_Time;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_Spectrum01;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_Spectrum23;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_WTable;
+in  vec2 vs_TEXCOORD0;                                                                                                                                       layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+vec4 u_xlat0;
+bvec4 u_xlatb0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+vec4 u_xlat6;
+vec4 u_xlat7;
+float u_xlat9;
+float u_xlat10;
+float u_xlat13;
+vec2 u_xlat17;
+vec2 u_xlat21;
+void main()
+{
+    u_xlatb0 = lessThan(vec4(0.5, 0.5, 0.5, 0.5), vs_TEXCOORD0.xyxy);
+    u_xlat1 = vs_TEXCOORD0.xyxy + vec4(-1.0, -1.0, -1.0, -1.0);
+    u_xlat0.x = (u_xlatb0.x) ? u_xlat1.x : vs_TEXCOORD0.x;
+    u_xlat0.y = (u_xlatb0.y) ? u_xlat1.y : vs_TEXCOORD0.y;
+    u_xlat0.z = (u_xlatb0.z) ? u_xlat1.z : vs_TEXCOORD0.x;
+    u_xlat0.w = (u_xlatb0.w) ? u_xlat1.w : vs_TEXCOORD0.y;
+    u_xlat1 = u_xlat0.zwzw * Ceto_InverseGridSizes.xxyy;
+    u_xlat0 = u_xlat0 * Ceto_InverseGridSizes.zzww;
+    u_xlat2 = textureLod(Ceto_Spectrum01, vs_TEXCOORD0.xy, 0.0);
+    u_xlat3.xy = (-vs_TEXCOORD0.xy) + Ceto_Offset.xy;
+    u_xlat4 = textureLod(Ceto_Spectrum01, u_xlat3.xy, 0.0);
+    u_xlat3 = textureLod(Ceto_Spectrum23, u_xlat3.xy, 0.0);
+    u_xlat5 = u_xlat2 + u_xlat4;
+    u_xlat2 = u_xlat2 + (-u_xlat4);
+    u_xlat4 = texture(Ceto_WTable, vs_TEXCOORD0.xy);
+    u_xlat4 = u_xlat4 * vec4(Ceto_Time);
+    u_xlat6.x = cos(u_xlat4.x);
+    u_xlat4.x = sin(u_xlat4.x);
+    u_xlat13 = u_xlat4.x * u_xlat5.y;
+    u_xlat5.x = u_xlat5.x * u_xlat6.x + (-u_xlat13);
+    u_xlat10 = u_xlat2.y * u_xlat6.x;
+    u_xlat5.y = u_xlat2.x * u_xlat4.x + u_xlat10;
+    u_xlat6.xy = u_xlat1.xx * u_xlat5.xy;
+    u_xlat6.z = (-u_xlat6.y);
+    SV_Target0.xy = (-u_xlat1.yy) * u_xlat5.xy + u_xlat6.zx;
+    u_xlat1.x = sin(u_xlat4.y);
+    u_xlat2.x = cos(u_xlat4.y);
+    u_xlat9 = u_xlat1.x * u_xlat5.w;
+    u_xlat21.x = u_xlat5.z * u_xlat2.x + (-u_xlat9);
+    u_xlat9 = u_xlat2.x * u_xlat2.w;
+    u_xlat21.y = u_xlat2.z * u_xlat1.x + u_xlat9;
+    u_xlat1.xy = u_xlat1.zz * u_xlat21.xy;
+    u_xlat1.z = (-u_xlat1.y);
+    SV_Target0.zw = (-u_xlat1.ww) * u_xlat21.xy + u_xlat1.zx;
+    u_xlat1.x = sin(u_xlat4.z);
+    u_xlat2.x = cos(u_xlat4.z);
+    u_xlat5.x = cos(u_xlat4.w);
+    u_xlat4.x = sin(u_xlat4.w);
+    u_xlat6 = textureLod(Ceto_Spectrum23, vs_TEXCOORD0.xy, 0.0);
+    u_xlat7 = u_xlat3 + u_xlat6;
+    u_xlat3 = (-u_xlat3) + u_xlat6;
+    u_xlat9 = u_xlat1.x * u_xlat7.y;
+    u_xlat6.x = u_xlat7.x * u_xlat2.x + (-u_xlat9);
+    u_xlat9 = u_xlat2.x * u_xlat3.y;
+    u_xlat6.y = u_xlat3.x * u_xlat1.x + u_xlat9;
+    u_xlat1.xy = u_xlat0.xx * u_xlat6.xy;
+    u_xlat1.z = (-u_xlat1.y);
+    SV_Target1.xy = (-u_xlat0.yy) * u_xlat6.xy + u_xlat1.zx;
+    u_xlat0.x = u_xlat4.x * u_xlat7.w;
+    u_xlat17.x = u_xlat7.z * u_xlat5.x + (-u_xlat0.x);
+    u_xlat0.x = u_xlat5.x * u_xlat3.w;
+    u_xlat17.y = u_xlat3.z * u_xlat4.x + u_xlat0.x;
+    u_xlat0.xy = u_xlat0.zz * u_xlat17.xy;
+    u_xlat0.z = (-u_xlat0.y);
+    SV_Target1.zw = (-u_xlat0.ww) * u_xlat17.xy + u_xlat0.zx;
+    return;
+}
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+
+
+
+
+
