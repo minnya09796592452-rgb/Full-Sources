@@ -1,0 +1,178 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. EXACT RUNTIME ENABLEKEYWORD / DISABLEKEYWORD CALLS IN CETO C# ==="
+=== 1. EXACT RUNTIME ENABLEKEYWORD / DISABLEKEYWORD CALLS IN CETO C# ===                                                                                     root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");                                                                                                                              /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. INSPECT SHADER TYPETREE FOR EXACT KEYWORD MAPPING ==="
+=== 2. INSPECT SHADER TYPETREE FOR EXACT KEYWORD MAPPING ===                                                                                                 root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy                                                                                                                                             > from pathlib import Path
+>                                                                                                                                                            > data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))                                                                                                  >
+> for pid, label, pass_idx in ((175, "OceanTopSide_Transparent", 1), (143, "OceanUnderSide_Transparent", 0)):
+>     obj = next(o for o in e0.objects if o.path_id == pid)
+>     tt = obj.read_typetree()
+>     pf = tt["m_ParsedForm"]
+>     sub = next(iter(pf["m_SubShaders"]))
+>     ps = sub["m_Passes"][pass_idx]
+>
+>     pf_names = {v: k for k, v in pf.get("m_NameIndices", [])} if isinstance(pf.get("m_NameIndices"), list) else {}
+>     ps_names = {v: k for k, v in ps.get("m_NameIndices", [])} if isinstance(ps.get("m_NameIndices"), list) else {}
+>     print(f"\n==================== {label} (pid={pid}) ====================")
+>     print("Pass keys:", list(ps.keys()))
+>     print("pf m_NameIndices:", pf.get("m_NameIndices")[:5] if isinstance(pf.get("m_NameIndices"), list) else type(pf.get("m_NameIndices")))
+>     print("ps m_NameIndices:", ps.get("m_NameIndices")[:5] if isinstance(ps.get("m_NameIndices"), list) else type(ps.get("m_NameIndices")))
+>
+>     frag_sps = ps["progFragment"]["m_SubPrograms"]
+>     first_sp = next(iter(frag_sps))
+>     print("Sample Frag SubProgram:", first_sp)
+>
+>     name_lookup = ps_names if ps_names else pf_names
+>     all_kw_names = set()
+>     for sp in frag_sps:
+>         for k in sp.get("m_GlobalKeywordIndices", []) + sp.get("m_LocalKeywordIndices", []) + sp.get("m_KeywordIndices", []):
+>             all_kw_names.add(name_lookup.get(k, str(k)))
+>     print(f"Resolved Frag Keywords ({len(all_kw_names)}):", sorted(all_kw_names))
+> EOF
+
+==================== OceanTopSide_Transparent (pid=175) ====================                                                                                 Pass keys: ['m_EditorDataHash', 'm_Platforms', 'm_NameIndices', 'm_Type', 'm_State', 'm_ProgramMask', 'progVertex', 'progFragment', 'progGeometry', 'progHull', 'progDomain', 'progRayTracing', 'm_HasInstancingVariant', 'm_HasProceduralInstancingVariant', 'm_UseName', 'm_Name', 'm_TextureName', 'm_Tags', 'm_SerializedKeywordStateMask']
+pf m_NameIndices: <class 'NoneType'>
+ps m_NameIndices: [('$Globals', 0), ('Ceto_AbsCof', 16), ('Ceto_FoamTextureScale0', 17), ('Ceto_FoamTextureScale1', 18), ('Ceto_FoamTint', 15)]
+Sample Frag SubProgram: {'m_BlobIndex': 352, 'm_Channels': {'m_Channels': [], 'm_SourceMap': 0}, 'm_KeywordIndices': [13], 'm_ShaderHardwareTier': 3, 'm_GpuProgramType': 17, 'm_Parameters': {'m_VectorParams': [], 'm_MatrixParams': [], 'm_TextureParams': [], 'm_BufferParams': [], 'm_ConstantBuffers': [], 'm_ConstantBufferBindings': [], 'm_UAVParams': [], 'm_Samplers': []}, 'm_ShaderRequirements': 227}
+Resolved Frag Keywords (9): ['Ceto_AbsCof', 'Ceto_FoamTint', 'Ceto_GridEdgeBorder', 'Ceto_MinFresnel', 'Ceto_OceanLevel', 'Ceto_ReflectionTint', 'Ceto_SpecularIntensity', 'Ceto_SpecularRoughness', '_LightColor0']
+
+==================== OceanUnderSide_Transparent (pid=143) ====================
+Pass keys: ['m_EditorDataHash', 'm_Platforms', 'm_NameIndices', 'm_Type', 'm_State', 'm_ProgramMask', 'progVertex', 'progFragment', 'progGeometry', 'progHull', 'progDomain', 'progRayTracing', 'm_HasInstancingVariant', 'm_HasProceduralInstancingVariant', 'm_UseName', 'm_Name', 'm_TextureName', 'm_Tags', 'm_SerializedKeywordStateMask']
+pf m_NameIndices: <class 'NoneType'>
+ps m_NameIndices: [('$Globals', 0), ('Ceto_AbsCof', 14), ('Ceto_FoamTextureScale0', 15), ('Ceto_FoamTextureScale1', 16), ('Ceto_FoamTint', 13)]
+Sample Frag SubProgram: {'m_BlobIndex': 352, 'm_Channels': {'m_Channels': [], 'm_SourceMap': 0}, 'm_KeywordIndices': [13], 'm_ShaderHardwareTier': 3, 'm_GpuProgramType': 17, 'm_Parameters': {'m_VectorParams': [], 'm_MatrixParams': [], 'm_TextureParams': [], 'm_BufferParams': [], 'm_ConstantBuffers': [], 'm_ConstantBufferBindings': [], 'm_UAVParams': [], 'm_Samplers': []}, 'm_ShaderRequirements': 227}                                                                    Resolved Frag Keywords (9): ['Ceto_AbsCof', 'Ceto_FoamTextureScale0', 'Ceto_FoamTextureScale1', 'Ceto_FoamTint', 'Ceto_GridSizes', 'Ceto_PosOffset', 'Ceto_SpecularIntensity', 'Ceto_SpecularRoughness', '_LightColor0']
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+--------------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"                                                                                                                                                 root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. CETO RUNTIME ENABLEKEYWORD / DISABLEKEYWORD ==="
+=== 1. CETO RUNTIME ENABLEKEYWORD / DISABLEKEYWORD ===                                                                                                       root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");                                                                                                                                      /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");                                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. EXTRACT RUNTIME ACTIVE VARIANT VIA KEYWORD STATE MASK ==="
+=== 2. EXTRACT RUNTIME ACTIVE VARIANT VIA KEYWORD STATE MASK ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'                                                                       > import UnityPy, lz4.block, re
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> out_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> # Runtime keywords enabled in Stranded Deep Ocean (4 spectrum grids + directional light)
+> target_kws = {"DIRECTIONAL", "CETO_USE_4_SPECTRUM_GRIDS", "CETO_OCEAN_TOPSIDE", "CETO_OCEAN_UNDERSIDE"}
+>
+> for pid, label, pass_idx in ((175, "OceanTopSide_Transparent", 1), (143, "OceanUnderSide_Transparent", 0)):
+>     obj = next(o for o in e0.objects if o.path_id == pid)
+>     tt = obj.read_typetree()
+>     pf = tt["m_ParsedForm"]
+>     ps = next(iter(pf["m_SubShaders"]))["m_Passes"][pass_idx]
+>
+>     kw_mask = ps.get("m_SerializedKeywordStateMask", [])
+>     print(f"\n==================== {label} (pid={pid}) ====================")
+>     print("m_SerializedKeywordStateMask:", kw_mask)
+>     kw_list = [x[0] if isinstance(x, (list, tuple)) else str(x) for x in kw_mask]
+>
+>     frag_sps = ps["progFragment"]["m_SubPrograms"]
+>     vert_sps = ps["progVertex"]["m_SubPrograms"]
+>
+>     # Show unique keyword combinations in Frag SubPrograms
+>     seen = {}
+>     for sp in frag_sps:
+>         idxs = tuple(sp.get("m_KeywordIndices", []))
+>         if idxs not in seen:
+>             names = [kw_list[i] if i < len(kw_list) else str(i) for i in idxs]
+>             seen[idxs] = (sp["m_BlobIndex"], names)
+>     print(f"Unique Frag Keyword Sets ({len(seen)}):")
+>     for idxs, (bidx, names) in list(seen.items())[:15]:
+>         print(f"  Frag BlobIdx={bidx} | idxs={list(idxs)} -> {names}")
+>                                                                                                                                                            >     # Pick variant matching DIRECTIONAL + CETO_USE_4_SPECTRUM_GRIDS (without FOG/SHADOWS/LIGHTMAP bloat)
+>     def score(sp):                                                                                                                                         >         names = {kw_list[i] if i < len(kw_list) else str(i) for i in sp.get("m_KeywordIndices", [])}
+>         hits = len(names & target_kws)
+>         extra = len(names - target_kws)
+>         return (hits, -extra)                                                                                                                              >
+>     best_f = max(frag_sps, key=score)                                                                                                                      >     best_v = max(vert_sps, key=lambda sp: (sp.get("m_KeywordIndices") == best_f.get("m_KeywordIndices"), score(sp)))
+>     f_names = [kw_list[i] if i < len(kw_list) else str(i) for i in best_f.get("m_KeywordIndices", [])]
+>     v_names = [kw_list[i] if i < len(kw_list) else str(i) for i in best_v.get("m_KeywordIndices", [])]
+>     print(f"--> SELECTED VERTEX   BlobIdx={best_v['m_BlobIndex']} | Keywords={v_names}")
+>     print(f"--> SELECTED FRAGMENT BlobIdx={best_f['m_BlobIndex']} | Keywords={f_names}")
+>
+>     sh = obj.read()                                                                                                                                        >     p_idx = list(sh.platforms).index(15)
+>     off, clen, dlen = sum(sh.offsets[p_idx]), sum(sh.compressedLengths[p_idx]), sum(sh.decompressedLengths[p_idx])
+>     dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")
+>     all_shaders = re.findall(r"(#version[\s\S]*?\n\})", dec)
+>     v_src = all_shaders[best_v["m_BlobIndex"]].strip()                                                                                                     >     f_src = all_shaders[best_f["m_BlobIndex"]].strip()
+>     out_file = out_dir / f"{label}_pid{pid}_VERIFIED_RUNTIME.glsl"
+>     out_file.write_text(
+>         f"// Shader: {label} (pid={pid}) | Pass[{pass_idx}]\n"                                                                                             >         f"// Vertex   BlobIdx={best_v['m_BlobIndex']} | Keywords={v_names}\n"
+>         f"// Fragment BlobIdx={best_f['m_BlobIndex']} | Keywords={f_names}\n\n"                                                                            >         f"// ==================== FULL VERTEX SHADER ====================\n{v_src}\n\n"
+>         f"// ==================== FULL FRAGMENT SHADER ====================\n{f_src}\n"
+>     )
+>     print(f"[SAVED]: {out_file.name} ({out_file.stat().st_size} bytes)")
+> EOF                                                                                                                                                        
+==================== OceanTopSide_Transparent (pid=175) ====================                                                                                 m_SerializedKeywordStateMask: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+Unique Frag Keyword Sets (160):                                                                                                                                Frag BlobIdx=352 | idxs=[13] -> ['13']
+  Frag BlobIdx=353 | idxs=[13, 14] -> ['13', '14']
+  Frag BlobIdx=354 | idxs=[13, 15] -> ['13', '15']
+  Frag BlobIdx=355 | idxs=[13, 14, 15] -> ['13', '14', '15']                                                                                                   Frag BlobIdx=356 | idxs=[13, 14, 15, 16] -> ['13', '14', '15', '16']
+  Frag BlobIdx=357 | idxs=[8, 13] -> ['8', '13']
+  Frag BlobIdx=358 | idxs=[8, 13, 14] -> ['8', '13', '14']                                                                                                     Frag BlobIdx=359 | idxs=[8, 13, 15] -> ['8', '13', '15']
+  Frag BlobIdx=360 | idxs=[8, 13, 14, 15] -> ['8', '13', '14', '15']                                                                                           Frag BlobIdx=361 | idxs=[8, 13, 14, 15, 16] -> ['8', '13', '14', '15', '16']
+  Frag BlobIdx=362 | idxs=[7, 13] -> ['7', '13']
+  Frag BlobIdx=363 | idxs=[7, 13, 14] -> ['7', '13', '14']                                                                                                     Frag BlobIdx=364 | idxs=[7, 13, 15] -> ['7', '13', '15']
+  Frag BlobIdx=365 | idxs=[7, 13, 14, 15] -> ['7', '13', '14', '15']
+  Frag BlobIdx=366 | idxs=[7, 13, 14, 15, 16] -> ['7', '13', '14', '15', '16']
+--> SELECTED VERTEX   BlobIdx=0 | Keywords=['13']                                                                                                            --> SELECTED FRAGMENT BlobIdx=352 | Keywords=['13']
+[SAVED]: OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl (19905 bytes)                                                                                 
+==================== OceanUnderSide_Transparent (pid=143) ====================
+m_SerializedKeywordStateMask: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+Unique Frag Keyword Sets (160):
+  Frag BlobIdx=352 | idxs=[13] -> ['13']                                                                                                                       Frag BlobIdx=353 | idxs=[13, 14] -> ['13', '14']
+  Frag BlobIdx=354 | idxs=[13, 15] -> ['13', '15']
+  Frag BlobIdx=355 | idxs=[13, 14, 15] -> ['13', '14', '15']
+  Frag BlobIdx=356 | idxs=[13, 14, 15, 16] -> ['13', '14', '15', '16']
+  Frag BlobIdx=357 | idxs=[8, 13] -> ['8', '13']                                                                                                               Frag BlobIdx=358 | idxs=[8, 13, 14] -> ['8', '13', '14']
+  Frag BlobIdx=359 | idxs=[8, 13, 15] -> ['8', '13', '15']                                                                                                     Frag BlobIdx=360 | idxs=[8, 13, 14, 15] -> ['8', '13', '14', '15']
+  Frag BlobIdx=361 | idxs=[8, 13, 14, 15, 16] -> ['8', '13', '14', '15', '16']
+  Frag BlobIdx=362 | idxs=[7, 13] -> ['7', '13']
+  Frag BlobIdx=363 | idxs=[7, 13, 14] -> ['7', '13', '14']
+  Frag BlobIdx=364 | idxs=[7, 13, 15] -> ['7', '13', '15']                                                                                                     Frag BlobIdx=365 | idxs=[7, 13, 14, 15] -> ['7', '13', '14', '15']
+  Frag BlobIdx=366 | idxs=[7, 13, 14, 15, 16] -> ['7', '13', '14', '15', '16']
+--> SELECTED VERTEX   BlobIdx=0 | Keywords=['13']
+--> SELECTED FRAGMENT BlobIdx=352 | Keywords=['13']
+[SAVED]: OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl (19922 bytes)                                                                               root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+--------------
