@@ -1023,3 +1023,110 @@ The extracted arithmetic confirms that foam-copy output is built from Jacobian-b
 ## 25. Raw Output 7 archive
 
 - [Output 7](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%207) — original terminal output containing the platform-15 GLSL fragments for SlopeCopy, FoamCopy, and DisplacementCopy.
+
+
+## 26. Output 8 — displacement copy pass mapping, query channels, and GPU readback
+
+Source: [Output 8](https://github.com/minnya09796592452-rgb/Full-Sources/blob/b88650d28807d3a215c1f106cadfbfee0c76dcdc/Outputs/Output%208)
+
+### 26.1 WaveSpectrum.GenerateDisplacement — C# pass mapping
+
+Output 8 provides the relevant `WaveSpectrum.cs` call sites and closes the pass-selection gap left by Output 7:
+
+- The displacement init material uses pass `numGrids - 1`.
+- Buffer 0 is bound as `Ceto_HeightBuffer`; buffer 1 is initially bound as `Ceto_DisplacementBuffer`.
+- For displacement map 0, the copy pass is **4 when there is exactly one grid**, otherwise pass **0**.
+- Displacement map 1 uses pass **1** when grid 1 exists.
+- Before map 2, `Ceto_DisplacementBuffer` is rebound to logical buffer 2; map 2 uses pass **2**.
+- Map 3 uses pass **3** when grid 3 exists.
+- Missing maps are explicitly assigned the black texture.
+- Sampling is enabled before the copy operations and disabled afterward; `BeenSampled` is then set.
+- If the displacement buffer is GPU-backed, `ReadFromGPU(numGrids)` is called after the map copies, followed by `FindRanges()`.
+
+This maps the C# selected pass numbers to the five DisplacementCopy fragment variants by matching the pass index with the extracted fragment ordering. The source excerpt does not independently expose Unity's serialized pass metadata, so the pass-index/fragment-index identity remains a strong direct correlation, not a separately inspected serialized pass table.
+
+### 26.2 QueryDisplacements.Sample — query output channel use
+
+The supplied `QueryDisplacements.cs` excerpt shows four grid slots and their per-grid inverse-size scaling:
+
+- Grid 0 uses `scaling.invGridSizes.x`.
+- Grid 1 uses `scaling.invGridSizes.y`.
+- Grid 2 uses `scaling.invGridSizes.z`.
+- Grid 3 uses `scaling.invGridSizes.w`.
+
+For each enabled grid, `Sample()` computes sample coordinates from world/query `x,z`, samples the corresponding `InterpolatedArray2f`, then assigns:
+
+- `result[0]` to output displacement `d[grid].x`, multiplied by the grid's choppyness component.
+- `result[1]` to output height `d[grid].y`, multiplied by `scaling.scaleY`.
+- `result[2]` to output displacement `d[grid].z`, multiplied by the grid's choppyness component.
+
+`SampleHeightOnly()` reads the same grid-specific sample but uses only `result[1]` for output height, scaled by `scaleY`.
+
+This confirms the query-array channel-to-output-vector mapping: channels 0, 1, and 2 feed output X, Y, and Z respectively. It does not alone prove the upstream render-texture RGBA packing that populated those three query-array channels; that bridge still needs the complete copy/read implementation.
+
+### 26.3 ReadFromGPU — conditional readback path
+
+The shown method establishes the complete readback gate:
+
+- If readback is requested (`disableReadBack == false`) but `readSdr` is null, it logs a warning.
+- Actual readback requires all of:
+  - `disableReadBack == false`
+  - `readSdr != null`
+  - `m_readBuffer != null`
+  - graphics shader level at least 5.0
+  - compute-shader support
+- For each available grid, `CBUtility.ReadFromRenderTexture(map, 3, m_readBuffer, readSdr)` is called, then `m_readBuffer.GetData(readDisplacements[grid].Data)`.
+- Missing grid slots are cleared.
+- The excerpt only shows grids 0–2 explicitly; it does not show a fourth readback operation.
+
+This confirms readback is optional and compute-capability-gated. The output does not include `CBUtility.ReadFromRenderTexture`, the read shader body, or the exact `ComputeBuffer` element struct, so the 12-byte stride's field layout remains unverified.
+
+### 26.4 FindRanges — GPU/no-readback fallback
+
+When `disableReadBack` is true and the displacement buffer is GPU-backed, `FindRanges()` assigns `MaxDisplacement = (0, 40 * gridScale)`. Otherwise it schedules a `FindRangeTask` when no task exists or the prior task is complete.
+
+The fallback is a fixed source-level range assignment; it is not evidence that the actual frame's displacement extrema were measured on the GPU.
+
+### 26.5 GenerateSlopes — confirmed call-site behavior
+
+The same Output 8 excerpt confirms:
+
+- Slopes are disabled when the graphics shader level is below 3.0, with a warning.
+- If disabled, all slope buffers are disabled and both global slope maps are set to black.
+- With active slopes, buffer 1 is disabled when `numGrids <= 2`.
+- The init pass is `numGrids - 1`.
+- Buffer 0 is copied to slope map 0 with SlopeCopy pass 0.
+- Buffer 1 is copied to slope map 1 only when `numGrids > 2`; otherwise map 1 is black.
+- The buffer's sampling state is restored after the copy.
+
+This joins the direct-copy shader body from Output 7 to the actual C# slope-map call sites.
+
+### 26.6 Updated evidence status
+
+| Item | Status after Output 8 |
+|---|---|
+| DisplacementCopy selected pass numbers | Confirmed in C# call sites: map0 uses 4 for one grid, else 0; maps1–3 use 1–3 |
+| Height/displacement source-buffer binding | Confirmed for buffers 0, 1, and 2 |
+| QueryDisplacements result channel mapping | Confirmed: result[0/1/2] → output X/Y/Z |
+| Per-grid query coordinate scaling | Confirmed: inverse grid size x/y/z/w for grids 0–3 |
+| Query displacement choppyness scaling | Confirmed per grid on output X and Z |
+| Query height scaling | Confirmed through `scaleY` |
+| GPU readback capability gate | Confirmed from method body |
+| Readback data layout / 12-byte stride fields | Still unverified |
+| Query-array channel ↔ render-texture source RGBA bridge | Still requires full copy/read implementation |
+| Fourth-grid GPU readback | Not shown in supplied excerpt |
+| Foam generation invocation/body | Not included in the supplied Output 8 excerpt |
+
+### 26.7 Next evidence required
+
+1. Inspect the complete `DisplacementBufferGPU` and `QueryDisplacements.CopyAndCreateDisplacements/CopyDisplacements` bodies to connect the render-texture channels to `InterpolatedArray2f` channels 0–2.
+2. Recover `CBUtility.ReadFromRenderTexture`, the read shader, and the exact ComputeBuffer element type to resolve the 12-byte layout.
+3. Extract the remainder of `WaveSpectrum.GenerateFoam()` and its call sites, including the foam-copy material pass selection and foam-map publication.
+4. Verify the shader's serialized pass ordering if the asset metadata is available, rather than relying only on fragment extraction order.
+5. Trace the four-grid CPU query path separately from GPU readback, since the shown GPU readback body explicitly handles only three map slots.
+
+**Evidence boundary:** Output 8 materially links C# displacement/slope call sites to the copy shader variants and establishes query output channel usage and the GPU readback gate. It still does not fully connect the copied RGBA render textures to the three query-array channels, decode the readback struct, or expose the foam-generation body.
+
+## 27. Raw Output 8 archive
+
+- [Output 8](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%208) — original terminal output containing WaveSpectrum generation/readback call sites and QueryDisplacements sampling code.
