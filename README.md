@@ -1130,3 +1130,69 @@ This joins the direct-copy shader body from Output 7 to the actual C# slope-map 
 ## 27. Raw Output 8 archive
 
 - [Output 8](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%208) — original terminal output containing WaveSpectrum generation/readback call sites and QueryDisplacements sampling code.
+
+
+## 28. Output 9 — compute readback dispatch and foam-generation call path
+
+Source: [Output 9](https://github.com/minnya09796592452-rgb/Full-Sources/blob/94f921623c7fba2afffba04f36add9da2a8caa14/Outputs/Output%209)
+
+### 28.1 CBUtility.ReadFromRenderTexture — readback dispatch setup
+
+Output 9 supplies the complete displayed ReadFromRenderTexture() method. It rejects null texture/buffer/shader inputs, accepts channel counts 1–4, and requires the RenderTexture to be created. For channels == 3 it selects kernel read2DC3, binds the source as _Tex2D and destination as _Buffer2DC3. It sets _Width, _Height, and _Depth (fixed to 1), then dispatches in 8×8×8 thread-group units, rounding dimensions upward when needed and clamping each dispatch dimension to at least 1.
+
+The method binds texture and buffer before checking whether FindKernel returned -1; this is the literal order in the supplied source. The Read ComputeShader kernel bodies, thread-group declarations, and destination element type are absent, so dispatch setup is confirmed but the 12-byte element layout is not decoded.
+
+The separate ReadSingleFromRenderTexture() method is also present. It selects readSingleBilinear2D when useBilinear is false and readSingle2D when true, then binds _Tex2D and BufferSingle2D. This records the source's literal boolean/kernel relationship without inferring intended filtering semantics.
+
+### 28.2 Read ComputeShader discovery
+
+The UnityPy scan reports a ComputeShader named Read in sharedassets0.assets at path ID 186. This is a strong name-based candidate for the readback shader used by CBUtility, but the supplied output does not show serialized reference resolution from WaveSpectrum.readSdr to PID 186. The scan also prints no kernel names, so read2DC3 and other kernel bodies remain to be extracted.
+
+### 28.3 GenerateFoam — complete supplied method body
+
+The Output 9 WaveSpectrum.GenerateFoam(float time) excerpt establishes:
+
+- It reads Choppyness into a Vector4 and computes its squared magnitude.
+- If foam is enabled but graphics shader level is below 3.0, it logs a warning and sets disableFoam = true.
+- It initially enables all Jacobian buffers. It disables them all if foam is disabled, foamAmount is zero, choppyness squared magnitude is zero, or the active condition does not support Jacobians.
+- If no Jacobian buffers remain enabled, global Ceto_FoamMap0 is set to the black texture and the method returns.
+- Grid count comes from m_conditions[0].Key.NumGrids. For one grid, Jacobian buffers 1 and 2 are disabled; for two grids, buffer 2 is disabled.
+- Jacobians are regenerated if the buffer has never run or its TimeValue differs from the requested time. The method sets Ceto_FoamAmount, assigns m_foamInitMat, selects init pass numGrids - 1, and runs the buffer with the active condition and time.
+- If not already sampled, it enables sampling and binds Jacobian textures 0–2, displacement height buffer 0, the choppyness vector, and foam coverage to the foam-copy material.
+- It blits into m_foamMaps[0] using FoamCopy pass numGrids - 1, publishes the result as Ceto_FoamMap0, disables Jacobian sampling, and marks the buffer sampled.
+
+This closes the missing C# foam invocation and pass-selection call site. Combined with Output 7's four FoamCopy fragments, the selected pass is numGrids - 1. Serialized pass metadata is still not independently inspected, so pass-index-to-fragment-order matching remains qualified.
+
+### 28.4 QueryWaves gate
+
+QueryWaves proceeds only when the component is enabled and a displacement buffer exists. It calls displacementBuffer.QueryWaves(query, m_queryScaling) only when either readback is enabled or the displacement buffer is not GPU-backed, the query mode is DISPLACEMENT or POSITION, and at least one of the four sampleSpectrum flags is true. This is a call-site gate, not the full query/copy implementation; it does not resolve the fourth-grid GPU readback gap.
+
+### 28.5 Updated evidence status
+
+| Item | Status after Output 9 |
+|---|---|
+| CBUtility three-channel read kernel/bindings | Confirmed: read2DC3, _Tex2D, _Buffer2DC3 |
+| Readback dispatch dimensions | Confirmed: 8-wide group rounding, depth 1 |
+| Read ComputeShader candidate | Found: sharedassets0.assets, PID 186, name Read; PPtr identity not proven |
+| 12-byte ComputeBuffer element fields | Still unresolved; kernel and element type absent |
+| GenerateFoam disable conditions | Confirmed from method body |
+| Jacobian buffer count by grid count | Confirmed: disable buffers 1–2 for one grid; buffer 2 for two grids |
+| Jacobian regeneration condition | Confirmed: never run or time differs |
+| Foam init pass | Confirmed call-site value: numGrids - 1 |
+| FoamCopy pass | Confirmed call-site value: numGrids - 1; serialized pass order still to verify |
+| Foam material inputs and global output | Confirmed: Jacobian maps 0–2, height buffer 0, choppyness, coverage → Ceto_FoamMap0 |
+| QueryWaves dispatch gate | Confirmed from call site; underlying query/copy implementation still incomplete |
+
+### 28.6 Next evidence required
+
+1. Extract ComputeShader PID 186 (Read) in full: kernel names, thread-group sizes, resource bindings, and shader code for read2DC3 and related kernels.
+2. Recover the exact C# element type used to allocate m_readBuffer and the InterpolatedArray2f.Data storage type; reconcile both with the 12-byte stride.
+3. Inspect DisplacementBufferGPU and all QueryDisplacements copy methods to establish how readback/copy data populates channels 0–2 and how the fourth grid is handled on CPU/GPU.
+4. Verify serialized pass metadata for FoamCopy and DisplacementCopy to bind numGrids - 1 and explicit copy pass numbers to exact fragment programs.
+5. Trace m_conditions[0].SupportsJacobians and the Jacobian init shader output through FoamCopy inputs; leave channel semantics unassigned until supported by source.
+
+**Evidence boundary:** Output 9 closes the C# foam-generation invocation and documents CBUtility's three-channel compute dispatch setup. It does not provide the Read kernel implementation or buffer element structure, so the 12-byte layout and actual data conversion remain open.
+
+## 29. Raw Output 9 archive
+
+- [Output 9](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%209) — original terminal output containing CBUtility readback dispatch code, GenerateFoam, QueryWaves, and the Read ComputeShader name scan.
