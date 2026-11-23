@@ -1,0 +1,822 @@
+// Ceto/Fourier Shader (pid=178) - Complete Passes 0 to 7 (GLSL Extracted)
+
+// ============================================================================
+// Pass 0 (PASS_X_1 - 1 Target Horizontal FFT)
+// ============================================================================
+
+// --- Pass[0] Vertex Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform 	vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform 	vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+in  vec4 in_POSITION0;
+in  vec4 in_TEXCOORD0;
+out vec2 vs_TEXCOORD0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+void main()
+{
+    u_xlat0 = in_POSITION0.yyyy * hlslcc_mtx4x4unity_ObjectToWorld[1];
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[0] * in_POSITION0.xxxx + u_xlat0;
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[2] * in_POSITION0.zzzz + u_xlat0;
+    u_xlat0 = u_xlat0 + hlslcc_mtx4x4unity_ObjectToWorld[3];
+    u_xlat1 = u_xlat0.yyyy * hlslcc_mtx4x4unity_MatrixVP[1];
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[0] * u_xlat0.xxxx + u_xlat1;
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[2] * u_xlat0.zzzz + u_xlat1;
+    gl_Position = hlslcc_mtx4x4unity_MatrixVP[3] * u_xlat0.wwww + u_xlat1;
+    vs_TEXCOORD0.xy = in_TEXCOORD0.xy;
+    return;
+}
+
+// --- Pass[0] Fragment Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_ButterFlyLookUp;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_ReadBuffer0;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+void main()
+{
+    u_xlat0.y = vs_TEXCOORD0.y;
+    u_xlat1.y = 0.0;
+    u_xlat1.xw = vs_TEXCOORD0.xy;
+    u_xlat2 = texture(Ceto_ButterFlyLookUp, u_xlat1.xy);
+    u_xlat0.x = u_xlat2.y;
+    u_xlat0 = texture(Ceto_ReadBuffer0, u_xlat0.xy);
+    u_xlat1.xy = u_xlat0.yw * u_xlat2.ww;
+    u_xlat3.xz = u_xlat2.zz * u_xlat0.xz + (-u_xlat1.xy);
+    u_xlat1.z = u_xlat2.x;
+    u_xlat1 = texture(Ceto_ReadBuffer0, u_xlat1.zw);
+    u_xlat3.y = dot(u_xlat2.wz, u_xlat0.xy);
+    u_xlat3.w = dot(u_xlat2.wz, u_xlat0.zw);
+    SV_Target0 = u_xlat1 + u_xlat3;
+    return;
+}
+
+// ============================================================================
+// Pass 1 (PASS_Y_1 - 1 Target Vertical FFT)
+// ============================================================================
+
+// --- Pass[1] Vertex Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform 	vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform 	vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+in  vec4 in_POSITION0;
+in  vec4 in_TEXCOORD0;
+out vec2 vs_TEXCOORD0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+void main()
+{
+    u_xlat0 = in_POSITION0.yyyy * hlslcc_mtx4x4unity_ObjectToWorld[1];
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[0] * in_POSITION0.xxxx + u_xlat0;
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[2] * in_POSITION0.zzzz + u_xlat0;
+    u_xlat0 = u_xlat0 + hlslcc_mtx4x4unity_ObjectToWorld[3];
+    u_xlat1 = u_xlat0.yyyy * hlslcc_mtx4x4unity_MatrixVP[1];
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[0] * u_xlat0.xxxx + u_xlat1;
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[2] * u_xlat0.zzzz + u_xlat1;
+    gl_Position = hlslcc_mtx4x4unity_MatrixVP[3] * u_xlat0.wwww + u_xlat1;
+    vs_TEXCOORD0.xy = in_TEXCOORD0.xy;
+    return;
+}
+
+// --- Pass[1] Fragment Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_ButterFlyLookUp;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_ReadBuffer0;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+void main()
+{
+    u_xlat0.x = vs_TEXCOORD0.x;
+    u_xlat1.y = 0.0;
+    u_xlat1.xz = vs_TEXCOORD0.yx;
+    u_xlat2 = texture(Ceto_ButterFlyLookUp, u_xlat1.xy);
+    u_xlat0.y = u_xlat2.y;
+    u_xlat0 = texture(Ceto_ReadBuffer0, u_xlat0.xy);
+    u_xlat1.xy = u_xlat0.yw * u_xlat2.ww;
+    u_xlat3.xz = u_xlat2.zz * u_xlat0.xz + (-u_xlat1.xy);
+    u_xlat1.w = u_xlat2.x;
+    u_xlat1 = texture(Ceto_ReadBuffer0, u_xlat1.zw);
+    u_xlat3.y = dot(u_xlat2.wz, u_xlat0.xy);
+    u_xlat3.w = dot(u_xlat2.wz, u_xlat0.zw);
+    SV_Target0 = u_xlat1 + u_xlat3;
+    return;
+}
+
+// ============================================================================
+// Pass 2 (PASS_X_2 - 2 Targets Horizontal FFT)
+// ============================================================================
+
+// --- Pass[2] Vertex Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform 	vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform 	vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+in  vec4 in_POSITION0;
+in  vec4 in_TEXCOORD0;
+out vec2 vs_TEXCOORD0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+void main()
+{
+    u_xlat0 = in_POSITION0.yyyy * hlslcc_mtx4x4unity_ObjectToWorld[1];
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[0] * in_POSITION0.xxxx + u_xlat0;
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[2] * in_POSITION0.zzzz + u_xlat0;
+    u_xlat0 = u_xlat0 + hlslcc_mtx4x4unity_ObjectToWorld[3];
+    u_xlat1 = u_xlat0.yyyy * hlslcc_mtx4x4unity_MatrixVP[1];
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[0] * u_xlat0.xxxx + u_xlat1;
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[2] * u_xlat0.zzzz + u_xlat1;
+    gl_Position = hlslcc_mtx4x4unity_MatrixVP[3] * u_xlat0.wwww + u_xlat1;
+    vs_TEXCOORD0.xy = in_TEXCOORD0.xy;
+    return;
+}
+
+// --- Pass[2] Fragment Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_ButterFlyLookUp;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_ReadBuffer0;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_ReadBuffer1;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+void main()
+{
+    u_xlat0.y = vs_TEXCOORD0.y;
+    u_xlat1.y = 0.0;
+    u_xlat1.xw = vs_TEXCOORD0.xy;
+    u_xlat2 = texture(Ceto_ButterFlyLookUp, u_xlat1.xy);
+    u_xlat0.x = u_xlat2.y;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat0.xy);
+    u_xlat0 = texture(Ceto_ReadBuffer1, u_xlat0.xy);
+    u_xlat1.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat1.xy);
+    u_xlat1.z = u_xlat2.x;
+    u_xlat5 = texture(Ceto_ReadBuffer0, u_xlat1.zw);
+    u_xlat1 = texture(Ceto_ReadBuffer1, u_xlat1.zw);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    SV_Target0 = u_xlat4 + u_xlat5;
+    u_xlat2.xy = u_xlat0.yw * u_xlat2.ww;
+    u_xlat3.xz = u_xlat2.zz * u_xlat0.xz + (-u_xlat2.xy);
+    u_xlat3.y = dot(u_xlat2.wz, u_xlat0.xy);
+    u_xlat3.w = dot(u_xlat2.wz, u_xlat0.zw);
+    SV_Target1 = u_xlat1 + u_xlat3;
+    return;
+}
+
+// ============================================================================
+// Pass 3 (PASS_Y_2 - 2 Targets Vertical FFT)
+// ============================================================================
+
+// --- Pass[3] Vertex Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform 	vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform 	vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+in  vec4 in_POSITION0;
+in  vec4 in_TEXCOORD0;
+out vec2 vs_TEXCOORD0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+void main()
+{
+    u_xlat0 = in_POSITION0.yyyy * hlslcc_mtx4x4unity_ObjectToWorld[1];
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[0] * in_POSITION0.xxxx + u_xlat0;
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[2] * in_POSITION0.zzzz + u_xlat0;
+    u_xlat0 = u_xlat0 + hlslcc_mtx4x4unity_ObjectToWorld[3];
+    u_xlat1 = u_xlat0.yyyy * hlslcc_mtx4x4unity_MatrixVP[1];
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[0] * u_xlat0.xxxx + u_xlat1;
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[2] * u_xlat0.zzzz + u_xlat1;
+    gl_Position = hlslcc_mtx4x4unity_MatrixVP[3] * u_xlat0.wwww + u_xlat1;
+    vs_TEXCOORD0.xy = in_TEXCOORD0.xy;
+    return;
+}
+
+// --- Pass[3] Fragment Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_ButterFlyLookUp;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_ReadBuffer0;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_ReadBuffer1;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+void main()
+{
+    u_xlat0.x = vs_TEXCOORD0.x;
+    u_xlat1.y = 0.0;
+    u_xlat1.xz = vs_TEXCOORD0.yx;
+    u_xlat2 = texture(Ceto_ButterFlyLookUp, u_xlat1.xy);
+    u_xlat0.y = u_xlat2.y;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat0.xy);
+    u_xlat0 = texture(Ceto_ReadBuffer1, u_xlat0.xy);
+    u_xlat1.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat1.xy);
+    u_xlat1.w = u_xlat2.x;
+    u_xlat5 = texture(Ceto_ReadBuffer0, u_xlat1.zw);
+    u_xlat1 = texture(Ceto_ReadBuffer1, u_xlat1.zw);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    SV_Target0 = u_xlat4 + u_xlat5;
+    u_xlat2.xy = u_xlat0.yw * u_xlat2.ww;
+    u_xlat3.xz = u_xlat2.zz * u_xlat0.xz + (-u_xlat2.xy);
+    u_xlat3.y = dot(u_xlat2.wz, u_xlat0.xy);
+    u_xlat3.w = dot(u_xlat2.wz, u_xlat0.zw);
+    SV_Target1 = u_xlat1 + u_xlat3;
+    return;
+}
+
+// ============================================================================
+// Pass 4 (PASS_X_3 - 3 Targets Horizontal FFT)
+// ============================================================================
+
+// --- Pass[4] Vertex Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform 	vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform 	vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+in  vec4 in_POSITION0;
+in  vec4 in_TEXCOORD0;
+out vec2 vs_TEXCOORD0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+void main()
+{
+    u_xlat0 = in_POSITION0.yyyy * hlslcc_mtx4x4unity_ObjectToWorld[1];
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[0] * in_POSITION0.xxxx + u_xlat0;
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[2] * in_POSITION0.zzzz + u_xlat0;
+    u_xlat0 = u_xlat0 + hlslcc_mtx4x4unity_ObjectToWorld[3];
+    u_xlat1 = u_xlat0.yyyy * hlslcc_mtx4x4unity_MatrixVP[1];
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[0] * u_xlat0.xxxx + u_xlat1;
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[2] * u_xlat0.zzzz + u_xlat1;
+    gl_Position = hlslcc_mtx4x4unity_MatrixVP[3] * u_xlat0.wwww + u_xlat1;
+    vs_TEXCOORD0.xy = in_TEXCOORD0.xy;
+    return;
+}
+
+// --- Pass[4] Fragment Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_ButterFlyLookUp;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_ReadBuffer0;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_ReadBuffer1;
+UNITY_LOCATION(3) uniform  sampler2D Ceto_ReadBuffer2;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+layout(location = 2) out vec4 SV_Target2;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+vec2 u_xlat12;
+void main()
+{
+    u_xlat0.y = vs_TEXCOORD0.y;
+    u_xlat1.y = 0.0;
+    u_xlat1.xw = vs_TEXCOORD0.xy;
+    u_xlat2 = texture(Ceto_ButterFlyLookUp, u_xlat1.xy);
+    u_xlat0.x = u_xlat2.y;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat0.xy);
+    u_xlat12.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat12.xy);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    u_xlat1.z = u_xlat2.x;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat1.zw);
+    SV_Target0 = u_xlat4 + u_xlat3;
+    u_xlat3 = texture(Ceto_ReadBuffer1, u_xlat0.xy);
+    u_xlat0 = texture(Ceto_ReadBuffer2, u_xlat0.xy);
+    u_xlat1.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat1.xy);
+    u_xlat5 = texture(Ceto_ReadBuffer1, u_xlat1.zw);
+    u_xlat1 = texture(Ceto_ReadBuffer2, u_xlat1.zw);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    SV_Target1 = u_xlat4 + u_xlat5;
+    u_xlat2.xy = u_xlat0.yw * u_xlat2.ww;
+    u_xlat3.xz = u_xlat2.zz * u_xlat0.xz + (-u_xlat2.xy);
+    u_xlat3.y = dot(u_xlat2.wz, u_xlat0.xy);
+    u_xlat3.w = dot(u_xlat2.wz, u_xlat0.zw);
+    SV_Target2 = u_xlat1 + u_xlat3;
+    return;
+}
+
+// ============================================================================
+// Pass 5 (PASS_Y_3 - 3 Targets Vertical FFT)
+// ============================================================================
+
+// --- Pass[5] Vertex Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform 	vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform 	vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+in  vec4 in_POSITION0;
+in  vec4 in_TEXCOORD0;
+out vec2 vs_TEXCOORD0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+void main()
+{
+    u_xlat0 = in_POSITION0.yyyy * hlslcc_mtx4x4unity_ObjectToWorld[1];
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[0] * in_POSITION0.xxxx + u_xlat0;
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[2] * in_POSITION0.zzzz + u_xlat0;
+    u_xlat0 = u_xlat0 + hlslcc_mtx4x4unity_ObjectToWorld[3];
+    u_xlat1 = u_xlat0.yyyy * hlslcc_mtx4x4unity_MatrixVP[1];
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[0] * u_xlat0.xxxx + u_xlat1;
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[2] * u_xlat0.zzzz + u_xlat1;
+    gl_Position = hlslcc_mtx4x4unity_MatrixVP[3] * u_xlat0.wwww + u_xlat1;
+    vs_TEXCOORD0.xy = in_TEXCOORD0.xy;
+    return;
+}
+
+// --- Pass[5] Fragment Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_ButterFlyLookUp;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_ReadBuffer0;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_ReadBuffer1;
+UNITY_LOCATION(3) uniform  sampler2D Ceto_ReadBuffer2;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+layout(location = 2) out vec4 SV_Target2;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+vec2 u_xlat12;
+void main()
+{
+    u_xlat0.x = vs_TEXCOORD0.x;
+    u_xlat1.y = 0.0;
+    u_xlat1.xz = vs_TEXCOORD0.yx;
+    u_xlat2 = texture(Ceto_ButterFlyLookUp, u_xlat1.xy);
+    u_xlat0.y = u_xlat2.y;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat0.xy);
+    u_xlat12.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat12.xy);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    u_xlat1.w = u_xlat2.x;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat1.zw);
+    SV_Target0 = u_xlat4 + u_xlat3;
+    u_xlat3 = texture(Ceto_ReadBuffer1, u_xlat0.xy);
+    u_xlat0 = texture(Ceto_ReadBuffer2, u_xlat0.xy);
+    u_xlat1.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat1.xy);
+    u_xlat5 = texture(Ceto_ReadBuffer1, u_xlat1.zw);
+    u_xlat1 = texture(Ceto_ReadBuffer2, u_xlat1.zw);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    SV_Target1 = u_xlat4 + u_xlat5;
+    u_xlat2.xy = u_xlat0.yw * u_xlat2.ww;
+    u_xlat3.xz = u_xlat2.zz * u_xlat0.xz + (-u_xlat2.xy);
+    u_xlat3.y = dot(u_xlat2.wz, u_xlat0.xy);
+    u_xlat3.w = dot(u_xlat2.wz, u_xlat0.zw);
+    SV_Target2 = u_xlat1 + u_xlat3;
+    return;
+}
+
+// ============================================================================
+// Pass 6 (PASS_X_4 - 4 Targets Horizontal FFT)
+// ============================================================================
+
+// --- Pass[6] Vertex Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform 	vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform 	vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+in  vec4 in_POSITION0;
+in  vec4 in_TEXCOORD0;
+out vec2 vs_TEXCOORD0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+void main()
+{
+    u_xlat0 = in_POSITION0.yyyy * hlslcc_mtx4x4unity_ObjectToWorld[1];
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[0] * in_POSITION0.xxxx + u_xlat0;
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[2] * in_POSITION0.zzzz + u_xlat0;
+    u_xlat0 = u_xlat0 + hlslcc_mtx4x4unity_ObjectToWorld[3];
+    u_xlat1 = u_xlat0.yyyy * hlslcc_mtx4x4unity_MatrixVP[1];
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[0] * u_xlat0.xxxx + u_xlat1;
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[2] * u_xlat0.zzzz + u_xlat1;
+    gl_Position = hlslcc_mtx4x4unity_MatrixVP[3] * u_xlat0.wwww + u_xlat1;
+    vs_TEXCOORD0.xy = in_TEXCOORD0.xy;
+    return;
+}
+
+// --- Pass[6] Fragment Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_ButterFlyLookUp;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_ReadBuffer0;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_ReadBuffer1;
+UNITY_LOCATION(3) uniform  sampler2D Ceto_ReadBuffer2;
+UNITY_LOCATION(4) uniform  sampler2D Ceto_ReadBuffer3;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+layout(location = 2) out vec4 SV_Target2;
+layout(location = 3) out vec4 SV_Target3;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+vec2 u_xlat12;
+void main()
+{
+    u_xlat0.y = vs_TEXCOORD0.y;
+    u_xlat1.y = 0.0;
+    u_xlat1.xw = vs_TEXCOORD0.xy;
+    u_xlat2 = texture(Ceto_ButterFlyLookUp, u_xlat1.xy);
+    u_xlat0.x = u_xlat2.y;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat0.xy);
+    u_xlat12.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat12.xy);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    u_xlat1.z = u_xlat2.x;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat1.zw);
+    SV_Target0 = u_xlat4 + u_xlat3;
+    u_xlat3 = texture(Ceto_ReadBuffer1, u_xlat0.xy);
+    u_xlat12.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat12.xy);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    u_xlat3 = texture(Ceto_ReadBuffer1, u_xlat1.zw);
+    SV_Target1 = u_xlat4 + u_xlat3;
+    u_xlat3 = texture(Ceto_ReadBuffer2, u_xlat0.xy);
+    u_xlat0 = texture(Ceto_ReadBuffer3, u_xlat0.xy);
+    u_xlat1.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat1.xy);
+    u_xlat5 = texture(Ceto_ReadBuffer2, u_xlat1.zw);
+    u_xlat1 = texture(Ceto_ReadBuffer3, u_xlat1.zw);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    SV_Target2 = u_xlat4 + u_xlat5;
+    u_xlat2.xy = u_xlat0.yw * u_xlat2.ww;
+    u_xlat3.xz = u_xlat2.zz * u_xlat0.xz + (-u_xlat2.xy);
+    u_xlat3.y = dot(u_xlat2.wz, u_xlat0.xy);
+    u_xlat3.w = dot(u_xlat2.wz, u_xlat0.zw);
+    SV_Target3 = u_xlat1 + u_xlat3;
+    return;
+}
+
+// ============================================================================
+// Pass 7 (PASS_Y_4 - 4 Targets Vertical FFT)
+// ============================================================================
+
+// --- Pass[7] Vertex Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform 	vec4 hlslcc_mtx4x4unity_ObjectToWorld[4];
+uniform 	vec4 hlslcc_mtx4x4unity_MatrixVP[4];
+in  vec4 in_POSITION0;
+in  vec4 in_TEXCOORD0;
+out vec2 vs_TEXCOORD0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+void main()
+{
+    u_xlat0 = in_POSITION0.yyyy * hlslcc_mtx4x4unity_ObjectToWorld[1];
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[0] * in_POSITION0.xxxx + u_xlat0;
+    u_xlat0 = hlslcc_mtx4x4unity_ObjectToWorld[2] * in_POSITION0.zzzz + u_xlat0;
+    u_xlat0 = u_xlat0 + hlslcc_mtx4x4unity_ObjectToWorld[3];
+    u_xlat1 = u_xlat0.yyyy * hlslcc_mtx4x4unity_MatrixVP[1];
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[0] * u_xlat0.xxxx + u_xlat1;
+    u_xlat1 = hlslcc_mtx4x4unity_MatrixVP[2] * u_xlat0.zzzz + u_xlat1;
+    gl_Position = hlslcc_mtx4x4unity_MatrixVP[3] * u_xlat0.wwww + u_xlat1;
+    vs_TEXCOORD0.xy = in_TEXCOORD0.xy;
+    return;
+}
+
+// --- Pass[7] Fragment Shader ---
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_ButterFlyLookUp;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_ReadBuffer0;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_ReadBuffer1;
+UNITY_LOCATION(3) uniform  sampler2D Ceto_ReadBuffer2;
+UNITY_LOCATION(4) uniform  sampler2D Ceto_ReadBuffer3;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+layout(location = 1) out vec4 SV_Target1;
+layout(location = 2) out vec4 SV_Target2;
+layout(location = 3) out vec4 SV_Target3;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+vec4 u_xlat3;
+vec4 u_xlat4;
+vec4 u_xlat5;
+vec2 u_xlat12;
+void main()
+{
+    u_xlat0.x = vs_TEXCOORD0.x;
+    u_xlat1.y = 0.0;
+    u_xlat1.xz = vs_TEXCOORD0.yx;
+    u_xlat2 = texture(Ceto_ButterFlyLookUp, u_xlat1.xy);
+    u_xlat0.y = u_xlat2.y;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat0.xy);
+    u_xlat12.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat12.xy);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    u_xlat1.w = u_xlat2.x;
+    u_xlat3 = texture(Ceto_ReadBuffer0, u_xlat1.zw);
+    SV_Target0 = u_xlat4 + u_xlat3;
+    u_xlat3 = texture(Ceto_ReadBuffer1, u_xlat0.xy);
+    u_xlat12.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat12.xy);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    u_xlat3 = texture(Ceto_ReadBuffer1, u_xlat1.zw);
+    SV_Target1 = u_xlat4 + u_xlat3;
+    u_xlat3 = texture(Ceto_ReadBuffer2, u_xlat0.xy);
+    u_xlat0 = texture(Ceto_ReadBuffer3, u_xlat0.xy);
+    u_xlat1.xy = u_xlat2.ww * u_xlat3.yw;
+    u_xlat4.xz = u_xlat2.zz * u_xlat3.xz + (-u_xlat1.xy);
+    u_xlat5 = texture(Ceto_ReadBuffer2, u_xlat1.zw);
+    u_xlat1 = texture(Ceto_ReadBuffer3, u_xlat1.zw);
+    u_xlat4.y = dot(u_xlat2.wz, u_xlat3.xy);
+    u_xlat4.w = dot(u_xlat2.wz, u_xlat3.zw);
+    SV_Target2 = u_xlat4 + u_xlat5;
+    u_xlat2.xy = u_xlat0.yw * u_xlat2.ww;
+    u_xlat3.xz = u_xlat2.zz * u_xlat0.xz + (-u_xlat2.xy);
+    u_xlat3.y = dot(u_xlat2.wz, u_xlat0.xy);
+    u_xlat3.w = dot(u_xlat2.wz, u_xlat0.zw);
+    SV_Target3 = u_xlat1 + u_xlat3;
+    return;
+}
+
