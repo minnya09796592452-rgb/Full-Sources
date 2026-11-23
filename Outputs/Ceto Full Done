@@ -1,0 +1,659 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -n "Ceto_DisplacementMap" "$SH_DIR/OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl" "$SH_DIR/OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl:47:UNITY_LOCATION(9) uniform  sampler2D Ceto_DisplacementMap0;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl:48:UNITY_LOCATION(10) uniform  sampler2D Ceto_DisplacementMap1;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl:147:    u_xlat2 = textureLod(Ceto_DisplacementMap0, u_xlat1.xy, u_xlat0.x);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl:148:    u_xlat0 = textureLod(Ceto_DisplacementMap1, u_xlat1.zw, u_xlat0.z);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl:272:UNITY_LOCATION(10) uniform  sampler2D Ceto_DisplacementMap0;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl:273:UNITY_LOCATION(11) uniform  sampler2D Ceto_DisplacementMap1;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl:372:    u_xlat2 = textureLod(Ceto_DisplacementMap0, u_xlat1.xy, u_xlat0.x);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl:373:    u_xlat0 = textureLod(Ceto_DisplacementMap1, u_xlat1.zw, u_xlat0.z);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl:47:UNITY_LOCATION(8) uniform  sampler2D Ceto_DisplacementMap0;                                                                                                   /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl:48:UNITY_LOCATION(9) uniform  sampler2D Ceto_DisplacementMap1;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl:147:    u_xlat2 = textureLod(Ceto_DisplacementMap0, u_xlat1.xy, u_xlat0.x);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl:148:    u_xlat0 = textureLod(Ceto_DisplacementMap1, u_xlat1.zw, u_xlat0.z);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl:272:UNITY_LOCATION(8) uniform  sampler2D Ceto_DisplacementMap0;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl:273:UNITY_LOCATION(9) uniform  sampler2D Ceto_DisplacementMap1;                                                                                                  /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl:372:    u_xlat2 = textureLod(Ceto_DisplacementMap0, u_xlat1.xy, u_xlat0.x);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders/OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl:373:    u_xlat0 = textureLod(Ceto_DisplacementMap1, u_xlat1.zw, u_xlat0.z);
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"                                                                                                                                                 root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. C# RUNTIME ENABLEKEYWORD / DISABLEKEYWORD EXACT LINES ==="
+=== 1. C# RUNTIME ENABLEKEYWORD / DISABLEKEYWORD EXACT LINES ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");                                                                                                                     /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");                                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                                               root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. RESOLVE EXACT KEYWORD STRINGS FOR IDXS [7, 8, 13, 14, 15, 16] & EXTRACT 4-GRID VARIANT ==="
+=== 2. RESOLVE EXACT KEYWORD STRINGS FOR IDXS [7, 8, 13, 14, 15, 16] & EXTRACT 4-GRID VARIANT ===                                                            root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re                                                                                                                              > from pathlib import Path
+>                                                                                                                                                            > data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> out_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders")                                         > e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>                                                                                                                                                            > for pid, label, pass_idx in ((175, "OceanTopSide_Transparent", 1), (143, "OceanUnderSide_Transparent", 0)):                                                >     obj = next(o for o in e0.objects if o.path_id == pid)                                                                                                  >     tt = obj.read_typetree()
+>     pf = tt["m_ParsedForm"]                                                                                                                                >     ps = next(iter(pf["m_SubShaders"]))["m_Passes"][pass_idx]
+>                                                                                                                                                            >     sh = obj.read()
+>     p_idx = list(sh.platforms).index(15)                                                                                                                   >     off, clen, dlen = sum(sh.offsets[p_idx]), sum(sh.compressedLengths[p_idx]), sum(sh.decompressedLengths[p_idx])
+>     dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")                           >     all_shaders = re.findall(r"(#version[\s\S]*?\n\})", dec)
+>                                                                                                                                                            >     # Check which Vertex SubPrograms actually sample Ceto_DisplacementMap2 & Ceto_DisplacementMap3!
+>     vert_sps = ps["progVertex"]["m_SubPrograms"]                                                                                                           >     frag_sps = ps["progFragment"]["m_SubPrograms"]
+>                                                                                                                                                            >     print(f"\n==================== {label} (pid={pid}) ====================")
+>     # Map keyword index -> displacement map count in vertex shader                                                                                         >     kw_to_maps = {}
+>     for sp in vert_sps:
+>         idxs = tuple(sp.get("m_KeywordIndices", []))
+>         if idxs not in kw_to_maps:
+>             v_code = all_shaders[sp["m_BlobIndex"]]
+>             maps = sorted(set(re.findall(r"Ceto_DisplacementMap\d", v_code)))
+>             kw_to_maps[idxs] = (sp["m_BlobIndex"], maps)
+>
+>     for idxs, (v_bidx, maps) in sorted(kw_to_maps.items()):
+>         print(f"  Vert KeywordIdxs={list(idxs)} -> BlobIdx={v_bidx} | Samples={maps}")
+>
+>     # Find the exact 4-grid variant (samples Ceto_DisplacementMap0..3) with standard directional light (minimal extra fog/shadow keywords)
+>     four_grid_v = [(idxs, bidx, maps) for idxs, (bidx, maps) in kw_to_maps.items() if "Ceto_DisplacementMap3" in maps]
+>     if four_grid_v:
+>         best_v_idxs, best_v_bidx, _ = min(four_grid_v, key=lambda x: len(x))
+>         # Find matching Fragment SubProgram with exact same m_KeywordIndices
+>         matching_f = [sp for sp in frag_sps if tuple(sp.get("m_KeywordIndices", [])) == best_v_idxs]
+>         best_f_bidx = matching_f["m_BlobIndex"] if matching_f else frag_sps["m_BlobIndex"]
+>
+>         v_src = all_shaders[best_v_bidx].strip()
+>         f_src = all_shaders[best_f_bidx].strip()
+>         f_foams = sorted(set(re.findall(r"Ceto_FoamMap\d|Ceto_SlopeMap\d|Ceto_DisplacementMap\d", f_src)))
+>         print(f"--> VERIFIED 4-GRID VARIANT: KeywordIdxs={list(best_v_idxs)} | VertBlob={best_v_bidx} | FragBlob={best_f_bidx}")
+>         print(f"--> Fragment Samples: {f_foams}")
+>
+>         out_file = out_dir / f"{label}_pid{pid}_4GRID_ACTIVE.glsl"
+>         out_file.write_text(
+>             f"// Shader: {label} (pid={pid}) | Pass[{pass_idx}] | 4-Grid Active Variant\n"
+>             f"// KeywordIndices={list(best_v_idxs)} | VertexBlob={best_v_bidx} | FragmentBlob={best_f_bidx}\n\n"
+>             f"// ==================== FULL VERTEX SHADER ====================\n{v_src}\n\n"
+>             f"// ==================== FULL FRAGMENT SHADER ====================\n{f_src}\n"                                                                >         )
+>         print(f"[SAVED]: {out_file.name} ({out_file.stat().st_size} bytes)")
+> EOF
+
+==================== OceanTopSide_Transparent (pid=175) ====================
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13] -> BlobIdx=341 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14] -> BlobIdx=342 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 15] -> BlobIdx=344 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']            Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 15, 16] -> BlobIdx=345 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=351 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 15, 17] -> BlobIdx=349 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 17] -> BlobIdx=347 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 15] -> BlobIdx=343 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 15, 16, 17] -> BlobIdx=350 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 15, 17] -> BlobIdx=348 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 17] -> BlobIdx=346 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13] -> BlobIdx=330 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                       Vert KeywordIdxs=[4, 5, 6, 7, 13, 14] -> BlobIdx=331 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 15] -> BlobIdx=333 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 15, 16] -> BlobIdx=334 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 15, 16, 17] -> BlobIdx=340 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 15, 17] -> BlobIdx=338 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 17] -> BlobIdx=336 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 15] -> BlobIdx=332 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 15, 16, 17] -> BlobIdx=339 | Samples=[]                                                                                    Vert KeywordIdxs=[4, 5, 6, 7, 13, 15, 17] -> BlobIdx=337 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 17] -> BlobIdx=335 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13] -> BlobIdx=319 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 14] -> BlobIdx=320 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 15] -> BlobIdx=322 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']               Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 15, 16] -> BlobIdx=323 | Samples=[]                                                                                    Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 15, 16, 17] -> BlobIdx=329 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 15, 17] -> BlobIdx=327 | Samples=[]                                                                                    Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 17] -> BlobIdx=325 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 15] -> BlobIdx=321 | Samples=[]                                                                                            Vert KeywordIdxs=[4, 5, 6, 8, 13, 15, 16, 17] -> BlobIdx=328 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 15, 17] -> BlobIdx=326 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']               Vert KeywordIdxs=[4, 5, 6, 8, 13, 17] -> BlobIdx=324 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13] -> BlobIdx=308 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                          Vert KeywordIdxs=[4, 5, 6, 13, 14] -> BlobIdx=309 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 13, 14, 15] -> BlobIdx=311 | Samples=[]                                                                                           Vert KeywordIdxs=[4, 5, 6, 13, 14, 15, 16] -> BlobIdx=312 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13, 14, 15, 16, 17] -> BlobIdx=318 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']          Vert KeywordIdxs=[4, 5, 6, 13, 14, 15, 17] -> BlobIdx=316 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13, 14, 17] -> BlobIdx=314 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                  Vert KeywordIdxs=[4, 5, 6, 13, 15] -> BlobIdx=310 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13, 15, 16, 17] -> BlobIdx=317 | Samples=[]                                                                                       Vert KeywordIdxs=[4, 5, 6, 13, 15, 17] -> BlobIdx=315 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 13, 17] -> BlobIdx=313 | Samples=[]                                                                                               Vert KeywordIdxs=[4, 5, 7, 8, 13] -> BlobIdx=297 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 14] -> BlobIdx=298 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                            Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 15] -> BlobIdx=300 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 15, 16] -> BlobIdx=301 | Samples=[]                                                                                    Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=307 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 15, 17] -> BlobIdx=305 | Samples=[]                                                                                    Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 17] -> BlobIdx=303 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 15] -> BlobIdx=299 | Samples=[]                                                                                            Vert KeywordIdxs=[4, 5, 7, 8, 13, 15, 16, 17] -> BlobIdx=306 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 15, 17] -> BlobIdx=304 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                        Vert KeywordIdxs=[4, 5, 7, 8, 13, 17] -> BlobIdx=302 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13] -> BlobIdx=286 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                   Vert KeywordIdxs=[4, 5, 7, 13, 14] -> BlobIdx=287 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 13, 14, 15] -> BlobIdx=289 | Samples=[]                                                                                           Vert KeywordIdxs=[4, 5, 7, 13, 14, 15, 16] -> BlobIdx=290 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13, 14, 15, 16, 17] -> BlobIdx=296 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                   Vert KeywordIdxs=[4, 5, 7, 13, 14, 15, 17] -> BlobIdx=294 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13, 14, 17] -> BlobIdx=292 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                           Vert KeywordIdxs=[4, 5, 7, 13, 15] -> BlobIdx=288 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13, 15, 16, 17] -> BlobIdx=295 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 13, 15, 17] -> BlobIdx=293 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 13, 17] -> BlobIdx=291 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13] -> BlobIdx=275 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 14] -> BlobIdx=276 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 8, 13, 14, 15] -> BlobIdx=278 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                           Vert KeywordIdxs=[4, 5, 8, 13, 14, 15, 16] -> BlobIdx=279 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 14, 15, 16, 17] -> BlobIdx=285 | Samples=[]                                                                                   Vert KeywordIdxs=[4, 5, 8, 13, 14, 15, 17] -> BlobIdx=283 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 14, 17] -> BlobIdx=281 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 15] -> BlobIdx=277 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 15, 16, 17] -> BlobIdx=284 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 8, 13, 15, 17] -> BlobIdx=282 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 8, 13, 17] -> BlobIdx=280 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13] -> BlobIdx=264 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 14] -> BlobIdx=265 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 13, 14, 15] -> BlobIdx=267 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 13, 14, 15, 16] -> BlobIdx=268 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[4, 5, 13, 14, 15, 16, 17] -> BlobIdx=274 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 14, 15, 17] -> BlobIdx=272 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 14, 17] -> BlobIdx=270 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 15] -> BlobIdx=266 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 15, 16, 17] -> BlobIdx=273 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 13, 15, 17] -> BlobIdx=271 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 13, 17] -> BlobIdx=269 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 8, 13] -> BlobIdx=253 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 14] -> BlobIdx=254 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 15] -> BlobIdx=256 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 15, 16] -> BlobIdx=257 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=263 | Samples=[]                                                                                Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 15, 17] -> BlobIdx=261 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 17] -> BlobIdx=259 | Samples=[]                                                                                        Vert KeywordIdxs=[4, 6, 7, 8, 13, 15] -> BlobIdx=255 | Samples=[]                                                                                            Vert KeywordIdxs=[4, 6, 7, 8, 13, 15, 16, 17] -> BlobIdx=262 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 15, 17] -> BlobIdx=260 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 17] -> BlobIdx=258 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 13] -> BlobIdx=242 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 13, 14] -> BlobIdx=243 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 13, 14, 15] -> BlobIdx=245 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 13, 14, 15, 16] -> BlobIdx=246 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 13, 14, 15, 16, 17] -> BlobIdx=252 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']          Vert KeywordIdxs=[4, 6, 7, 13, 14, 15, 17] -> BlobIdx=250 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']              Vert KeywordIdxs=[4, 6, 7, 13, 14, 17] -> BlobIdx=248 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 13, 15] -> BlobIdx=244 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 13, 15, 16, 17] -> BlobIdx=251 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 13, 15, 17] -> BlobIdx=249 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 13, 17] -> BlobIdx=247 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 8, 13] -> BlobIdx=231 | Samples=[]                                                                                                   Vert KeywordIdxs=[4, 6, 8, 13, 14] -> BlobIdx=232 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 8, 13, 14, 15] -> BlobIdx=234 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                  Vert KeywordIdxs=[4, 6, 8, 13, 14, 15, 16] -> BlobIdx=235 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 8, 13, 14, 15, 16, 17] -> BlobIdx=241 | Samples=[]                                                                                   Vert KeywordIdxs=[4, 6, 8, 13, 14, 15, 17] -> BlobIdx=239 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 8, 13, 14, 17] -> BlobIdx=237 | Samples=[]                                                                                           Vert KeywordIdxs=[4, 6, 8, 13, 15] -> BlobIdx=233 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 8, 13, 15, 16, 17] -> BlobIdx=240 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']              Vert KeywordIdxs=[4, 6, 8, 13, 15, 17] -> BlobIdx=238 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 8, 13, 17] -> BlobIdx=236 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                      Vert KeywordIdxs=[4, 6, 13] -> BlobIdx=220 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 13, 14] -> BlobIdx=221 | Samples=[]                                                                                                  Vert KeywordIdxs=[4, 6, 13, 14, 15] -> BlobIdx=223 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 13, 14, 15, 16] -> BlobIdx=224 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                 Vert KeywordIdxs=[4, 6, 13, 14, 15, 16, 17] -> BlobIdx=230 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 13, 14, 15, 17] -> BlobIdx=228 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                 Vert KeywordIdxs=[4, 6, 13, 14, 17] -> BlobIdx=226 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 13, 15] -> BlobIdx=222 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                         Vert KeywordIdxs=[4, 6, 13, 15, 16, 17] -> BlobIdx=229 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 13, 15, 17] -> BlobIdx=227 | Samples=[]                                                                                              Vert KeywordIdxs=[4, 6, 13, 17] -> BlobIdx=225 | Samples=[]
+  Vert KeywordIdxs=[4, 7, 8, 13] -> BlobIdx=209 | Samples=[]                                                                                                   Vert KeywordIdxs=[4, 7, 8, 13, 14] -> BlobIdx=210 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                               Vert KeywordIdxs=[4, 7, 8, 13, 14, 15] -> BlobIdx=212 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                           Vert KeywordIdxs=[4, 7, 8, 13, 14, 15, 16] -> BlobIdx=213 | Samples=[]
+  Vert KeywordIdxs=[4, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=219 | Samples=[]                                                                                   Vert KeywordIdxs=[4, 7, 8, 13, 14, 15, 17] -> BlobIdx=217 | Samples=[]
+  Vert KeywordIdxs=[4, 7, 8, 13, 14, 17] -> BlobIdx=215 | Samples=[]                                                                                           Vert KeywordIdxs=[4, 7, 8, 13, 15] -> BlobIdx=211 | Samples=[]
+  Vert KeywordIdxs=[4, 7, 8, 13, 15, 16, 17] -> BlobIdx=218 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                       Vert KeywordIdxs=[4, 7, 8, 13, 15, 17] -> BlobIdx=216 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 7, 8, 13, 17] -> BlobIdx=214 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                               Vert KeywordIdxs=[4, 7, 13] -> BlobIdx=198 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 7, 13, 14] -> BlobIdx=199 | Samples=[]                                                                                                  Vert KeywordIdxs=[4, 7, 13, 14, 15] -> BlobIdx=201 | Samples=[]
+  Vert KeywordIdxs=[4, 7, 13, 14, 15, 16] -> BlobIdx=202 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[4, 7, 13, 14, 15, 16, 17] -> BlobIdx=208 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 7, 13, 14, 15, 17] -> BlobIdx=206 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 7, 13, 14, 17] -> BlobIdx=204 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 7, 13, 15] -> BlobIdx=200 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 7, 13, 15, 16, 17] -> BlobIdx=207 | Samples=[]
+  Vert KeywordIdxs=[4, 7, 13, 15, 17] -> BlobIdx=205 | Samples=[]
+  Vert KeywordIdxs=[4, 7, 13, 17] -> BlobIdx=203 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13] -> BlobIdx=187 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13, 14] -> BlobIdx=188 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 8, 13, 14, 15] -> BlobIdx=190 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 8, 13, 14, 15, 16] -> BlobIdx=191 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13, 14, 15, 16, 17] -> BlobIdx=197 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13, 14, 15, 17] -> BlobIdx=195 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13, 14, 17] -> BlobIdx=193 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13, 15] -> BlobIdx=189 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13, 15, 16, 17] -> BlobIdx=196 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 8, 13, 15, 17] -> BlobIdx=194 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 8, 13, 17] -> BlobIdx=192 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13] -> BlobIdx=176 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13, 14] -> BlobIdx=177 | Samples=[]
+  Vert KeywordIdxs=[4, 13, 14, 15] -> BlobIdx=179 | Samples=[]
+  Vert KeywordIdxs=[4, 13, 14, 15, 16] -> BlobIdx=180 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13, 14, 15, 16, 17] -> BlobIdx=186 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13, 14, 15, 17] -> BlobIdx=184 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13, 14, 17] -> BlobIdx=182 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13, 15] -> BlobIdx=178 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13, 15, 16, 17] -> BlobIdx=185 | Samples=[]
+  Vert KeywordIdxs=[4, 13, 15, 17] -> BlobIdx=183 | Samples=[]
+  Vert KeywordIdxs=[4, 13, 17] -> BlobIdx=181 | Samples=[]                                                                                                     Vert KeywordIdxs=[5, 6, 7, 8, 13] -> BlobIdx=165 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 14] -> BlobIdx=166 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 15] -> BlobIdx=168 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 15, 16] -> BlobIdx=169 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=175 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 15, 17] -> BlobIdx=173 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 17] -> BlobIdx=171 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 15] -> BlobIdx=167 | Samples=[]                                                                                            Vert KeywordIdxs=[5, 6, 7, 8, 13, 15, 16, 17] -> BlobIdx=174 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 15, 17] -> BlobIdx=172 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 17] -> BlobIdx=170 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 13] -> BlobIdx=154 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 13, 14] -> BlobIdx=155 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 13, 14, 15] -> BlobIdx=157 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 13, 14, 15, 16] -> BlobIdx=158 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 13, 14, 15, 16, 17] -> BlobIdx=164 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']          Vert KeywordIdxs=[5, 6, 7, 13, 14, 15, 17] -> BlobIdx=162 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 13, 14, 17] -> BlobIdx=160 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 13, 15] -> BlobIdx=156 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                      Vert KeywordIdxs=[5, 6, 7, 13, 15, 16, 17] -> BlobIdx=163 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 13, 15, 17] -> BlobIdx=161 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 13, 17] -> BlobIdx=159 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13] -> BlobIdx=143 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 14] -> BlobIdx=144 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 8, 13, 14, 15] -> BlobIdx=146 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 8, 13, 14, 15, 16] -> BlobIdx=147 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 14, 15, 16, 17] -> BlobIdx=153 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 14, 15, 17] -> BlobIdx=151 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 14, 17] -> BlobIdx=149 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 15] -> BlobIdx=145 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 15, 16, 17] -> BlobIdx=152 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']              Vert KeywordIdxs=[5, 6, 8, 13, 15, 17] -> BlobIdx=150 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 8, 13, 17] -> BlobIdx=148 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13] -> BlobIdx=132 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13, 14] -> BlobIdx=133 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 13, 14, 15] -> BlobIdx=135 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 13, 14, 15, 16] -> BlobIdx=136 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                 Vert KeywordIdxs=[5, 6, 13, 14, 15, 16, 17] -> BlobIdx=142 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13, 14, 15, 17] -> BlobIdx=140 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                 Vert KeywordIdxs=[5, 6, 13, 14, 17] -> BlobIdx=138 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13, 15] -> BlobIdx=134 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                         Vert KeywordIdxs=[5, 6, 13, 15, 16, 17] -> BlobIdx=141 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 13, 15, 17] -> BlobIdx=139 | Samples=[]                                                                                              Vert KeywordIdxs=[5, 6, 13, 17] -> BlobIdx=137 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13] -> BlobIdx=121 | Samples=[]                                                                                                   Vert KeywordIdxs=[5, 7, 8, 13, 14] -> BlobIdx=122 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 8, 13, 14, 15] -> BlobIdx=124 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                           Vert KeywordIdxs=[5, 7, 8, 13, 14, 15, 16] -> BlobIdx=125 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=131 | Samples=[]                                                                                   Vert KeywordIdxs=[5, 7, 8, 13, 14, 15, 17] -> BlobIdx=129 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13, 14, 17] -> BlobIdx=127 | Samples=[]                                                                                           Vert KeywordIdxs=[5, 7, 8, 13, 15] -> BlobIdx=123 | Samples=[]                                                                                               Vert KeywordIdxs=[5, 7, 8, 13, 15, 16, 17] -> BlobIdx=130 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                       Vert KeywordIdxs=[5, 7, 8, 13, 15, 17] -> BlobIdx=128 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 8, 13, 17] -> BlobIdx=126 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                               Vert KeywordIdxs=[5, 7, 13] -> BlobIdx=110 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 13, 14] -> BlobIdx=111 | Samples=[]                                                                                                  Vert KeywordIdxs=[5, 7, 13, 14, 15] -> BlobIdx=113 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 13, 14, 15, 16] -> BlobIdx=114 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[5, 7, 13, 14, 15, 16, 17] -> BlobIdx=120 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 13, 14, 15, 17] -> BlobIdx=118 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[5, 7, 13, 14, 17] -> BlobIdx=116 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 13, 15] -> BlobIdx=112 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[5, 7, 13, 15, 16, 17] -> BlobIdx=119 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 13, 15, 17] -> BlobIdx=117 | Samples=[]                                                                                              Vert KeywordIdxs=[5, 7, 13, 17] -> BlobIdx=115 | Samples=[]
+  Vert KeywordIdxs=[5, 8, 13] -> BlobIdx=99 | Samples=[]                                                                                                       Vert KeywordIdxs=[5, 8, 13, 14] -> BlobIdx=100 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 8, 13, 14, 15] -> BlobIdx=102 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[5, 8, 13, 14, 15, 16] -> BlobIdx=103 | Samples=[]
+  Vert KeywordIdxs=[5, 8, 13, 14, 15, 16, 17] -> BlobIdx=109 | Samples=[]                                                                                      Vert KeywordIdxs=[5, 8, 13, 14, 15, 17] -> BlobIdx=107 | Samples=[]
+  Vert KeywordIdxs=[5, 8, 13, 14, 17] -> BlobIdx=105 | Samples=[]                                                                                              Vert KeywordIdxs=[5, 8, 13, 15] -> BlobIdx=101 | Samples=[]
+  Vert KeywordIdxs=[5, 8, 13, 15, 16, 17] -> BlobIdx=108 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 8, 13, 15, 17] -> BlobIdx=106 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[5, 8, 13, 17] -> BlobIdx=104 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 13] -> BlobIdx=88 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 13, 14] -> BlobIdx=89 | Samples=[]
+  Vert KeywordIdxs=[5, 13, 14, 15] -> BlobIdx=91 | Samples=[]
+  Vert KeywordIdxs=[5, 13, 14, 15, 16] -> BlobIdx=92 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 13, 14, 15, 16, 17] -> BlobIdx=98 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 13, 14, 15, 17] -> BlobIdx=96 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 13, 14, 17] -> BlobIdx=94 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[5, 13, 15] -> BlobIdx=90 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 13, 15, 16, 17] -> BlobIdx=97 | Samples=[]
+  Vert KeywordIdxs=[5, 13, 15, 17] -> BlobIdx=95 | Samples=[]
+  Vert KeywordIdxs=[5, 13, 17] -> BlobIdx=93 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13] -> BlobIdx=77 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13, 14] -> BlobIdx=78 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 8, 13, 14, 15] -> BlobIdx=80 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 8, 13, 14, 15, 16] -> BlobIdx=81 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=87 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13, 14, 15, 17] -> BlobIdx=85 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13, 14, 17] -> BlobIdx=83 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13, 15] -> BlobIdx=79 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13, 15, 16, 17] -> BlobIdx=86 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 8, 13, 15, 17] -> BlobIdx=84 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 8, 13, 17] -> BlobIdx=82 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13] -> BlobIdx=66 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 14] -> BlobIdx=67 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 13, 14, 15] -> BlobIdx=69 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 13, 14, 15, 16] -> BlobIdx=70 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 14, 15, 16, 17] -> BlobIdx=76 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 14, 15, 17] -> BlobIdx=74 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                  Vert KeywordIdxs=[6, 7, 13, 14, 17] -> BlobIdx=72 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 15] -> BlobIdx=68 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 15, 16, 17] -> BlobIdx=75 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 13, 15, 17] -> BlobIdx=73 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 13, 17] -> BlobIdx=71 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13] -> BlobIdx=55 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13, 14] -> BlobIdx=56 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 8, 13, 14, 15] -> BlobIdx=58 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 8, 13, 14, 15, 16] -> BlobIdx=59 | Samples=[]                                                                                           Vert KeywordIdxs=[6, 8, 13, 14, 15, 16, 17] -> BlobIdx=65 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13, 14, 15, 17] -> BlobIdx=63 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13, 14, 17] -> BlobIdx=61 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13, 15] -> BlobIdx=57 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13, 15, 16, 17] -> BlobIdx=64 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 8, 13, 15, 17] -> BlobIdx=62 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                      Vert KeywordIdxs=[6, 8, 13, 17] -> BlobIdx=60 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 13] -> BlobIdx=44 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                                 Vert KeywordIdxs=[6, 13, 14] -> BlobIdx=45 | Samples=[]
+  Vert KeywordIdxs=[6, 13, 14, 15] -> BlobIdx=47 | Samples=[]                                                                                                  Vert KeywordIdxs=[6, 13, 14, 15, 16] -> BlobIdx=48 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                     Vert KeywordIdxs=[6, 13, 14, 15, 16, 17] -> BlobIdx=54 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                 Vert KeywordIdxs=[6, 13, 14, 15, 17] -> BlobIdx=52 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 13, 14, 17] -> BlobIdx=50 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                         Vert KeywordIdxs=[6, 13, 15] -> BlobIdx=46 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 13, 15, 16, 17] -> BlobIdx=53 | Samples=[]                                                                                              Vert KeywordIdxs=[6, 13, 15, 17] -> BlobIdx=51 | Samples=[]                                                                                                  Vert KeywordIdxs=[6, 13, 17] -> BlobIdx=49 | Samples=[]                                                                                                      Vert KeywordIdxs=[7, 8, 13] -> BlobIdx=33 | Samples=[]                                                                                                       Vert KeywordIdxs=[7, 8, 13, 14] -> BlobIdx=34 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                   Vert KeywordIdxs=[7, 8, 13, 14, 15] -> BlobIdx=36 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                               Vert KeywordIdxs=[7, 8, 13, 14, 15, 16] -> BlobIdx=37 | Samples=[]                                                                                           Vert KeywordIdxs=[7, 8, 13, 14, 15, 16, 17] -> BlobIdx=43 | Samples=[]                                                                                       Vert KeywordIdxs=[7, 8, 13, 14, 15, 17] -> BlobIdx=41 | Samples=[]                                                                                           Vert KeywordIdxs=[7, 8, 13, 14, 17] -> BlobIdx=39 | Samples=[]                                                                                               Vert KeywordIdxs=[7, 8, 13, 15] -> BlobIdx=35 | Samples=[]                                                                                                   Vert KeywordIdxs=[7, 8, 13, 15, 16, 17] -> BlobIdx=42 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                           Vert KeywordIdxs=[7, 8, 13, 15, 17] -> BlobIdx=40 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                               Vert KeywordIdxs=[7, 8, 13, 17] -> BlobIdx=38 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                   Vert KeywordIdxs=[7, 13] -> BlobIdx=22 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                          Vert KeywordIdxs=[7, 13, 14] -> BlobIdx=23 | Samples=[]                                                                                                      Vert KeywordIdxs=[7, 13, 14, 15] -> BlobIdx=25 | Samples=[]                                                                                                  Vert KeywordIdxs=[7, 13, 14, 15, 16] -> BlobIdx=26 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[7, 13, 14, 15, 16, 17] -> BlobIdx=32 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[7, 13, 14, 15, 17] -> BlobIdx=30 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[7, 13, 14, 17] -> BlobIdx=28 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[7, 13, 15] -> BlobIdx=24 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                      Vert KeywordIdxs=[7, 13, 15, 16, 17] -> BlobIdx=31 | Samples=[]                                                                                              Vert KeywordIdxs=[7, 13, 15, 17] -> BlobIdx=29 | Samples=[]                                                                                                  Vert KeywordIdxs=[7, 13, 17] -> BlobIdx=27 | Samples=[]                                                                                                      Vert KeywordIdxs=[8, 13] -> BlobIdx=11 | Samples=[]                                                                                                          Vert KeywordIdxs=[8, 13, 14] -> BlobIdx=12 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                      Vert KeywordIdxs=[8, 13, 14, 15] -> BlobIdx=14 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[8, 13, 14, 15, 16] -> BlobIdx=15 | Samples=[]
+  Vert KeywordIdxs=[8, 13, 14, 15, 16, 17] -> BlobIdx=21 | Samples=[]                                                                                          Vert KeywordIdxs=[8, 13, 14, 15, 17] -> BlobIdx=19 | Samples=[]
+  Vert KeywordIdxs=[8, 13, 14, 17] -> BlobIdx=17 | Samples=[]                                                                                                  Vert KeywordIdxs=[8, 13, 15] -> BlobIdx=13 | Samples=[]
+  Vert KeywordIdxs=[8, 13, 15, 16, 17] -> BlobIdx=20 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[8, 13, 15, 17] -> BlobIdx=18 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[8, 13, 17] -> BlobIdx=16 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                      Vert KeywordIdxs=[13] -> BlobIdx=0 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[13, 14] -> BlobIdx=1 | Samples=[]                                                                                                          Vert KeywordIdxs=[13, 14, 15] -> BlobIdx=3 | Samples=[]
+  Vert KeywordIdxs=[13, 14, 15, 16] -> BlobIdx=4 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[13, 14, 15, 16, 17] -> BlobIdx=10 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[13, 14, 15, 17] -> BlobIdx=8 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[13, 14, 17] -> BlobIdx=6 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[13, 15] -> BlobIdx=2 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[13, 15, 16, 17] -> BlobIdx=9 | Samples=[]
+  Vert KeywordIdxs=[13, 15, 17] -> BlobIdx=7 | Samples=[]
+  Vert KeywordIdxs=[13, 17] -> BlobIdx=5 | Samples=[]
+
+==================== OceanUnderSide_Transparent (pid=143) ====================
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13] -> BlobIdx=341 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14] -> BlobIdx=342 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 15] -> BlobIdx=344 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 15, 16] -> BlobIdx=345 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=351 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 15, 17] -> BlobIdx=349 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 14, 17] -> BlobIdx=347 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 15] -> BlobIdx=343 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 15, 16, 17] -> BlobIdx=350 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 15, 17] -> BlobIdx=348 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 8, 13, 17] -> BlobIdx=346 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13] -> BlobIdx=330 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14] -> BlobIdx=331 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 15] -> BlobIdx=333 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 15, 16] -> BlobIdx=334 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']           Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 15, 16, 17] -> BlobIdx=340 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 15, 17] -> BlobIdx=338 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 14, 17] -> BlobIdx=336 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 15] -> BlobIdx=332 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 15, 16, 17] -> BlobIdx=339 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 15, 17] -> BlobIdx=337 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 7, 13, 17] -> BlobIdx=335 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13] -> BlobIdx=319 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 14] -> BlobIdx=320 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 15] -> BlobIdx=322 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 15, 16] -> BlobIdx=323 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 15, 16, 17] -> BlobIdx=329 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 15, 17] -> BlobIdx=327 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 14, 17] -> BlobIdx=325 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 15] -> BlobIdx=321 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 15, 16, 17] -> BlobIdx=328 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 15, 17] -> BlobIdx=326 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 8, 13, 17] -> BlobIdx=324 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13] -> BlobIdx=308 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13, 14] -> BlobIdx=309 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 13, 14, 15] -> BlobIdx=311 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 13, 14, 15, 16] -> BlobIdx=312 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13, 14, 15, 16, 17] -> BlobIdx=318 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13, 14, 15, 17] -> BlobIdx=316 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13, 14, 17] -> BlobIdx=314 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13, 15] -> BlobIdx=310 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 5, 6, 13, 15, 16, 17] -> BlobIdx=317 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 13, 15, 17] -> BlobIdx=315 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 6, 13, 17] -> BlobIdx=313 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 8, 13] -> BlobIdx=297 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 14] -> BlobIdx=298 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 15] -> BlobIdx=300 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                        Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 15, 16] -> BlobIdx=301 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=307 | Samples=[]                                                                                Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 15, 17] -> BlobIdx=305 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 14, 17] -> BlobIdx=303 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 15] -> BlobIdx=299 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 15, 16, 17] -> BlobIdx=306 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 15, 17] -> BlobIdx=304 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 8, 13, 17] -> BlobIdx=302 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13] -> BlobIdx=286 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13, 14] -> BlobIdx=287 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 13, 14, 15] -> BlobIdx=289 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 13, 14, 15, 16] -> BlobIdx=290 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13, 14, 15, 16, 17] -> BlobIdx=296 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13, 14, 15, 17] -> BlobIdx=294 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13, 14, 17] -> BlobIdx=292 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13, 15] -> BlobIdx=288 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 7, 13, 15, 16, 17] -> BlobIdx=295 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 13, 15, 17] -> BlobIdx=293 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 7, 13, 17] -> BlobIdx=291 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13] -> BlobIdx=275 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 14] -> BlobIdx=276 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 8, 13, 14, 15] -> BlobIdx=278 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 8, 13, 14, 15, 16] -> BlobIdx=279 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 14, 15, 16, 17] -> BlobIdx=285 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 14, 15, 17] -> BlobIdx=283 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 14, 17] -> BlobIdx=281 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 15] -> BlobIdx=277 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 8, 13, 15, 16, 17] -> BlobIdx=284 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 8, 13, 15, 17] -> BlobIdx=282 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 8, 13, 17] -> BlobIdx=280 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13] -> BlobIdx=264 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 14] -> BlobIdx=265 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 13, 14, 15] -> BlobIdx=267 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 13, 14, 15, 16] -> BlobIdx=268 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 14, 15, 16, 17] -> BlobIdx=274 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                      Vert KeywordIdxs=[4, 5, 13, 14, 15, 17] -> BlobIdx=272 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 14, 17] -> BlobIdx=270 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 15] -> BlobIdx=266 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 5, 13, 15, 16, 17] -> BlobIdx=273 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 13, 15, 17] -> BlobIdx=271 | Samples=[]
+  Vert KeywordIdxs=[4, 5, 13, 17] -> BlobIdx=269 | Samples=[]                                                                                                  Vert KeywordIdxs=[4, 6, 7, 8, 13] -> BlobIdx=253 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 14] -> BlobIdx=254 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                   Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 15] -> BlobIdx=256 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 15, 16] -> BlobIdx=257 | Samples=[]                                                                                    Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=263 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 15, 17] -> BlobIdx=261 | Samples=[]                                                                                    Vert KeywordIdxs=[4, 6, 7, 8, 13, 14, 17] -> BlobIdx=259 | Samples=[]
+  Vert KeywordIdxs=[4, 6, 7, 8, 13, 15] -> BlobIdx=255 | Samples=[]                                                                                            Vert KeywordIdxs=[4, 6, 7, 8, 13, 15, 16, 17] -> BlobIdx=262 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']           Vert KeywordIdxs=[4, 6, 7, 8, 13, 15, 17] -> BlobIdx=260 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']               Vert KeywordIdxs=[4, 6, 7, 8, 13, 17] -> BlobIdx=258 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[4, 6, 7, 13] -> BlobIdx=242 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                          Vert KeywordIdxs=[4, 6, 7, 13, 14] -> BlobIdx=243 | Samples=[]                                                                                               Vert KeywordIdxs=[4, 6, 7, 13, 14, 15] -> BlobIdx=245 | Samples=[]                                                                                           Vert KeywordIdxs=[4, 6, 7, 13, 14, 15, 16] -> BlobIdx=246 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']              Vert KeywordIdxs=[4, 6, 7, 13, 14, 15, 16, 17] -> BlobIdx=252 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']          Vert KeywordIdxs=[4, 6, 7, 13, 14, 15, 17] -> BlobIdx=250 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']              Vert KeywordIdxs=[4, 6, 7, 13, 14, 17] -> BlobIdx=248 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                  Vert KeywordIdxs=[4, 6, 7, 13, 15] -> BlobIdx=244 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                      Vert KeywordIdxs=[4, 6, 7, 13, 15, 16, 17] -> BlobIdx=251 | Samples=[]                                                                                       Vert KeywordIdxs=[4, 6, 7, 13, 15, 17] -> BlobIdx=249 | Samples=[]                                                                                           Vert KeywordIdxs=[4, 6, 7, 13, 17] -> BlobIdx=247 | Samples=[]                                                                                               Vert KeywordIdxs=[4, 6, 8, 13] -> BlobIdx=231 | Samples=[]                                                                                                   Vert KeywordIdxs=[4, 6, 8, 13, 14] -> BlobIdx=232 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                      Vert KeywordIdxs=[4, 6, 8, 13, 14, 15] -> BlobIdx=234 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                  Vert KeywordIdxs=[4, 6, 8, 13, 14, 15, 16] -> BlobIdx=235 | Samples=[]                                                                                       Vert KeywordIdxs=[4, 6, 8, 13, 14, 15, 16, 17] -> BlobIdx=241 | Samples=[]                                                                                   Vert KeywordIdxs=[4, 6, 8, 13, 14, 15, 17] -> BlobIdx=239 | Samples=[]                                                                                       Vert KeywordIdxs=[4, 6, 8, 13, 14, 17] -> BlobIdx=237 | Samples=[]                                                                                           Vert KeywordIdxs=[4, 6, 8, 13, 15] -> BlobIdx=233 | Samples=[]                                                                                               Vert KeywordIdxs=[4, 6, 8, 13, 15, 16, 17] -> BlobIdx=240 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']              Vert KeywordIdxs=[4, 6, 8, 13, 15, 17] -> BlobIdx=238 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                  Vert KeywordIdxs=[4, 6, 8, 13, 17] -> BlobIdx=236 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                      Vert KeywordIdxs=[4, 6, 13] -> BlobIdx=220 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                             Vert KeywordIdxs=[4, 6, 13, 14] -> BlobIdx=221 | Samples=[]                                                                                                  Vert KeywordIdxs=[4, 6, 13, 14, 15] -> BlobIdx=223 | Samples=[]                                                                                              Vert KeywordIdxs=[4, 6, 13, 14, 15, 16] -> BlobIdx=224 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                 Vert KeywordIdxs=[4, 6, 13, 14, 15, 16, 17] -> BlobIdx=230 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']             Vert KeywordIdxs=[4, 6, 13, 14, 15, 17] -> BlobIdx=228 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                 Vert KeywordIdxs=[4, 6, 13, 14, 17] -> BlobIdx=226 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                     Vert KeywordIdxs=[4, 6, 13, 15] -> BlobIdx=222 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                         Vert KeywordIdxs=[4, 6, 13, 15, 16, 17] -> BlobIdx=229 | Samples=[]                                                                                          Vert KeywordIdxs=[4, 6, 13, 15, 17] -> BlobIdx=227 | Samples=[]                                                                                              Vert KeywordIdxs=[4, 6, 13, 17] -> BlobIdx=225 | Samples=[]                                                                                                  Vert KeywordIdxs=[4, 7, 8, 13] -> BlobIdx=209 | Samples=[]                                                                                                   Vert KeywordIdxs=[4, 7, 8, 13, 14] -> BlobIdx=210 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                               Vert KeywordIdxs=[4, 7, 8, 13, 14, 15] -> BlobIdx=212 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                           Vert KeywordIdxs=[4, 7, 8, 13, 14, 15, 16] -> BlobIdx=213 | Samples=[]                                                                                       Vert KeywordIdxs=[4, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=219 | Samples=[]                                                                                   Vert KeywordIdxs=[4, 7, 8, 13, 14, 15, 17] -> BlobIdx=217 | Samples=[]                                                                                       Vert KeywordIdxs=[4, 7, 8, 13, 14, 17] -> BlobIdx=215 | Samples=[]                                                                                           Vert KeywordIdxs=[4, 7, 8, 13, 15] -> BlobIdx=211 | Samples=[]                                                                                               Vert KeywordIdxs=[4, 7, 8, 13, 15, 16, 17] -> BlobIdx=218 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                       Vert KeywordIdxs=[4, 7, 8, 13, 15, 17] -> BlobIdx=216 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                           Vert KeywordIdxs=[4, 7, 8, 13, 17] -> BlobIdx=214 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                               Vert KeywordIdxs=[4, 7, 13] -> BlobIdx=198 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                      Vert KeywordIdxs=[4, 7, 13, 14] -> BlobIdx=199 | Samples=[]                                                                                                  Vert KeywordIdxs=[4, 7, 13, 14, 15] -> BlobIdx=201 | Samples=[]                                                                                              Vert KeywordIdxs=[4, 7, 13, 14, 15, 16] -> BlobIdx=202 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[4, 7, 13, 14, 15, 16, 17] -> BlobIdx=208 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                      Vert KeywordIdxs=[4, 7, 13, 14, 15, 17] -> BlobIdx=206 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[4, 7, 13, 14, 17] -> BlobIdx=204 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[4, 7, 13, 15] -> BlobIdx=200 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[4, 7, 13, 15, 16, 17] -> BlobIdx=207 | Samples=[]                                                                                          Vert KeywordIdxs=[4, 7, 13, 15, 17] -> BlobIdx=205 | Samples=[]                                                                                              Vert KeywordIdxs=[4, 7, 13, 17] -> BlobIdx=203 | Samples=[]                                                                                                  Vert KeywordIdxs=[4, 8, 13] -> BlobIdx=187 | Samples=[]                                                                                                      Vert KeywordIdxs=[4, 8, 13, 14] -> BlobIdx=188 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[4, 8, 13, 14, 15] -> BlobIdx=190 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[4, 8, 13, 14, 15, 16] -> BlobIdx=191 | Samples=[]                                                                                          Vert KeywordIdxs=[4, 8, 13, 14, 15, 16, 17] -> BlobIdx=197 | Samples=[]                                                                                      Vert KeywordIdxs=[4, 8, 13, 14, 15, 17] -> BlobIdx=195 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13, 14, 17] -> BlobIdx=193 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13, 15] -> BlobIdx=189 | Samples=[]
+  Vert KeywordIdxs=[4, 8, 13, 15, 16, 17] -> BlobIdx=196 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[4, 8, 13, 15, 17] -> BlobIdx=194 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 8, 13, 17] -> BlobIdx=192 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[4, 13] -> BlobIdx=176 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13, 14] -> BlobIdx=177 | Samples=[]                                                                                                     Vert KeywordIdxs=[4, 13, 14, 15] -> BlobIdx=179 | Samples=[]
+  Vert KeywordIdxs=[4, 13, 14, 15, 16] -> BlobIdx=180 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                             Vert KeywordIdxs=[4, 13, 14, 15, 16, 17] -> BlobIdx=186 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13, 14, 15, 17] -> BlobIdx=184 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                             Vert KeywordIdxs=[4, 13, 14, 17] -> BlobIdx=182 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[4, 13, 15] -> BlobIdx=178 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                     Vert KeywordIdxs=[4, 13, 15, 16, 17] -> BlobIdx=185 | Samples=[]
+  Vert KeywordIdxs=[4, 13, 15, 17] -> BlobIdx=183 | Samples=[]                                                                                                 Vert KeywordIdxs=[4, 13, 17] -> BlobIdx=181 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 8, 13] -> BlobIdx=165 | Samples=[]                                                                                                Vert KeywordIdxs=[5, 6, 7, 8, 13, 14] -> BlobIdx=166 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 15] -> BlobIdx=168 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']               Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 15, 16] -> BlobIdx=169 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=175 | Samples=[]                                                                                Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 15, 17] -> BlobIdx=173 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 14, 17] -> BlobIdx=171 | Samples=[]                                                                                        Vert KeywordIdxs=[5, 6, 7, 8, 13, 15] -> BlobIdx=167 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 15, 16, 17] -> BlobIdx=174 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']           Vert KeywordIdxs=[5, 6, 7, 8, 13, 15, 17] -> BlobIdx=172 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 7, 8, 13, 17] -> BlobIdx=170 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                   Vert KeywordIdxs=[5, 6, 7, 13] -> BlobIdx=154 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                          Vert KeywordIdxs=[5, 6, 7, 13, 14] -> BlobIdx=155 | Samples=[]                                                                                               Vert KeywordIdxs=[5, 6, 7, 13, 14, 15] -> BlobIdx=157 | Samples=[]                                                                                           Vert KeywordIdxs=[5, 6, 7, 13, 14, 15, 16] -> BlobIdx=158 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']              Vert KeywordIdxs=[5, 6, 7, 13, 14, 15, 16, 17] -> BlobIdx=164 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']          Vert KeywordIdxs=[5, 6, 7, 13, 14, 15, 17] -> BlobIdx=162 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']              Vert KeywordIdxs=[5, 6, 7, 13, 14, 17] -> BlobIdx=160 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                  Vert KeywordIdxs=[5, 6, 7, 13, 15] -> BlobIdx=156 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                      Vert KeywordIdxs=[5, 6, 7, 13, 15, 16, 17] -> BlobIdx=163 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 7, 13, 15, 17] -> BlobIdx=161 | Samples=[]                                                                                           Vert KeywordIdxs=[5, 6, 7, 13, 17] -> BlobIdx=159 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13] -> BlobIdx=143 | Samples=[]                                                                                                   Vert KeywordIdxs=[5, 6, 8, 13, 14] -> BlobIdx=144 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 8, 13, 14, 15] -> BlobIdx=146 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                  Vert KeywordIdxs=[5, 6, 8, 13, 14, 15, 16] -> BlobIdx=147 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 14, 15, 16, 17] -> BlobIdx=153 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 14, 15, 17] -> BlobIdx=151 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 14, 17] -> BlobIdx=149 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 15] -> BlobIdx=145 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 8, 13, 15, 16, 17] -> BlobIdx=152 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 8, 13, 15, 17] -> BlobIdx=150 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 8, 13, 17] -> BlobIdx=148 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13] -> BlobIdx=132 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13, 14] -> BlobIdx=133 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 13, 14, 15] -> BlobIdx=135 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 13, 14, 15, 16] -> BlobIdx=136 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13, 14, 15, 16, 17] -> BlobIdx=142 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13, 14, 15, 17] -> BlobIdx=140 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13, 14, 17] -> BlobIdx=138 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13, 15] -> BlobIdx=134 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[5, 6, 13, 15, 16, 17] -> BlobIdx=141 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 13, 15, 17] -> BlobIdx=139 | Samples=[]
+  Vert KeywordIdxs=[5, 6, 13, 17] -> BlobIdx=137 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13] -> BlobIdx=121 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13, 14] -> BlobIdx=122 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 8, 13, 14, 15] -> BlobIdx=124 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                           Vert KeywordIdxs=[5, 7, 8, 13, 14, 15, 16] -> BlobIdx=125 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=131 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13, 14, 15, 17] -> BlobIdx=129 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13, 14, 17] -> BlobIdx=127 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13, 15] -> BlobIdx=123 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 8, 13, 15, 16, 17] -> BlobIdx=130 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                       Vert KeywordIdxs=[5, 7, 8, 13, 15, 17] -> BlobIdx=128 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 8, 13, 17] -> BlobIdx=126 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                               Vert KeywordIdxs=[5, 7, 13] -> BlobIdx=110 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 13, 14] -> BlobIdx=111 | Samples=[]                                                                                                  Vert KeywordIdxs=[5, 7, 13, 14, 15] -> BlobIdx=113 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 13, 14, 15, 16] -> BlobIdx=114 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[5, 7, 13, 14, 15, 16, 17] -> BlobIdx=120 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 13, 14, 15, 17] -> BlobIdx=118 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[5, 7, 13, 14, 17] -> BlobIdx=116 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 7, 13, 15] -> BlobIdx=112 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[5, 7, 13, 15, 16, 17] -> BlobIdx=119 | Samples=[]
+  Vert KeywordIdxs=[5, 7, 13, 15, 17] -> BlobIdx=117 | Samples=[]                                                                                              Vert KeywordIdxs=[5, 7, 13, 17] -> BlobIdx=115 | Samples=[]
+  Vert KeywordIdxs=[5, 8, 13] -> BlobIdx=99 | Samples=[]                                                                                                       Vert KeywordIdxs=[5, 8, 13, 14] -> BlobIdx=100 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 8, 13, 14, 15] -> BlobIdx=102 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[5, 8, 13, 14, 15, 16] -> BlobIdx=103 | Samples=[]
+  Vert KeywordIdxs=[5, 8, 13, 14, 15, 16, 17] -> BlobIdx=109 | Samples=[]                                                                                      Vert KeywordIdxs=[5, 8, 13, 14, 15, 17] -> BlobIdx=107 | Samples=[]
+  Vert KeywordIdxs=[5, 8, 13, 14, 17] -> BlobIdx=105 | Samples=[]                                                                                              Vert KeywordIdxs=[5, 8, 13, 15] -> BlobIdx=101 | Samples=[]
+  Vert KeywordIdxs=[5, 8, 13, 15, 16, 17] -> BlobIdx=108 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[5, 8, 13, 15, 17] -> BlobIdx=106 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 8, 13, 17] -> BlobIdx=104 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[5, 13] -> BlobIdx=88 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 13, 14] -> BlobIdx=89 | Samples=[]                                                                                                      Vert KeywordIdxs=[5, 13, 14, 15] -> BlobIdx=91 | Samples=[]
+  Vert KeywordIdxs=[5, 13, 14, 15, 16] -> BlobIdx=92 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[5, 13, 14, 15, 16, 17] -> BlobIdx=98 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 13, 14, 15, 17] -> BlobIdx=96 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                              Vert KeywordIdxs=[5, 13, 14, 17] -> BlobIdx=94 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[5, 13, 15] -> BlobIdx=90 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                      Vert KeywordIdxs=[5, 13, 15, 16, 17] -> BlobIdx=97 | Samples=[]                                                                                              Vert KeywordIdxs=[5, 13, 15, 17] -> BlobIdx=95 | Samples=[]                                                                                                  Vert KeywordIdxs=[5, 13, 17] -> BlobIdx=93 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13] -> BlobIdx=77 | Samples=[]                                                                                                    Vert KeywordIdxs=[6, 7, 8, 13, 14] -> BlobIdx=78 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 8, 13, 14, 15] -> BlobIdx=80 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 8, 13, 14, 15, 16] -> BlobIdx=81 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13, 14, 15, 16, 17] -> BlobIdx=87 | Samples=[]                                                                                    Vert KeywordIdxs=[6, 7, 8, 13, 14, 15, 17] -> BlobIdx=85 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13, 14, 17] -> BlobIdx=83 | Samples=[]                                                                                            Vert KeywordIdxs=[6, 7, 8, 13, 15] -> BlobIdx=79 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 8, 13, 15, 16, 17] -> BlobIdx=86 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 8, 13, 15, 17] -> BlobIdx=84 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 8, 13, 17] -> BlobIdx=82 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13] -> BlobIdx=66 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 14] -> BlobIdx=67 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 13, 14, 15] -> BlobIdx=69 | Samples=[]                                                                                               Vert KeywordIdxs=[6, 7, 13, 14, 15, 16] -> BlobIdx=70 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 14, 15, 16, 17] -> BlobIdx=76 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 14, 15, 17] -> BlobIdx=74 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 14, 17] -> BlobIdx=72 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 7, 13, 15] -> BlobIdx=68 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                          Vert KeywordIdxs=[6, 7, 13, 15, 16, 17] -> BlobIdx=75 | Samples=[]                                                                                           Vert KeywordIdxs=[6, 7, 13, 15, 17] -> BlobIdx=73 | Samples=[]
+  Vert KeywordIdxs=[6, 7, 13, 17] -> BlobIdx=71 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13] -> BlobIdx=55 | Samples=[]                                                                                                       Vert KeywordIdxs=[6, 8, 13, 14] -> BlobIdx=56 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 8, 13, 14, 15] -> BlobIdx=58 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                      Vert KeywordIdxs=[6, 8, 13, 14, 15, 16] -> BlobIdx=59 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13, 14, 15, 16, 17] -> BlobIdx=65 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13, 14, 15, 17] -> BlobIdx=63 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13, 14, 17] -> BlobIdx=61 | Samples=[]
+  Vert KeywordIdxs=[6, 8, 13, 15] -> BlobIdx=57 | Samples=[]                                                                                                   Vert KeywordIdxs=[6, 8, 13, 15, 16, 17] -> BlobIdx=64 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 8, 13, 15, 17] -> BlobIdx=62 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 8, 13, 17] -> BlobIdx=60 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 13] -> BlobIdx=44 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                                 Vert KeywordIdxs=[6, 13, 14] -> BlobIdx=45 | Samples=[]
+  Vert KeywordIdxs=[6, 13, 14, 15] -> BlobIdx=47 | Samples=[]
+  Vert KeywordIdxs=[6, 13, 14, 15, 16] -> BlobIdx=48 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 13, 14, 15, 16, 17] -> BlobIdx=54 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                 Vert KeywordIdxs=[6, 13, 14, 15, 17] -> BlobIdx=52 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 13, 14, 17] -> BlobIdx=50 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']
+  Vert KeywordIdxs=[6, 13, 15] -> BlobIdx=46 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']                             Vert KeywordIdxs=[6, 13, 15, 16, 17] -> BlobIdx=53 | Samples=[]
+  Vert KeywordIdxs=[6, 13, 15, 17] -> BlobIdx=51 | Samples=[]                                                                                                  Vert KeywordIdxs=[6, 13, 17] -> BlobIdx=49 | Samples=[]
+  Vert KeywordIdxs=[7, 8, 13] -> BlobIdx=33 | Samples=[]
+  Vert KeywordIdxs=[7, 8, 13, 14] -> BlobIdx=34 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                   Vert KeywordIdxs=[7, 8, 13, 14, 15] -> BlobIdx=36 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[7, 8, 13, 14, 15, 16] -> BlobIdx=37 | Samples=[]
+  Vert KeywordIdxs=[7, 8, 13, 14, 15, 16, 17] -> BlobIdx=43 | Samples=[]
+  Vert KeywordIdxs=[7, 8, 13, 14, 15, 17] -> BlobIdx=41 | Samples=[]                                                                                           Vert KeywordIdxs=[7, 8, 13, 14, 17] -> BlobIdx=39 | Samples=[]
+  Vert KeywordIdxs=[7, 8, 13, 15] -> BlobIdx=35 | Samples=[]                                                                                                   Vert KeywordIdxs=[7, 8, 13, 15, 16, 17] -> BlobIdx=42 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[7, 8, 13, 15, 17] -> BlobIdx=40 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                               Vert KeywordIdxs=[7, 8, 13, 17] -> BlobIdx=38 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[7, 13] -> BlobIdx=22 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                          Vert KeywordIdxs=[7, 13, 14] -> BlobIdx=23 | Samples=[]                                                                                                      Vert KeywordIdxs=[7, 13, 14, 15] -> BlobIdx=25 | Samples=[]                                                                                                  Vert KeywordIdxs=[7, 13, 14, 15, 16] -> BlobIdx=26 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[7, 13, 14, 15, 16, 17] -> BlobIdx=32 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                          Vert KeywordIdxs=[7, 13, 14, 15, 17] -> BlobIdx=30 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[7, 13, 14, 17] -> BlobIdx=28 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[7, 13, 15] -> BlobIdx=24 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[7, 13, 15, 16, 17] -> BlobIdx=31 | Samples=[]                                                                                              Vert KeywordIdxs=[7, 13, 15, 17] -> BlobIdx=29 | Samples=[]
+  Vert KeywordIdxs=[7, 13, 17] -> BlobIdx=27 | Samples=[]                                                                                                      Vert KeywordIdxs=[8, 13] -> BlobIdx=11 | Samples=[]
+  Vert KeywordIdxs=[8, 13, 14] -> BlobIdx=12 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                      Vert KeywordIdxs=[8, 13, 14, 15] -> BlobIdx=14 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[8, 13, 14, 15, 16] -> BlobIdx=15 | Samples=[]                                                                                              Vert KeywordIdxs=[8, 13, 14, 15, 16, 17] -> BlobIdx=21 | Samples=[]
+  Vert KeywordIdxs=[8, 13, 14, 15, 17] -> BlobIdx=19 | Samples=[]                                                                                              Vert KeywordIdxs=[8, 13, 14, 17] -> BlobIdx=17 | Samples=[]
+  Vert KeywordIdxs=[8, 13, 15] -> BlobIdx=13 | Samples=[]                                                                                                      Vert KeywordIdxs=[8, 13, 15, 16, 17] -> BlobIdx=20 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[8, 13, 15, 17] -> BlobIdx=18 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[8, 13, 17] -> BlobIdx=16 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[13] -> BlobIdx=0 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                              Vert KeywordIdxs=[13, 14] -> BlobIdx=1 | Samples=[]
+  Vert KeywordIdxs=[13, 14, 15] -> BlobIdx=3 | Samples=[]                                                                                                      Vert KeywordIdxs=[13, 14, 15, 16] -> BlobIdx=4 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                  Vert KeywordIdxs=[13, 14, 15, 16, 17] -> BlobIdx=10 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                             Vert KeywordIdxs=[13, 14, 15, 17] -> BlobIdx=8 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[13, 14, 17] -> BlobIdx=6 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']                                                      Vert KeywordIdxs=[13, 15] -> BlobIdx=2 | Samples=['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1']
+  Vert KeywordIdxs=[13, 15, 16, 17] -> BlobIdx=9 | Samples=[]                                                                                                  Vert KeywordIdxs=[13, 15, 17] -> BlobIdx=7 | Samples=[]
+  Vert KeywordIdxs=[13, 17] -> BlobIdx=5 | Samples=[]                                                                                                        root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-------------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. EXACT RUNTIME ENABLEKEYWORD / DISABLEKEYWORD IN CETO C# ==="
+=== 1. EXACT RUNTIME ENABLEKEYWORD / DISABLEKEYWORD IN CETO C# ===                                                                                           root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");                                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");                                                                                                                                              /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. EXTRACT 3-GRID VARIANT (KeywordIdxs=(6, 13) -> Vert BlobIdx=44) ==="
+=== 2. EXTRACT 3-GRID VARIANT (KeywordIdxs=(6, 13) -> Vert BlobIdx=44) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re
+> from pathlib import Path
+>                                                                                                                                                            > data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> out_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders")                                         > e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> target_tuple = (6, 13)
+>                                                                                                                                                            > for pid, label, pass_idx in ((175, "OceanTopSide_Transparent", 1), (143, "OceanUnderSide_Transparent", 0)):
+>     obj = next(o for o in e0.objects if o.path_id == pid)                                                                                                  >     tt = obj.read_typetree()
+>     ps = next(iter(tt["m_ParsedForm"]["m_SubShaders"]))["m_Passes"][pass_idx]
+>     vert_sps = ps["progVertex"]["m_SubPrograms"]
+>     frag_sps = ps["progFragment"]["m_SubPrograms"]
+>
+>     v_sp = next(sp for sp in vert_sps if tuple(sp.get("m_KeywordIndices") or ()) == target_tuple)
+>     f_sp = next(sp for sp in frag_sps if tuple(sp.get("m_KeywordIndices") or ()) == target_tuple)                                                          >
+>     sh = obj.read()
+>     p_idx = list(sh.platforms).index(15)
+>     off, clen, dlen = sum(sh.offsets[p_idx]), sum(sh.compressedLengths[p_idx]), sum(sh.decompressedLengths[p_idx])
+>     dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")                           >     all_shaders = re.findall(r"(#version[\s\S]*?\n\})", dec)
+>
+>     v_src = all_shaders[v_sp["m_BlobIndex"]].strip()
+>     f_src = all_shaders[f_sp["m_BlobIndex"]].strip()                                                                                                       >     v_maps = sorted(set(re.findall(r"Ceto_DisplacementMap\d", v_src)))
+>     f_maps = sorted(set(re.findall(r"Ceto_(?:Displacement|Slope|Foam)Map\d", f_src)))                                                                      >
+>     out_file = out_dir / f"{label}_pid{pid}_3GRID_VERIFIED.glsl"
+>     out_file.write_text(
+>         f"// Shader: {label} (pid={pid}) | Pass[{pass_idx}] | KeywordIndices={list(target_tuple)}\n"
+>         f"// Vertex   BlobIdx={v_sp['m_BlobIndex']} | Samples={v_maps}\n"                                                                                  >         f"// Fragment BlobIdx={f_sp['m_BlobIndex']} | Samples={f_maps}\n\n"
+>         f"// ==================== FULL VERTEX SHADER ====================\n{v_src}\n\n"                                                                    >         f"// ==================== FULL FRAGMENT SHADER ====================\n{f_src}\n"
+>     )                                                                                                                                                      >     print(f"[SAVED] {out_file.name}: VertBlob={v_sp['m_BlobIndex']} ({v_maps}) | FragBlob={f_sp['m_BlobIndex']} ({f_maps})")
+> EOF
+[SAVED] OceanTopSide_Transparent_pid175_3GRID_VERIFIED.glsl: VertBlob=44 (['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']) | FragBlob=372 (['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1'])                                                                                                [SAVED] OceanUnderSide_Transparent_pid143_3GRID_VERIFIED.glsl: VertBlob=44 (['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']) | FragBlob=372 (['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1'])
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+----------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. EXACT RUNTIME ENABLEKEYWORD / DISABLEKEYWORD IN CETO C# ==="
+=== 1. EXACT RUNTIME ENABLEKEYWORD / DISABLEKEYWORD IN CETO C# ===                                                                                           root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");                                                                                                                                               /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");                                                                                                                                              /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. EXTRACT 3-GRID VARIANT (KeywordIdxs=(6, 13) -> Vert BlobIdx=44) ==="
+=== 2. EXTRACT 3-GRID VARIANT (KeywordIdxs=(6, 13) -> Vert BlobIdx=44) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re
+> from pathlib import Path
+>                                                                                                                                                            > data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> out_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders")                                         > e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> target_tuple = (6, 13)
+>                                                                                                                                                            > for pid, label, pass_idx in ((175, "OceanTopSide_Transparent", 1), (143, "OceanUnderSide_Transparent", 0)):
+>     obj = next(o for o in e0.objects if o.path_id == pid)                                                                                                  >     tt = obj.read_typetree()
+>     ps = next(iter(tt["m_ParsedForm"]["m_SubShaders"]))["m_Passes"][pass_idx]
+>     vert_sps = ps["progVertex"]["m_SubPrograms"]
+>     frag_sps = ps["progFragment"]["m_SubPrograms"]
+>
+>     v_sp = next(sp for sp in vert_sps if tuple(sp.get("m_KeywordIndices") or ()) == target_tuple)
+>     f_sp = next(sp for sp in frag_sps if tuple(sp.get("m_KeywordIndices") or ()) == target_tuple)                                                          >
+>     sh = obj.read()
+>     p_idx = list(sh.platforms).index(15)
+>     off, clen, dlen = sum(sh.offsets[p_idx]), sum(sh.compressedLengths[p_idx]), sum(sh.decompressedLengths[p_idx])
+>     dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")                           >     all_shaders = re.findall(r"(#version[\s\S]*?\n\})", dec)
+>
+>     v_src = all_shaders[v_sp["m_BlobIndex"]].strip()
+>     f_src = all_shaders[f_sp["m_BlobIndex"]].strip()                                                                                                       >     v_maps = sorted(set(re.findall(r"Ceto_DisplacementMap\d", v_src)))
+>     f_maps = sorted(set(re.findall(r"Ceto_(?:Displacement|Slope|Foam)Map\d", f_src)))                                                                      >
+>     out_file = out_dir / f"{label}_pid{pid}_3GRID_VERIFIED.glsl"
+>     out_file.write_text(
+>         f"// Shader: {label} (pid={pid}) | Pass[{pass_idx}] | KeywordIndices={list(target_tuple)}\n"
+>         f"// Vertex   BlobIdx={v_sp['m_BlobIndex']} | Samples={v_maps}\n"                                                                                  >         f"// Fragment BlobIdx={f_sp['m_BlobIndex']} | Samples={f_maps}\n\n"
+>         f"// ==================== FULL VERTEX SHADER ====================\n{v_src}\n\n"                                                                    >         f"// ==================== FULL FRAGMENT SHADER ====================\n{f_src}\n"
+>     )                                                                                                                                                      >     print(f"[SAVED] {out_file.name}: VertBlob={v_sp['m_BlobIndex']} ({v_maps}) | FragBlob={f_sp['m_BlobIndex']} ({f_maps})")
+> EOF
+[SAVED] OceanTopSide_Transparent_pid175_3GRID_VERIFIED.glsl: VertBlob=44 (['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']) | FragBlob=372 (['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1'])                                                                                                [SAVED] OceanUnderSide_Transparent_pid143_3GRID_VERIFIED.glsl: VertBlob=44 (['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1', 'Ceto_DisplacementMap2']) | FragBlob=372 (['Ceto_DisplacementMap0', 'Ceto_DisplacementMap1'])
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"       root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# ls -lh "$CLEAN" "$CLEAN/Ocean_Surface_Shaders"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN:                                                                                  total 67K
+drwxrws---. 89 10237 1023  44K Nov 23 11:54 CSharp_Scripts
+-rw-rw----.  1 10237 1023  28K Nov 23 16:24 Ceto_Fourier_Passes_0_to_7.glsl                                                                                  drwxrws---.  2 10237 1023 3.4K Nov 23 12:35 Fourier_DXBC_Blobs
+drwxrws---.  2 10237 1023 3.4K Nov 23 18:10 Ocean_Surface_Shaders
+
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders:                                                            total 22M
+-rw-rw----. 1 10237 1023 5.2K Nov 23 16:31 Ceto_NormalFade_pid160.glsl                                                                                       -rw-rw----. 1 10237 1023 1.8K Nov 23 16:31 Ceto_OceanBottom_pid139.glsl
+-rw-rw----. 1 10237 1023  41K Nov 23 16:31 Ceto_OceanDepth_pid179.glsl
+-rw-rw----. 1 10237 1023  35K Nov 23 16:31 Ceto_OceanMaskFlipped_pid142.glsl
+-rw-rw----. 1 10237 1023  35K Nov 23 16:31 Ceto_OceanMask_pid168.glsl
+-rw-rw----. 1 10237 1023  11M Nov 23 16:31 Ceto_OceanTopSide_Transparent_pid175.glsl                                                                         -rw-rw----. 1 10237 1023  11M Nov 23 16:31 Ceto_OceanUnderSide_Transparent_pid143.glsl
+-rw-rw----. 1 10237 1023  22K Nov 23 18:10 OceanTopSide_Transparent_pid175_3GRID_VERIFIED.glsl
+-rw-rw----. 1 10237 1023  20K Nov 23 17:17 OceanTopSide_Transparent_pid175_ACTIVE_VARIANT.glsl
+-rw-rw----. 1 10237 1023  20K Nov 23 17:16 OceanTopSide_Transparent_pid175_BASE_VARIANT.glsl
+-rw-rw----. 1 10237 1023  20K Nov 23 17:50 OceanTopSide_Transparent_pid175_RUNTIME_ACTIVE.glsl                                                               -rw-rw----. 1 10237 1023  20K Nov 23 17:57 OceanTopSide_Transparent_pid175_VERIFIED_RUNTIME.glsl
+-rw-rw----. 1 10237 1023  22K Nov 23 18:10 OceanUnderSide_Transparent_pid143_3GRID_VERIFIED.glsl                                                             -rw-rw----. 1 10237 1023  20K Nov 23 17:17 OceanUnderSide_Transparent_pid143_ACTIVE_VARIANT.glsl
+-rw-rw----. 1 10237 1023  20K Nov 23 17:16 OceanUnderSide_Transparent_pid143_BASE_VARIANT.glsl
+-rw-rw----. 1 10237 1023  20K Nov 23 17:50 OceanUnderSide_Transparent_pid143_RUNTIME_ACTIVE.glsl
+-rw-rw----. 1 10237 1023  20K Nov 23 17:57 OceanUnderSide_Transparent_pid143_VERIFIED_RUNTIME.glsl
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
