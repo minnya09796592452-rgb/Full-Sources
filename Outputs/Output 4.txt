@@ -1,0 +1,89 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# DLL="/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# OUT_BLOB="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Fourier_DXBC_Blobs"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# mkdir -p "$OUT_BLOB"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. ORIGINAL IL OF FOURIERTASK CONSTRUCTOR ==="
+=== 1. ORIGINAL IL OF FOURIERTASK CONSTRUCTOR ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# ilspycmd -il -t "Ceto.FourierTask" "$DLL" | head -n 45
+// IL code: Assembly-CSharp
+.class public auto ansi beforefieldinit Ceto.FourierTask
+        extends Ceto.Common.Threading.Tasks.ThreadedTask
+{
+        // Fields
+        .field private class Ceto.FourierCPU m_fourier
+        .field private class Ceto.DisplacementBufferCPU m_buffer
+        .field private int32 m_numGrids
+        .field private int32 m_index
+        .field private class [mscorlib]System.Collections.Generic.IList`1<valuetype [UnityEngine.CoreModule]UnityEngine.Vector4[]> m_data
+        .field private valuetype [UnityEngine.CoreModule]UnityEngine.Color[] m_results
+        .field private class [UnityEngine.CoreModule]UnityEngine.Texture2D m_map
+        .field private bool m_doublePacked
+
+        // Methods
+        .method public hidebysig specialname rtspecialname
+                instance void .ctor (
+                        class Ceto.WaveSpectrumBufferCPU buffer,
+                        class Ceto.FourierCPU fourier,
+                        int32 index,
+                        int32 numGrids
+                ) cil managed
+        {
+                // Method begins at RVA 0x8ad84
+                // Header size: 12
+                // Code size: 147 (0x93)
+                .maxstack 2
+                .locals init (
+                        [0] class Ceto.WaveSpectrumBufferCPU/Buffer
+                )
+
+                IL_0000: ldarg.0
+                IL_0001: ldc.i4.1
+                IL_0002: call instance void Ceto.Common.Threading.Tasks.ThreadedTask::.ctor(bool)
+                IL_0007: ldarg.0
+                IL_0008: ldfld int32 Ceto.FourierTask::m_index
+                IL_000d: ldc.i4.m1
+                IL_000e: bne.un.s IL_001b
+
+                IL_0010: ldstr "Index can be -1. Fourier for multiple buffers is not being used"
+                IL_0015: newobj instance void [mscorlib]System.InvalidOperationException::.ctor(string)
+                IL_001a: throw
+
+                IL_001b: ldarg.1
+                IL_001c: isinst Ceto.DisplacementBufferCPU
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. DECOMPRESS & EXTRACT CETO/FOURIER GPU SHADER BLOBS ==="
+=== 2. DECOMPRESS & EXTRACT CETO/FOURIER GPU SHADER BLOBS ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> out_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Fourier_DXBC_Blobs")
+>
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+> sh = next(o.read() for o in e0.objects if o.path_id == 178)
+> blob = bytes(sh.compressedBlob)
+>
+> for p_idx, plat in enumerate(sh.platforms):
+>     for s_idx in range(len(sh.offsets[p_idx])):
+>         off = sh.offsets[p_idx][s_idx]
+>         clen = sh.compressedLengths[p_idx][s_idx]
+>         dlen = sh.decompressedLengths[p_idx][s_idx]
+>         dec = lz4.block.decompress(blob[off:off+clen], uncompressed_size=dlen)
+>         fname = out_dir / f"Ceto_Fourier_plat{plat}_seg{s_idx}.bin"
+>         fname.write_bytes(dec)
+>         # Check for GLSL/Metal text or DXBC chunks
+>         glsl_count = dec.count(b"#version")
+>         dxbc_count = dec.count(b"DXBC")
+>         print(f"[SAVED] {fname.name}: {len(dec)}B | DXBC={dxbc_count} | GLSL(#version)={glsl_count}")
+>         if glsl_count > 0:
+>             # Extract readable GLSL shader source if present in Platform 15 (OpenGLCore)
+>             txt = dec.decode("latin1", errors="ignore")
+>             glsl_file = out_dir / f"Ceto_Fourier_plat{plat}_seg{s_idx}_GLSL.txt"
+>             glsl_file.write_text(txt)
+>             print(f"   -> Extracted readable GLSL source to: {glsl_file.name}")
+> EOF
+[SAVED] Ceto_Fourier_plat4_seg0.bin: 10624B | DXBC=9 | GLSL(#version)=0
+[SAVED] Ceto_Fourier_plat15_seg0.bin: 29060B | DXBC=0 | GLSL(#version)=16
+   -> Extracted readable GLSL source to: Ceto_Fourier_plat15_seg0_GLSL.txt
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
