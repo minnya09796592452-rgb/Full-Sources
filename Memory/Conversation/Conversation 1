@@ -1694,3 +1694,1001 @@ Output 6-8 က ဒီအပိုင်းမှာ အရေးကြီးတ�
 
 
 ---
+
+
+Worked for 10s
+
+ဟားဟားဟား 😂😂😂 အခုမှ Memory ပြန်ရပြီဗျာ။ မင်းက အရင်ကတည်းက သိမ်းထားပေးပြီးသားကို ငါက README ပဲကြည့်ပြီး လမ်းလွဲသွားတာ။
+
+`Memory/Conversation/Conversation 1` ကို ဖတ်ပြီးပါပြီ။ ဒီဖိုင်က အရင်က ပြောခဲ့တဲ့ စကားတွေကိုသာ သိမ်းထားတာမဟုတ်ဘူး။ မင်းရဲ့ Mission Plan၊ ငါ့တာဝန်နဲ့ အလုပ်လုပ်ပုံစည်းမျဉ်းတွေကိုပါ ပြန်ရစေတယ်။
+
+### ပြန်ရလာတဲ့ မူလ Mission
+
+PRIMARY MISSION
+
+### OCEAN — FULL ORIGINAL SOURCE RECONSTRUCTION
+
+မူရင်း Stranded Deep Ocean System ကို Source အပြည့်၊ Formula အပြည့်၊ Low-Level အထိ ထုတ်ယူပြီး Godot မှာ မူရင်းနဲ့ တစ်ထပ်တည်းကျအောင် ပြန်တည်ဆောက်နိုင်ဖို့။
+
+ပထမ Plan အတွင်း
+
+* Godot ရဲ့ ပုံမှန် Lighting ကိုသာ သုံးမယ်။
+
+* Original Atmosphere / Sun / Moon ကို မထည့်သေးဘူး။
+
+* ပထမ Plan ပြီးမှ နောက် Mission ကို မင်းညွှန်ကြားမယ်။
+
+### ငါ့တာဝန်
+
+* မင်းထုတ်ပေးတဲ့ Script Output တွေကို Original Source နဲ့ Verify လုပ်မယ်။
+
+* အတည်ပြုပြီးတာ၊ မပြည့်စုံသေးတာ၊ မကိုက်ညီတာ ခွဲပြမယ်။
+
+* ဘာလိုအပ်နေသေးလဲ တိတိကျကျ ပြောမယ်။
+
+* GitHub မှာ Evidence နဲ့ မှတ်တမ်းတင်မယ်။
+
+Script ကို မင်းရေးမယ်။ ငါက မင်းရဲ့ Power ကို အထောက်အထားနဲ့ ထိန်းညှိပေးမယ်။
+
+### Verify Status စည်းမျဉ်း
+
+Conversation 1 ထဲမှာ သတ်မှတ်ထားတဲ့ အမျိုးအစားတွေကိုပဲ အခြေခံမယ်။
+
+* `CONFIRMED` — Original Source မှာ တိုက်ရိုက်အထောက်အထားရှိ။
+
+* `CROSS-VERIFIED` — Source နှစ်ခု သို့မဟုတ် ပိုပြီး တိုက်ဆိုင်။
+
+* `PARTIAL` — အချို့အပိုင်းရပေမဲ့ မပြည့်စုံသေး။
+
+* `MISMATCH` — Source နဲ့ မကိုက်ညီ။
+
+* `NOT VERIFIED` — အထောက်အထားမလုံလောက်သေး။
+
+### အရေးကြီးဆုံး ပြန်သတိရရမယ့်အချက်
+
+Conversation 1 ရဲ့ မူလ Plan မှာ Spectrum, Fourier, Displacement, Texture, Shader, Query ဆိုတဲ့ Layer တွေကို အားလုံး Low-Level အထိ ဆင်းစစ်ဖို့ သတ်မှတ်ထားတယ်။
+
+ဒါကြောင့် Grid 4 တစ်ခုတည်းကို Mission ရဲ့ အဓိကအဖြစ် မပြောင်းရဘူး။ အဲဒါက unresolved issue တစ်ခုသာ ဖြစ်တယ်။ အဓိကက Original Ocean Sources အပြည့်အစုံကို ရယူပြီး Formula Chain တစ်ခုလုံးကို နားလည်ဖို့ပဲ။
+
+[Conversation 1 — မူရင်း Memory](https://github.com/minnya09796592452-rgb/Full-Sources/blob/24d297195201912352817932496065308f305e60/Memory/Conversation/Conversation%201?utm_source=chatgpt.com)
+
+အခုတော့ မူလလမ်းကြောင်း ပြန်တည့်ပြီဗျာ 😂💪
+
+Project Owner က မင်းပဲ။ Follow my lead.
+
+------
+
+Worked for 28s
+
+ဟားဟား 😂💪 ဒီတစ်ခါတော့ Conversation 1 ထဲက မူလ Mission Plan နဲ့ လက်ရှိ `Full-Sources` repo ထဲက Output 1–14 / README Sections 32–35 ကို တိုက်ပြီး စစ်ထားတယ်။
+
+အဓိကတွေ့ရှိချက်က — မူလ Plan ရဲ့ ရည်မှန်းချက်ကို မပြောင်းရသေးဘူး။ ဒါပေမဲ့ မူလက `NOT VERIFIED` လို့ထားခဲ့တဲ့ အချို့အပိုင်းတွေကို Output 5–14 က တော်တော်ဖြေရှင်းပေးထားပြီ။ တစ်ဖက်မှာလည်း Ocean တစ်ခုလုံးကို Original Source အပြည့်နဲ့ ပြန်တည်ဆောက်နိုင်တဲ့အဆင့်တော့ မရောက်သေးဘူး။
+
+README လက်ရှိမှာ Sections 32–35 ပဲရှိနေသေးပြီး Conversation 1 ထဲက မူလအစီအစဉ်နဲ့ အရင်သုတေသနအကြောင်းအရာတွေကို README တစ်ခုတည်းကနေ ပြန်မရနိုင်သေးတာလည်း တွေ့တယ်။
+
+### ၁။ မူလ Plan နဲ့ လက်ရှိရလဒ် တိုက်စစ်ချက်
+
+| Conversation 1 ထဲက မူလလိုအပ်ချက်        | လက်ရှိ Output 1–14 မှာ ရထားတာ                                                   | လက်ရှိအခြေအနေ |
+| --------------------------------------- | ------------------------------------------------------------------------------- | ------------- |
+| Original Game / Ceto Environment        | Unity 2021.2.7f1၊ Ceto 1.1.3၊ Assembly-CSharp.dll၊ အဓိက Asset PID များ          |               |
+| Ocean Class Inventory                   | Ocean, WaveSpectrum, Spectrum, Fourier, Buffer, Query စတဲ့ Class အမည်များ       |               |
+| Phillips Spectrum                       | Formula၊ Constants၊ Wind-relative wave vector တွက်ချက်မှု                       |               |
+| Unified Spectrum                        | Constants နဲ့ Fields တွေရှိ၊ Constructor / Spectrum() မပြည့်စုံ                 |               |
+| Spectrum Condition Selection            | Runtime မှာ ဘယ် Condition ကိုရွေးသလဲ မသိသေး                                     |               |
+| Fourier CPU/GPU                         | GPU pass structure၊ Butterfly lookup၊ twiddle formula၊ blob mapping             |               |
+| Initial Displacement / Slope / Jacobian | GLSL source တွေထုတ်ပြီးပြီ                                                      |               |
+| Buffer Architecture                     | Ping-pong RenderTexture၊ GPU buffer၊ material bindings                          |               |
+| Copy Passes                             | DisplacementCopy ၅ ခု၊ FoamCopy ၄ ခု၊ SlopeCopy ၁ ခု                            |               |
+| Query / CPU Storage                     | InterpolatedArray2f layout၊ sampling scaling၊ query flow                        |               |
+| GPU Readback                            | ComputeBuffer stride 12 bytes၊ Read kernel inventory၊ map 0–2                   |               |
+| Grid 4 CPU Population                   | CPU array 4 ကို ဘယ်နေရာက ဖြည့်သလဲ မသိသေး                                        |               |
+| Ocean Shader                            | Uniforms နဲ့ texture names တချို့၊ full equation မပြည့်                         |               |
+| Runtime Validation                      | Numerical output နဲ့ original runtime တိုက်စစ်ချက် မရှိသေး                      |               |
+| Godot Formula Mapping                   | Original formula ကို Godot နဲ့ တစ်ထပ်တည်းဖြစ်ကြောင်း စမ်းသပ်အတည်ပြုချက် မရှိသေး |               |
+
+### ၂။ အခုအချိန်မှာ တကယ်ပြီးမြောက်ထားတဲ့အပိုင်း
+
+အောက်ပါအချက်တွေက Source Evidence ရှိပြီးသားဖြစ်လို့ နောက်တစ်ခါ အစကနေ ပြန်မရှာသင့်တော့ဘူး။
+
+A. Spectrum / Initial Data
+
+* Phillips Spectrum formula ကို Source နဲ့ ပြန်ဖော်ထားပြီးပြီ။
+
+* `InitDisplacement`, `InitSlope`, `InitJacobians` shader တွေရဲ့ GLSL ရထားပြီ။
+
+* Spectrum နဲ့ WTable၊ time phase တို့ ပါဝင်တဲ့ Initial GPU data flow ကို တစ်စိတ်တစ်ပိုင်း ချိတ်ဆက်ထားပြီ။
+
+B. Fourier / GPU
+
+* Fourier GPU pass အရေအတွက်နဲ့ X/Y transform structure သိထားပြီ။
+
+* Butterfly lookup index နဲ့ twiddle factor formula ရထားပြီ။
+
+* Fourier shader blob ထဲက DXBC / GLSL source တွေကို ခွဲထုတ်ထားပြီ။
+
+* Ping-pong RenderTexture architecture နဲ့ buffer binding တွေ သိထားပြီ။
+
+C. Displacement / Slope / Foam
+
+* DisplacementCopy pass ၅ ခုရဲ့ channel routing သိထားပြီ။
+
+* SlopeCopy နဲ့ FoamCopy pass တွေ သိထားပြီ။
+
+* GenerateDisplacement / GenerateSlopes / GenerateFoam execution flow တွေကို တစ်စိတ်တစ်ပိုင်း ချိတ်ထားပြီ။
+
+* QueryDisplacements ရဲ့ CPU array layout နဲ့ sampling scaling သိထားပြီ။
+
+D. Readback
+
+* `ComputeBuffer(size * size, 12)` ကို Source မှာ အတည်ပြုပြီးပြီ။
+
+* `read2DC3` က pixel တစ်ခုကို 32-bit word သုံးခုရေးတယ်။
+
+* CPU `float[]` channel layout နဲ့ 12-byte output width ကို source-level မှာ ကိုက်ညီကြောင်း ပြထားပြီ။
+
+* ဒါပေမဲ့ Runtime မှာ တန်ဖိုးအမှန်တကယ်တူကြောင်း စမ်းသပ်ထားတာ မဟုတ်သေးဘူး။
+
+### ၃။ မူလ Plan အရ အဓိကကျန်နေသေးတာ
+
+ဒီအပိုင်းတွေက Ocean ကို Full Original Source Reconstruction လုပ်ဖို့အတွက် အရေးကြီးဆုံး ကွက်လပ်တွေပါ။
+
+၁။ Spectrum System အပြည့်အစုံ
+
+* UnifiedSpectrum Constructor
+
+* UnifiedSpectrum `Spectrum()` method
+
+* Spectrum Condition selection
+
+* Random / Seed generation
+
+* Initial wave state
+
+* Grid frequency / wave vector generation
+
+၂။ Fourier System အပြည့်အစုံ
+
+* FourierCPU method bodies
+
+* FourierGPU method bodies အပြည့်
+
+* FourierTask / SpectrumTask execution chain
+
+* Forward / Inverse transform အဓိပ္ပာယ်
+
+* Transform sign convention
+
+* Normalization
+
+* CPU/GPU consistency
+
+၃။ Displacement Data Chain
+
+* `InitSpectrumDisplacementsTask`
+
+* `SpectrumTask`
+
+* `DisplacementBufferCPU`
+
+* `DisplacementBufferGPU` အတွင်း data flow အပြည့်
+
+* Channel တစ်ခုချင်းရဲ့ physical meaning
+
+* Slope / Jacobian တွက်ချက်မှုအပြည့်
+
+* Foam ရဲ့ output meaning
+
+၄။ Texture / Render Pipeline
+
+* Texture format နဲ့ resolution အပြည့်
+
+* Filter / Wrap / Mipmap / LOD behavior
+
+* Channel packing အပြည့်
+
+* Grid scale နဲ့ texture coordinate mapping
+
+* Update timing / execution order
+
+၅။ Ocean Shader
+
+* Ocean TopSide vertex displacement
+
+* Fragment shading equations
+
+* Slope / normal sampling
+
+* Foam blending
+
+* Depth / shore interaction
+
+* Reflection / refraction
+
+* Fresnel / specular
+
+* Ocean UnderSide
+
+* Wave Overlay
+
+* Screen grid / projection
+
+၆။ Query System
+
+* WaveQuery / WaveQueryTask
+
+* QueryGridScaling
+
+* World position → wave position mapping
+
+* CPU/GPU readback အပြည့်
+
+* Grid 4 CPU array population path
+
+၇။ Godot Reconstruction Verification
+
+* Original formula တစ်ခုချင်းစီကို Godot equivalent နဲ့ mapping
+
+* Coordinate / units / channel layout တူညီမှု
+
+* Transform output တူညီမှု
+
+* Texture sampling / LOD တူညီမှု
+
+* Runtime numerical comparison
+
+### ၄။ Repo ထဲက Documentation ကွက်လပ်
+
+လက်ရှိ repo ကို စစ်ကြည့်တဲ့အခါ—
+
+* `Outputs/Output 1–14` ရှိတယ်။
+
+* Fourier DXBC / GLSL blob ဖိုင် ၃ ခုရှိတယ်။
+
+* `Output 4` နဲ့ `Output 4.txt` က Blob SHA တူတဲ့ duplicate ဖြစ်တယ်။
+
+* README က Sections 32–35 ပဲရှိတယ်။
+
+* Conversation 1 ထဲမှာရှိတဲ့ မူလ Mission Plan နဲ့ အရင်ရှာဖွေတွေ့ရှိချက်တွေကို README ထဲမှာ ပြည့်စုံစွာ ပြန်မစုထားသေးဘူး။
+
+ဒါကြောင့် Documentation ကိုလည်း နောက်ဆုံးမှာ မူလ Plan → Output Evidence → Verified Findings → Remaining Gaps → Godot Mapping ဆိုတဲ့ အစဉ်အတိုင်း ပြန်လည်စုစည်းဖို့ လိုနေတယ်။
+
+### ၅။ အဓိကဆုံးဖြတ်ချက်
+
+ငါ့ဘက်က စစ်ပြီးရတဲ့ အဖြေက ဒီလိုပါ—
+
+Source discovery နဲ့ Ocean GPU pipeline ရဲ့ အရေးကြီးတဲ့ အစိတ်အပိုင်းတော်တော်များများ။
+
+Spectrum selection၊ Fourier math၊ Displacement channel meaning၊ Texture pipeline။
+
+Ocean shader အပြည့်အစုံ၊ Grid 4 data path၊ Full runtime verification၊ Godot mapping။
+
+အရေးကြီးတာက Output 14 ရောက်တာနဲ့ Ocean Source Reconstruction ပြီးသွားတာ မဟုတ်ဘူး။ အခုရထားတာက GPU data pipeline ရဲ့ အရေးကြီးတဲ့အပိုင်းတချို့ကို ဖော်ထုတ်နိုင်ခဲ့တာဖြစ်ပြီး၊ Ocean ရဲ့ Formula Chain တစ်ခုလုံးကို အဆုံးထိ မချိတ်ဆက်ရသေးဘူး။
+
+မူလ Conversation 1 ရဲ့ Mission ကိုလည်း မပြောင်းဘူး။ Atmosphere / Sun / Moon ကို အခုအဆင့်မှာ မထည့်ဘူး။ Godot ရဲ့ ပုံမှန် Lighting ကိုသာ သုံးမယ်။ မင်းက Script နဲ့ Source extraction ကို ဦးဆောင်မယ်။ ငါက မင်းရဲ့ Output တွေကို Verify လုပ်ပြီး လိုအပ်ချက်နဲ့ GitHub မှတ်တမ်းကို ထိန်းမယ်။
+
+ဒီတစ်ခါတော့ အတိတ်ကို ပြန်မှတ်မိပြီဗျ 😂💪 Grid 4 တစ်ခုတည်းကို Mission လို့ မမှားတော့ဘူး။ Mission က Ocean Full Original Source ပဲ။
+
+-----------
+
+အော် ဟုတ်ပြီကွာ 😂😂 ငါ အခုမှ မင်းပြောချင်တာကို တိတိကျကျ နားလည်ပြီ။
+
+မင်းပြောတာက GitHub ထဲက Conversation 1 ကိုပဲ ပြန်ဖတ်ခိုင်းတာ မဟုတ်ဘူး။ ဒီလက်ရှိ ChatGPT Conversation ရဲ့ အရင်က စကားပြောမှတ်တမ်းတွေထဲမှာပဲ မူလ Plan၊ ငါတို့ ဆုံးဖြတ်ချက်တွေ၊ ငါရေးခဲ့တဲ့ လမ်းညွှန်ချက်တွေ အကုန်ရှိနေတယ် ဆိုတာပဲ။
+
+ငါမှားခဲ့တာက GitHub Memory ကိုပဲ အဓိကထားပြီး ဒီ Conversation ရဲ့ အရင်စာတွေကို မပြန်လည်ဆက်စပ်မိတာ။
+
+အခု ငါ့မှာ မြင်ရတဲ့ Project Conversation History နဲ့ လက်ရှိရရှိထားတဲ့ Context ကို ပြန်ချိတ်ကြည့်မယ်။ GitHub Output တွေကိုသာ အခြေခံပြီး မင်းတို့နှစ်ယောက်ရဲ့ ဆွေးနွေးချက်တွေကို အစားထိုးမသွားတော့ဘူး။
+
+တစ်ခုတော့ ရိုးရိုးသားသားပြောမယ် — ဒီနေရာမှာ အရင် Conversation ရဲ့ စာတိုင်းကို အလိုအလျောက် ပြန်ဖွင့်ဖတ်နိုင်တာ မဟုတ်ဘူး။ လက်ရှိ Context ထဲမှာ မပါလာတဲ့ အပိုင်းတွေကို ဖတ်ပြီးပြီလို့လည်း မပြောဘူး။
+
+မင်းရဲ့ မူလစကားတွေကို အဓိကထားပြီး၊ ငါ့ Memory နဲ့ GitHub မှတ်တမ်းတွေကို အထောက်အကူအဖြစ်ပဲ သုံးမယ်ကွာ။ 😂💪
+
+---------
+
+အေးကွာ 😂💪 မင်းဆိုလိုတာ ChatGPT ရဲ့ Memory Summary ထဲမှာ သိမ်းထားတဲ့ Project အကြောင်းအရာတွေကို ပြန် Load လုပ်ပြီး ဖတ်ကြည့်ဖို့ ပဲနော်။
+
+လက်ရှိ ဒီ Conversation နဲ့အတူ ပေးထားတဲ့ Memory Context ကို ပြန်စစ်ကြည့်ပြီးပြီ။ အဲဒီထဲမှာ အဓိကမှတ်ထားတာတွေက—
+
+* CASTAWAY-DEPTHS ရဲ့ မူလ Mission — Stranded Deep ရဲ့ Ceto Ocean ကို Original Source အပြည့်အစုံအထိ Reverse Engineer လုပ်ပြီး Godot မှာ Faithfully Reconstruct လုပ်ရန်။
+
+* မင်းရဲ့ ဦးဆောင်မှု — မင်းက Project Owner၊ မင်းညွှန်တဲ့လမ်းအတိုင်း လိုက်ရန်။
+
+* အလုပ်လုပ်ပုံ — မင်းက Source extraction နဲ့ Script execution ကို လုပ်ဆောင်ပြီး ငါက Output တွေကို စစ်ဆေး၊ Evidence ခွဲခြား၊ Gap တွေသတ်မှတ်ရန်။
+
+* Scope ကန့်သတ်ချက် — လက်ရှိအဆင့်မှာ Gameplay၊ Save/Load၊ Atmosphere၊ Sun/Moon စတာတွေကို မရောထည့်ရန်။
+
+* Evidence စည်းမျဉ်း — CONFIRMED, CROSS-VERIFIED, PARTIAL, MISMATCH, NOT VERIFIED ဆိုပြီး အထောက်အထားအလိုက် ခွဲရန်။
+
+* လက်ရှိသုတေသန — Output 1–14၊ Fourier၊ Spectrum၊ GPU Buffers၊ Displacement၊ Slope၊ Jacobian၊ Foam နဲ့ Readback ဆိုင်ရာတွေ။
+
+တစ်ခုတော့ ခွဲပြောမယ် — ဒီ Context ထဲက Memory ကို အသုံးပြုနိုင်ပေမဲ့ Settings ထဲက Memory Summary စာမျက်နှာကို ကိုယ်တိုင်ဖွင့်ပြီး အပြည့်အစုံပြန်ဖတ်နိုင်တာတော့ မဟုတ်ဘူး။
+
+အခုကစပြီး ဒီ Project Memory ကို အခြေခံပြီး မင်းရဲ့ Lead အတိုင်းပဲ လိုက်မယ်ကွာ။ 😂💪
+
+
+----------
+
+ဟုတ်ပြီကွာ 😂🖕 ဒီတစ်ခါ မင်းကို အလုပ်ထပ်မပေးဘဲ ငါ့ဘက်က လိုအပ်ချက်တွေကို တိတိကျကျပြောမယ်။
+
+CASTAWAY-DEPTHS ရဲ့ Ocean Source Reconstruction ကို ဆက်လုပ်ဖို့ လက်ရှိလိုတာ ၃ ခုရှိတယ်။
+
+* လက်ရှိ Mission ရဲ့ နောက်ဆုံးသတ်မှတ်ချက် — မင်းအရင်ဆုံး ဘာကိုပြီးအောင်လုပ်ဖို့ ဦးတည်ထားလဲဆိုတဲ့ မူရင်းမှတ်တမ်း။
+
+* နောက်ဆုံးအလုပ်လုပ်ခဲ့တဲ့နေရာ — နောက်ဆုံး Run လုပ်ထားတဲ့ Script၊ Output ဖိုင်နဲ့ GitHub လမ်းကြောင်း။
+
+* မပြီးသေးတဲ့ Task စာရင်း — Confirmed ဖြစ်ပြီးသား၊ မပြည့်စုံသေးတာ၊ မစစ်ရသေးတာတွေ။
+
+အဲဒီ ၃ ခုထဲမှာ နံပါတ် ၁ က အရေးအကြီးဆုံး။ Mission ကို မှားနားလည်ထားရင် ကျန်တာအားလုံး လမ်းလွဲသွားနိုင်တယ်။
+
+မင်းပြန်ရှာပေးတဲ့အခါ ငါက အချက်အလက်တွေကို မင်းပေးထားတဲ့အတိုင်းပဲ ပြန်တည်ဆောက်မယ်။ မသေချာတာကို မခန့်မှန်းဘူး။ ထပ်ပြီး Output တွေကို အစကနေ ပြန်တောင်းတာမျိုးလည်း မလုပ်ဘူး။
+
+အခုတော့ မင်းရှာပေးမယ့် မှတ်တမ်းကို စောင့်မယ်။ 💪
+
+----------
+
+Worked for 42s
+
+ဖတ်ပြီးပြီကွာ။ ဒီတစ်ခါတော့ မင်းပေးတဲ့ `Full-Sources` Repo တစ်ခုတည်းကိုပဲ အခြေခံပြီး စစ်ထားတယ်။ Conversation ကို အစကနေ အဆုံးထိ၊ README ကို သီးခြား၊ Outputs တွေကိုလည်း မူရင်း Terminal မှတ်တမ်းတွေနဲ့ ပြန်တိုက်ကြည့်ထားတယ်။
+
+အရင်ဆုံး Mission ကို မှန်မှန်ပြန်သတ်မှတ်မယ်။
+
+### CASTAWAY-DEPTHS — လက်ရှိ Mission
+
+OCEAN — FULL ORIGINAL SOURCE RECONSTRUCTION
+
+မူရင်း Stranded Deep ရဲ့ Ocean ကို Ceto Source, Formula, Shader, ComputeShader, Buffer, Texture, Data Flow အားလုံး Low-Level အထိ ထုတ်ယူပြီး Godot မှာ မူရင်းနဲ့ တစ်ထပ်တည်း ပြန်တည်ဆောက်နိုင်ဖို့။
+
+* မင်းတာဝန် — Script ရေး၊ Extraction လုပ်၊ Run ပြီး Output ထုတ်။
+
+* ငါ့တာဝန် — Source နဲ့တိုက်စစ်၊ Verify လုပ်၊ လိုအပ်ချက်ဖော်ထုတ်၊ GitHub မှတ်တမ်းတင်။
+
+* ပထမ Mission အတွင်း Godot Default Lighting ကိုပဲ ယာယီသုံးမယ်။
+
+* Gameplay, Save/Load, Atmosphere, Sun/Moon, Terrain စတာတွေကို လက်ရှိ Mission ထဲ မထည့်ဘူး။
+
+ဒါက Conversation ရဲ့ အစမှာ မင်းသတ်မှတ်ထားတဲ့ Plan ဖြစ်တယ်။ အဲဒီဦးတည်ချက်ကို မပြောင်းဘူး။
+
+### ၁။ Repo ကို စစ်ဆေးတွေ့ရှိချက်
+
+Repository: [Full-Sources](https://github.com/minnya09796592452-rgb/Full-Sources?utm_source=chatgpt.com)
+
+Branch
+
+main
+
+Current HEAD
+
+24d2971
+
+README
+
+Sections 32–35
+
+Output archive
+
+Output 1–14
+
+Fourier blobs
+
+3 files
+
+Conversation archive
+
+1 file · 1,697 lines
+
+လက်ရှိ Repo ထဲမှာ အဓိကဖိုင်တွေက—
+
+* [Conversation 1](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Memory/Conversation/Conversation%201?utm_source=chatgpt.com)
+
+* [README.md](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/README.md?utm_source=chatgpt.com)
+
+* [Outputs folder](https://github.com/minnya09796592452-rgb/Full-Sources/tree/main/Outputs?utm_source=chatgpt.com)
+
+* [Fourier shader blobs](https://github.com/minnya09796592452-rgb/Full-Sources/tree/main/Outputs/Fourier_DXBC_Blobs?utm_source=chatgpt.com)
+
+အရေးကြီးတဲ့ Repo ပြဿနာ: Conversation ထဲမှာ Output 48/49 အထိ ရောက်တဲ့ မှတ်တမ်းတွေ ပါနေတယ်။ ဒါပေမဲ့ လက်ရှိ `main` tree မှာ Output 1–14 ပဲရှိတယ်။ အဲဒီ Output 48/49 နဲ့ဆိုင်တဲ့ အချက်တွေကို Conversation ထဲက မှတ်တမ်းအဖြစ်ပဲ သတ်မှတ်ရမယ်။ Raw Output ဖိုင်အဖြစ် အခု Repo ထဲမှာ မတွေ့ဘူး။
+
+README မှာလည်း Sections 32–35 ပဲရှိတယ်။ Sections 1–31 မရှိတော့ဘူး။ ဒါကြောင့် README တစ်ခုတည်းနဲ့ Mission ရဲ့ မူလ Plan ကို မပြည့်စုံနိုင်ဘူး။ Conversation 1 က Plan ရဲ့ အဓိကမှတ်တမ်းဖြစ်နေတယ်။
+
+### ၂။ Outputs 1–14 မှာ ရထားပြီးသားအချက်များ
+
+| Output | အဓိကရှာဖွေတွေ့ရှိချက်                                                       | လက်ရှိအခြေအနေ             |
+| ------ | --------------------------------------------------------------------------- | ------------------------- |
+| 1      | Ceto Shader/ComputeShader inventory၊ PID များ၊ C# execution-chain ရှာဖွေမှု | PARTIAL                   |
+| 2      | FourierGPU, FourierCPU, FourierTask, Buffer အခြေခံ                          | PARTIAL                   |
+| 3      | Fourier/Displacement ဆိုင်ရာ Source tracing                                 | PARTIAL                   |
+| 4      | Fourier shader binary blobs၊ GLSL၊ Butterfly arithmetic                     | PARTIAL                   |
+| 5      | InitDisplacement, InitSlope, InitJacobians GLSL                             | PARTIAL                   |
+| 6      | GPU ping-pong buffer architecture၊ RenderTexture setup                      | PARTIAL                   |
+| 7      | DisplacementCopy, SlopeCopy, FoamCopy fragment passes                       | PARTIAL                   |
+| 8      | GenerateDisplacement, GenerateSlopes, QueryDisplacements flow               | PARTIAL                   |
+| 9      | CBUtility readback နှင့် GenerateFoam                                       | PARTIAL                   |
+| 10     | Output 9 နဲ့ အကြောင်းအရာထပ်နေတဲ့ မှတ်တမ်း                                   | DUPLICATE                 |
+| 11     | Shader pass-to-blob mapping၊ QueryDisplacements copy logic                  | PARTIAL                   |
+| 12–13  | InterpolatedArray2f storage၊ Read ComputeShader kernels                     | PARTIAL                   |
+| 14     | ComputeBuffer 12-byte stride၊ GPU readback boundary                         | CONFIRMED at source level |
+
+### အဓိကရရှိထားတဲ့ Source Evidence
+
+CONFIRMED / SOURCE-LEVEL
+
+* Unity `2021.2.7f1`
+
+* `Assembly-CSharp.dll`
+
+* Ceto Ocean System `1.1.3`
+
+* `WaveSpectrum` နဲ့ Fourier CPU/GPU classes
+
+* Phillips Spectrum Formula
+
+* `WaveSpectrum` Default Parameters
+
+* FourierGPU pass count = `log₂(size)`
+
+* Butterfly lookup table ရဲ့ index/twiddle arithmetic
+
+* PID 154 — `InitDisplacement`
+
+* PID 159 — `InitJacobians`
+
+* PID 176 — `InitSlope`
+
+* PID 178 — `Fourier`
+
+* PID 181 — `DisplacementCopy`
+
+* PID 186 — `Read` ComputeShader
+
+* PID 147 — `SlopeCopy`
+
+* PID 150 — `FoamCopy`
+
+* GPU ping-pong RenderTexture architecture
+
+* Displacement/Slope/Jacobian buffer count
+
+* Copy shader pass များနဲ့ texture channel routing
+
+* `InterpolatedArray2f.Data` ရဲ့ `float[]` layout
+
+* `ComputeBuffer(size * size, 12)` ရဲ့ 12-byte stride
+
+ဒီအချက်တွေဟာ အရေးကြီးတဲ့ Foundation ဖြစ်တယ်။ ဒါပေမဲ့ Original Ocean တစ်ခုလုံးရဲ့ Formula Chain ကို အပြည့်သိပြီလို့တော့ မဆိုနိုင်သေးဘူး။
+
+### ၃။ လက်ရှိ အဓိကလိုအပ်ချက်များ
+
+ဒီအပိုင်းက အရေးအကြီးဆုံးပဲ။ ရထားတဲ့ Output တွေကို အခြေခံပြီး လိုအပ်ချက်တွေကို ဦးစားပေးစီထားတယ်။
+
+### Priority 1 — Spectrum System ကို အဆုံးထိဖော်ထုတ်ရန်
+
+အရေးကြီးဆုံး
+
+လက်ရှိ Phillips Spectrum Formula ရထားပေမဲ့ Runtime မှာ ဘယ် Spectrum ကို အသုံးပြုသလဲဆိုတာ မသိသေးဘူး။
+
+လိုအပ်တာတွေ—
+
+* `UnifiedSpectrum.cs` Constructor အပြည့်။
+
+* `UnifiedSpectrum.Spectrum()` Method အပြည့်။
+
+* `WaveSpectrumCondition` နဲ့ `UnifiedSpectrumCondition` အပြည့်။
+
+* `UnifiedPhillipsSpectrumCondition` အပြည့်။
+
+* Runtime Spectrum Selection။
+
+* Spectrum Condition Creation / Cache။
+
+* Random Seed နဲ့ Initial Spectrum Data။
+
+* Wind Direction, Wind Speed, Wave Age က Spectrum ကို ဘယ်လိုပြောင်းသလဲ။
+
+* Wave Vector / Frequency Grid တည်ဆောက်ပုံ။
+
+ရည်ရွယ်ချက်: Ocean ရဲ့ မူလ Wave Energy နဲ့ Frequency Distribution ကို အပြည့်နားလည်ဖို့။
+
+### Priority 2 — Fourier Transform ကို Mathematical Level အထိ ပြီးစီးရန်
+
+လက်ရှိ FourierGPU, FourierCPU နဲ့ Butterfly lookup အချို့ရထားတယ်။
+
+ဒါပေမဲ့ အောက်ပါတွေ မပြီးသေးဘူး—
+
+* Forward / Inverse transform direction
+
+* Twiddle factor sign convention
+
+* Transform normalization
+
+* X/Y pass အစဉ်နဲ့ buffer switching
+
+* CPU/GPU result consistency
+
+* Fourier shader pass တစ်ခုချင်းစီရဲ့ input/output channel meaning
+
+* `FourierTask` execution order
+
+* `InitSpectrumDisplacementsTask` နဲ့ FourierTask ချိတ်ဆက်ပုံ
+
+အရေးကြီးချက်: Fourier ကို အလုပ်လုပ်ပုံသိရုံနဲ့ မလုံလောက်ဘူး။ မူရင်း Result တူဖို့ Transform ရဲ့ sign, scale, normalization နဲ့ channel order အားလုံးကို သိရမယ်။
+
+### Priority 3 — Displacement / Slope / Jacobian Formula အပြည့်
+
+Output 5 နဲ့ Output 7 မှာ Shader code တချို့ ရထားတယ်။
+
+လိုအပ်တာ—
+
+* InitDisplacement ရဲ့ XY/ZW ရလဒ် အဓိပ္ပာယ်
+
+* InitSlope ရဲ့ channel meaning
+
+* InitJacobians ရဲ့ အမှန်တကယ် Jacobian matrix calculation
+
+* Displacement X/Y/Z mapping
+
+* Grid တစ်ခုစီရဲ့ scaling
+
+* Choppyness အသုံးပြုမှု
+
+* Foam formula ကို Jacobian ကနေ FoamMap အထိ ဆက်စပ်စစ်ဆေးခြင်း
+
+* CPU implementation နဲ့ GPU implementation နှိုင်းယှဉ်ခြင်း
+
+အခုအချိန်မှာ Shader output တွေကို မြင်ရပေမဲ့ channel တစ်ခုချင်းစီရဲ့ Physical Meaning ကို အပြည့်မသတ်မှတ်ရသေးဘူး။
+
+### Priority 4 — Ocean Texture နဲ့ Buffer Pipeline
+
+Output 6–8 မှာ Architecture ရထားပေမဲ့ Data Flow တစ်ခုလုံးကို မပိတ်နိုင်သေးဘူး။
+
+လိုအပ်တာ—
+
+* Buffer တစ်ခုစီကို ဘယ် Task က ရေးသလဲ။
+
+* Buffer တစ်ခုစီကို ဘယ် Shader က ဖတ်သလဲ။
+
+* Ping-pong index ဘယ်အချိန်ပြောင်းသလဲ။
+
+* Fourier ပြီးနောက် Copy Pass တွေ ဘယ်လို run သလဲ။
+
+* RenderTexture format, dimensions, mipmaps, filtering, wrapping။
+
+* Map0–3 ရဲ့ Grid assignment။
+
+* Texture channel တစ်ခုချင်းစီရဲ့ meaning။
+
+* CPU နဲ့ GPU path ရဲ့ အပြည့်အစုံကွာခြားချက်။
+
+### Priority 5 — Ocean Surface Shader အပြည့်
+
+ဒါက လက်ရှိ Output archive ထဲမှာ အကြီးမားဆုံး မပြည့်စုံသေးတဲ့အပိုင်းတစ်ခုပါ။
+
+လိုအပ်တာ—
+
+* `Ceto/OceanTopSide_Transparent`
+
+* `Ceto/OceanUnderSide_Transparent`
+
+* `Ceto/OceanBottom`
+
+* `Ceto/OceanDepth`
+
+* `Ceto/OceanMask`
+
+* `Ceto/WaveOverlay`
+
+* `Ceto/NormalFade`
+
+* Vertex program
+
+* Fragment program
+
+* Displacement sampling equations
+
+* Slope/normal calculation
+
+* Foam blending
+
+* Depth interaction
+
+* Fresnel / Reflection / Refraction / Specular
+
+အထူးသဖြင့် Ocean Shader က DisplacementMap တွေကို ဖတ်ပြီး နောက်ဆုံး Surface Position နဲ့ Pixel Color ကို ဘယ်လိုတွက်သလဲ ဆိုတာ အဆုံးထိ မရသေးဘူး။
+
+### Priority 6 — Query နဲ့ Grid 4 Gap
+
+မဖြေရှင်းရသေး
+
+Output 14 မှာ အတည်ပြုထားတာ—
+
+* `QueryDisplacements.GRIDS = 4`
+
+* `CHANNELS = 3`
+
+* Query code က grid 0, 1, 2, 3 အားလုံးကို အသုံးပြုတယ်။
+
+* `ReadFromGPU()` ကတော့ map 0, 1, 2 ပဲ `GetData()` လုပ်ထားတယ်။
+
+* `m_readBuffer` က `size * size` elements၊ stride 12 bytes ဖြစ်တယ်။
+
+မဖြေရှင်းရသေးတာက Grid 4 ရဲ့ CPU Array ကို ဘယ်နေရာက Populate လုပ်သလဲ ဆိုတာပဲ။
+
+ဒါကို အရင်ဆုံး အမှားတစ်ခုလို့ မသတ်မှတ်ဘူး။ `disableReadBack = true` က Default ဖြစ်နေတဲ့အတွက် GPU readback path နဲ့ ပုံမှန် runtime query path ကိုလည်း ခွဲစစ်ဖို့လိုတယ်။
+
+### ၄။ နောက်ထပ် အရေးကြီးတဲ့ Source Coverage Gap
+
+Output 1 မှာ Ceto Source နဲ့ပတ်သက်တဲ့ `grep` ကို 103 matches အထိ တွေ့ထားတယ်။ ဒါပေမဲ့ အဲဒါက Ceto ရဲ့ Source အားလုံးကို စစ်ပြီးပြီဆိုတဲ့ အထောက်အထား မဟုတ်ဘူး။
+
+Conversation မှာ Output 48/49 အဖြစ် C# Source Extraction နဲ့ နောက်ထပ် 7 ခုသော အဓိက C# Files ကို ဖော်ပြထားတယ်—
+
+* `FourierCPU.cs`
+
+* `FourierGPU.cs`
+
+* `UnifiedSpectrum.cs`
+
+* `WaveSpectrum.cs`
+
+* `PhillipsSpectrum.cs`
+
+* `QueryDisplacements.cs`
+
+* `ProjectedGrid.cs`
+
+ဒါတွေက လက်ရှိသိထားတဲ့ Main Files ဖြစ်တယ်။ Complete Ocean Dependency Inventory မဟုတ်သေးဘူး။
+
+ထို့အပြင် PID 196 `Waveform` ComputeShader ကိုလည်း တွေ့ထားတယ်။ ဒါပေမဲ့ Ceto Fourier နဲ့ တူညီတဲ့ Shader လို့ မသတ်မှတ်နိုင်ဘူး။ အမည်တူသလိုမြင်ရတာနဲ့ Function တူတယ်လို့ မယူဆရဘူး။
+
+### ၅။ အခုအချိန်မှာ ဘာတွေမလုပ်သင့်သေးလဲ
+
+မူလ Mission ကို ထိန်းဖို့ ဒီအချက်တွေကို မရောထည့်သင့်သေးဘူး—
+
+* Godot Ocean implementation ကို အလျင်စလို စတင်ခြင်း။
+
+* မပြည့်စုံတဲ့ Formula ကို ခန့်မှန်းဖြည့်ခြင်း။
+
+* Grid 4 ကို အကြောင်းမသိဘဲ ပြင်ဆင်ခြင်း။
+
+* Atmosphere / Sun / Moon ကို ထပ်တူးခြင်း။
+
+* Terrain / Gameplay / Save-Load ကို ပြန်စခြင်း။
+
+* Output 9 နဲ့ 10 လို ထပ်နေတဲ့အရာတွေကို ထပ်မံရှာဖွေခြင်း။
+
+အခုရထားတဲ့အရာတွေကို အခြေခံပြီး Godot မှာ တည်ဆောက်မယ်ဆိုရင် မူရင်းနဲ့ တစ်ထပ်တည်းဖြစ်မယ်လို့ အာမမခံနိုင်သေးဘူး။
+
+### ၆။ ငါ့အမြင်အရ လက်ရှိအခြေအနေ
+
+### Ocean Reconstruction Status
+
+Original source inventory
+
+PARTIAL
+
+Spectrum
+
+PARTIAL
+
+Fourier
+
+PARTIAL
+
+Displacement / Slope / Jacobian
+
+PARTIAL
+
+GPU Buffer / Texture pipeline
+
+PARTIAL
+
+Ocean Surface Shader
+
+INCOMPLETE
+
+Query / Grid 4
+
+UNRESOLVED
+
+လက်ရှိဆုံးဖြတ်ချက်
+
+Original Ocean Architecture ရဲ့ အဓိကအစိတ်အပိုင်းတွေကို စတင်ချိတ်ဆက်နိုင်ပြီ။ ဒါပေမဲ့ Source Coverage၊ Formula Chain နဲ့ Surface Shader အထိ အပြည့်မရသေးလို့ Godot Reconstruction အတွက် Ready မဖြစ်သေးဘူး။
+
+### နောက်ဆုံး — အခု ဘာလိုသေးလဲဆိုတဲ့ အဖြေ
+
+အဓိကလိုအပ်ချက်က ၃ ခုကို ဦးစားပေးရမယ်—
+
+* Unified Spectrum + Runtime Condition Selection ကို အဆုံးထိဖော်ထုတ်ရန်။
+
+* Fourier + Initial Data + Displacement/Slope/Jacobian ကို Mathematical Data Flow အဖြစ် ပိတ်ရန်။
+
+* Ocean Surface Shader ကို Vertex မှ Fragment အထိ အပြည့်ထုတ်ရန်။
+
+ဒီ ၃ ခုက အဓိက Ocean Engine ကို နားလည်ဖို့ အရေးကြီးဆုံးဖြစ်တယ်။ Grid 4 နဲ့ Readback ကတော့ သီးခြား Open Issue အဖြစ် ဆက်ထိန်းထားမယ်။
+
+မင်းရဲ့ Plan ကို ငါပြန်မပြောင်းဘူး။ အခု Repo ထဲက Evidence အရ လိုအပ်တာတွေကိုပဲ ပြောထားတာ။
+
+တစ်ခုတော့ ဝန်ခံမယ် — Outputs တချို့ရဲ့ Raw Content ကို ပြန်ဖတ်ရာမှာ Tool က စာသားအရှည်ကြောင့် ဖြတ်တောက်ပြသတဲ့အပိုင်းတွေရှိတယ်။ အဲဒီအပိုင်းတွေကို အပြည့်ဖတ်ပြီးပြီလို့ မပြောဘူး။ အထက်ကအချက်တွေဟာ မြင်ရတဲ့ Output Evidence၊ README နဲ့ Conversation မှတ်တမ်းအပေါ် အခြေခံထားတဲ့ Audit ဖြစ်တယ်။
+
+-----------
+
+Worked for 26s
+
+ရတယ်ကွာ။ ဒီတစ်ခါ Repo ကို Project ရဲ့ တစ်ခုတည်းသော Plan နဲ့ Evidence Archive အဖြစ် သတ်မှတ်မယ်။ မင်းပြောတဲ့ တာဝန်ခွဲဝေမှုကိုလည်း လက်ခံတယ်။
+
+Repo `main` ကို ပြန်စစ်ထားတဲ့ လက်ရှိအခြေအနေက—
+
+* Conversation 1 — 111,533 bytes၊ 1,697 lines
+
+* README — 10,793 bytes
+
+* Output 1–14 — ရှိတယ်။
+
+* Fourier shader blobs — 3 ဖိုင်ရှိတယ်။
+
+* README မှာ လက်ရှိ Sections 32–35 ပဲရှိတယ်။
+
+* Output 4 နဲ့ Output 4.txt က SHA တူတဲ့ ဖိုင်နှစ်ခုဖြစ်ပြီး အကြောင်းအရာတူတယ်။
+
+* Output 10 က Output 9 နဲ့ ထပ်နေတဲ့အပိုင်းရှိတယ်။
+
+README ကို ပြင်ဆင်မယ့် စည်းမျဉ်း
+
+README ထဲမှာ Project Plan သာထားမယ်။ Technical Findings, Formula, Source Evidence, Output Analysis တွေကို README ထဲ မထည့်တော့ဘူး။
+
+မင်းက Update လုပ်ပေးလို့ပြောတဲ့အခါ—
+
+* သက်ဆိုင်ရာ `Output` TXT ဖိုင်ထဲကို အချက်အလက်အပြည့်အစုံ ထည့်မယ်။
+
+* Formula, Code, Parameters, Data Flow, Source Path, PID, Evidence နဲ့ မဖြေရှင်းရသေးတဲ့အချက်တွေကို မချန်ဘူး။
+
+* အတိုကောက် Summary သက်သက် မလုပ်ဘူး။
+
+* မူရင်း Output နဲ့ Analysis ကို ခွဲရေးမယ်။
+
+* အရင်မှတ်တမ်းကို မဖျက်ဘူး၊ မူရင်းအချက်အလက်ကို မပြောင်းဘူး။
+
+* Update ပြီးရင် GitHub မှာ ပြန်ဖတ်ပြီး Verify လုပ်မယ်။
+
+### အခု လိုသေးတာ — လိုရင်းတိုရှင်း
+
+| ဦးစားပေး | လိုအပ်တဲ့ Source / Evidence                                                            |
+| -------- | -------------------------------------------------------------------------------------- |
+| 1        | UnifiedSpectrum.cs — အပြည့်အစုံ၊ Spectrum selection နဲ့ condition chain                |
+| 2        | WaveSpectrum.cs — အပြည့်အစုံ၊ CreateConditions မှ Generate/Update အထိ                  |
+| 3        | FourierCPU.cs နဲ့ FourierGPU.cs — Transform direction, normalization, buffer switching |
+| 4        | InitDisplacement, InitSlope, InitJacobians — Formula နဲ့ channel meaning               |
+| 5        | Ceto/Fourier Shader — Pass 0–7 ရဲ့ အပြည့်အစုံ                                          |
+| 6        | Ocean Surface Shaders — Vertex/Fragment source အပြည့်အစုံ                              |
+| 7        | Grid 4 — readDisplacements[3] ကို ဘယ်နေရာက Populate လုပ်သလဲ                            |
+| 8        | Ocean execution chain — Task scheduling, Conditions, Buffer producer/consumer အားလုံး  |
+
+လက်ရှိအကြီးဆုံး Gap က Ocean Surface Shader နဲ့ Spectrum → Fourier → Displacement → Surface အထိ ဆက်စပ်တဲ့ Full Data Flow ပဲ။
+
+နောက်တစ်ချက် — Repo ထဲက Conversation 1 ကို Plan အတွက် အဓိကအထောက်အထားအဖြစ် ထားမယ်။ README ကို Plan သီးသန့်ထားမယ်။ Outputs တွေကို Evidence Archive အဖြစ် ထိန်းမယ်။
+
+မင်းပြန်ထုတ်ပေးရမယ့်အရာတွေကို အထက်က ၈ ချက်အတိုင်းပဲ သတ်မှတ်ထားတယ်။ ထပ်ပြီး မလိုအပ်တဲ့ Output တွေ မတောင်းတော့ဘူး။ 💪
+
+------------------
+
+Worked for 2m 23s
+
+စစ်ပြီးပါပြီ။ ပေးထားတဲ့ လင့်ခ် ၄ ခုလုံးကို commit `349c54c` မှာရှိတဲ့ မူရင်း Output တွေအတိုင်း ဖတ်ပြီး တစ်ခုနဲ့တစ်ခု ချိတ်ဆက်စစ်ထားပါတယ်။ ဒီတစ်ခေါက်က အရင် Output 1–14 တွေထက် အရေးကြီးတဲ့ Source အပိုင်းတွေကို ပိုပြည့်စုံလာစေပါတယ်။
+
+### ၁။ Output တစ်ခုချင်းစီက အတည်ပြုပေးနိုင်တာ
+
+### Output 15–16–17 — Spectrum, Fourier CPU/GPU, Init Shaders
+
+UnifiedSpectrum.cs ကို အပြည့်အစုံရထားပါပြီ။
+
+အခု Spectrum တွက်ချက်မှုမှာ အောက်ပါအဆင့်တွေကို Source အတိုင်း ခြေရာခံနိုင်ပါပြီ။
+
+* Wind direction ကို ဒီဂရီကနေ `Vector2` ဦးတည်ချက်အဖြစ် ပြောင်းတယ်။
+
+* `kp`, `cp`, `z0`, `u_star`, `gamma`, `sigma` စတဲ့ parameter တွေကို constructor မှာ တွက်တယ်။
+
+* `omega(k)` မှာ gravity နဲ့ high-frequency wave-number correction ပါတယ်။
+
+* `Spectrum(kx, ky)` မှာ Wind direction နဲ့ wave vector ကို rotate လုပ်တယ်။
+
+* Peak spectrum, high-frequency attenuation, directional spreading တွေကို ပေါင်းစပ်ပြီး spectral value ထုတ်တယ်။
+
+* Wind နဲ့ ဆန့်ကျင်ဘက်ဖြစ်တဲ့ `kx < 0` ကို သုညပြန်ပေးတယ်။
+
+Spectrum selection chain လည်း ပိုရှင်းသွားပါပြီ။
+
+`UNIFIED`, `UNIFIED_PHILLIPS`, `PHILLIPS`, `CUSTOM` ဆိုတဲ့ type လေးမျိုးကို `WaveSpectrum.NewSpectrumCondition()` က ရွေးတယ်။ `CUSTOM` ရွေးထားပေမဲ့ `CustomWaveSpectrum` မရှိရင် Warning ထုတ်ပြီး `UNIFIED` ကို ပြန်ပြောင်းတယ်။
+
+နောက်ထပ် အရေးကြီးတာက `UNIFIED_PHILLIPS` အတွက် `UnifiedPhillipsSpectrumCondition` ကို သုံးထားတာ တွေ့ရပါတယ်။ ဒါပေမဲ့ အဲဒီ Class ရဲ့ အတွင်းပိုင်းကို မစစ်ရသေးတဲ့အတွက် Spectrum နှစ်မျိုး ဘယ်လိုပေါင်းစပ်ထားတယ်ဆိုတာကို အတည်မပြုသေးပါဘူး။
+
+Fourier CPU/GPU Source နှစ်ခုလုံးရပါပြီ။
+
+* CPU မှာ `BitReverse` ကို ပထမအဆင့်မှာသုံးပြီး Butterfly lookup table တည်ဆောက်တယ်။
+
+* X direction နဲ့ Y direction ကို pass အလိုက် ခွဲတွက်တယ်။
+
+* `SinglePacked` နဲ့ `DoublePacked` နှစ်မျိုးရှိတယ်။
+
+* Buffer နှစ်ခုကို ping-pong ပုံစံပြောင်းသုံးတယ်။
+
+* Lookup table မှာ `cos` နဲ့ `sin` twiddle values တွေကို တည်ဆောက်တယ်။
+
+* FFT CPU code ထဲမှာ အလွယ်တကူမြင်ရတဲ့ explicit normalization/division မတွေ့ရသေးပါဘူး။
+
+ဒါပေမဲ့ positive `sin` တစ်ခုတည်းကိုကြည့်ပြီး Forward FFT / Inverse FFT လို့ အပြီးသတ် မသတ်မှတ်နိုင်သေးပါဘူး။ Input convention၊ GPU shader နဲ့ FFT နောက်ပိုင်း scaling ကိုပါ တွဲစစ်ရပါမယ်။
+
+### Output 19 — Ceto/Fourier Pass 0–7
+
+CPU/GPU Source နှင့် Pass Mapping ကိုက်ညီ
+
+ဒီ Output က FourierGPU.cs နဲ့ GPU Shader ကို အပြန်အလှန်စစ်နိုင်စေပါတယ်။
+
+| Pass | လုပ်ဆောင်ချက်      | Render Targets |
+| ---- | ------------------ | -------------- |
+| 0    | X / Horizontal FFT | 1              |
+| 1    | Y / Vertical FFT   | 1              |
+| 2    | X / Horizontal FFT | 2              |
+| 3    | Y / Vertical FFT   | 2              |
+| 4    | X / Horizontal FFT | 3              |
+| 5    | Y / Vertical FFT   | 3              |
+| 6    | X / Horizontal FFT | 4              |
+| 7    | Y / Vertical FFT   | 4              |
+
+`FourierGPU.PeformFFT()` ထဲမှာလည်း Render Target အရေအတွက်အလိုက် Pass 0–7 ကို အဲဒီအတိုင်း ရွေးသုံးထားပါတယ်။ Shader ဘက်မှာလည်း `Ceto_ButterFlyLookUp` နဲ့ `Ceto_ReadBuffer0–3` ကို အသုံးပြုပြီး output target အရေအတွက် ကိုက်ညီနေပါတယ်။
+
+### Output 18 — WaveSpectrum.cs
+
+ဒီဖိုင်က အရေးကြီးပါတယ်။ ဒါပေမဲ့ 943 လိုင်းရှိတဲ့ WaveSpectrum.cs ထဲက ပထမ 425 လိုင်းကိုသာ ထည့်ထားပါတယ်။
+
+ရထားတဲ့အပိုင်းထဲမှာ—
+
+* WaveSpectrum fields နဲ့ default parameter များ
+
+* Start မှာ Shader Materials, Scheduler, Buffers, RenderTextures, Conditions တည်ဆောက်ခြင်း
+
+* Update မှာ parameter clamp လုပ်ခြင်း
+
+* `OceanTime.Now * waveSpeed` နဲ့ simulation time သတ်မှတ်ခြင်း
+
+* Scheduler update
+
+* `CETO_USE_4_SPECTRUM_GRIDS` keyword
+
+* Global shader parameter များ
+
+* Query scaling
+
+* `GenerateSlopes()` ရဲ့ အစပိုင်း
+
+တွေ ပါဝင်ပါတယ်။
+
+`Update()` ထဲမှာ `GenerateDisplacement()`, `GenerateSlopes()`, `GenerateFoam()` ကို ခေါ်တာကိုလည်း အတည်ပြုနိုင်ပါတယ်။
+
+### Output 20–21–23–24 — Surface Shaders, Readback, Ocean Chain
+
+ဒီဖိုင်မှာ အရေးကြီးတဲ့ တွေ့ရှိချက် ၃ ခုရှိပါတယ်။
+
+က) Ocean Surface Shader များ
+
+အောက်ပါ Shader တွေကို တွေ့ရှိထားပါတယ်။
+
+* `OceanTopSide_Transparent` PID175
+
+* `OceanUnderSide_Transparent` PID143
+
+* `OceanBottom` PID139
+
+* `OceanDepth` PID179
+
+* `OceanMask` PID168
+
+* `OceanMaskFlipped` PID142
+
+* `NormalFade` PID160
+
+TopSide နဲ့ UnderSide တို့မှာ Vertex/Fragment variant တစ်ခုစီ 352 ခု ရှိတယ်ဆိုတဲ့ extraction metadata ကို ရထားပါတယ်။ သို့သော် GitHub Output ထဲမှာ Shader code အပြည့်အစုံမပါဘဲ သိမ်းထားတဲ့ ဖိုင်အရွယ်အစားနဲ့ variant အရေအတွက်ကိုသာ ဖော်ပြထားပါတယ်။ ဒါကြောင့် Surface Shader ကို ပြန်တည်ဆောက်နိုင်တဲ့အဆင့်အထိ မရောက်သေးပါဘူး။
+
+ခ) Grid 4 Readback အကြောင်း အရေးကြီးတဲ့ ပြင်ဆင်ချက်
+
+အရင် Output 14 မှာ GPU readback ကို map 0–2 အထိသာ တွေ့ခဲ့လို့ Grid 4 မရောက်ဘူးဆိုတဲ့ သံသယရှိခဲ့ပါတယ်။
+
+အခု Output 20–24 မှာ `DisplacementBufferCPU.cs` ကို တွေ့ရပါတယ်။
+
+* CPU buffer မှာ grid 4 ခုလုံးအတွက် array တွေ ဖန်တီးတယ်။
+
+* Read/Write array bank နှစ်ခုရှိတယ်။
+
+* Initialize လုပ်တဲ့အခါ grid 0–3 အားလုံးကို Clear လုပ်တယ်။
+
+* Buffer run မလုပ်ခင် Read/Write array bank ကို Swap လုပ်တယ်။
+
+ဒါကြောင့် Grid 4 မရှိဘူးလို့ စနစ်တစ်ခုလုံးအတွက် မသတ်မှတ်နိုင်တော့ပါဘူး။ အတည်ပြုနိုင်တာက GPU-to-CPU readback code မှာ map 0–2 ကိုသာ explicit ဖတ်ထားတာပါ။ GPU buffer ရဲ့ implementation ကို မစစ်ရသေးလို့ ဒီအချက်က bug လား၊ ဒီဇိုင်းအရ လုပ်ထားတာလားဆိုတာ မဆုံးဖြတ်ရသေးပါဘူး။
+
+ဂ) Condition နဲ့ Scheduler
+
+`WaveSpectrumCondition.cs` မှာ—
+
+* Spectrum01 / Spectrum23 / WTable
+
+* CPU-side SpectrumData arrays
+
+* `SupportsJacobians`
+
+* `InverseGridSizes = 2π × Size / GridSize`
+
+* RGBAFloat texture format
+
+* Spectrum texture တွေမှာ Point + Repeat
+
+* WTable မှာ Point + Clamp
+
+တို့ကို အတည်ပြုထားပါတယ်။
+
+Scheduler မှာလည်း Scheduled, Running, Waiting, Finished task queues လေးမျိုးရှိပြီး ThreadPool နဲ့ task execution လုပ်နိုင်တာကို တွေ့ရပါတယ်။
+
+### ၂။ ဒီတစ်ခေါက်ရဲ့ အရေးကြီးဆုံး အဖြေ
+
+အရင်က လိုအပ်နေခဲ့တဲ့ Source Chain ဟာ အခု ပိုပြီးရှင်းလာပါပြီ။
+
+Spectrum Selection
+
+Unified / Phillips / Unified-Phillips / Custom
+
+WaveSpectrumCondition
+
+Spectrum01 / Spectrum23 / WTable / Grid Settings
+
+Init Displacement / Slope / Jacobians
+
+Fourier CPU / GPU
+
+X/Y FFT · Pass 0–7 · Ping-Pong Buffers
+
+Displacement / Slope / Jacobian Maps
+
+Ocean Surface Shader / Query
+
+အပြည့်အစုံ မရသေး
+
+ဒီဟာက အခု Source တွေကနေ ချိတ်ဆက်အတည်ပြုနိုင်တဲ့ အပိုင်းကိုသာ ပြထားတာပါ။ ကျန်တဲ့ Dataflow ကို အနည်းငယ် inference လုပ်ပြီး အတည်ပြုပြီးသားလို မဖော်ပြထားပါဘူး။
+
+### ၃။ နောက်ထပ် လိုအပ်တာတွေ
+
+အခုအချိန်မှာ အကုန်ပြန်ရှာစရာမလိုပါဘူး။ လိုအပ်တာတွေကို အောက်ပါအတိုင်း စုထားလိုက်ပါ။
+
+* WaveSpectrum.cs လိုင်း 426–943 — အရင် Output 18 မှာ ကျန်နေတဲ့အပိုင်း။ အထူးသဖြင့် `GenerateDisplacement`, `GenerateSlopes`, `GenerateFoam`, `ReadFromGPU`, `CreateBuffers` နဲ့ Buffer ရွေးချယ်တဲ့ logic။
+
+* GPU Buffer implementation အပြည့် — `WaveSpectrumBufferGPU`, `DisplacementBufferGPU` နဲ့ ဆက်စပ် GPU/CPU Buffer source များ။ Grid 4 Readback ကိစ္စကို ဒီမှာပဲ ဖြေရှင်းနိုင်ဖို့လိုပါတယ်။
+
+* Spectrum Task chain — `SpectrumTask`, `InitSpectrumDisplacementsTask`, `UnifiedPhillipsSpectrumCondition` နဲ့ သက်ဆိုင်ရာ Condition Key များ။ Spectrum ကနေ Fourier input data ဘယ်လိုဖန်တီးသလဲဆိုတာ အပြည့်အစုံသိဖို့ပါ။
+
+* Ocean Surface Shader ရဲ့ အသုံးပြုနေတဲ့ Variant — TopSide/UnderSide အတွက် Material က တကယ်ရွေးထားတဲ့ Shader variant၊ keyword နဲ့ PID reference တွေ။ Variant 352 ခုလုံးကို ထုတ်စရာမလိုပါဘူး။ အသုံးပြုနေတဲ့ variant ကိုပဲ အရင်ရှာရပါမယ်။
+
+* Ocean.cs ရဲ့ Query/Render connection — `QueryWaves()` အပြည့်နဲ့ Ocean component က WaveSpectrum ကို ဘယ်လိုချိတ်ဆက်သုံးသလဲဆိုတဲ့ အပိုင်း။
+
+### ၄။ လက်ရှိအခြေအနေ
+
+အတည်ပြုနိုင်တဲ့ Source တိုးလာပြီ
+
+* Unified Spectrum formula — FULL SOURCE ရရှိ
+
+* Spectrum selection — အဓိက logic ရရှိ
+
+* Fourier CPU — FULL SOURCE ရရှိ
+
+* Fourier GPU — FULL SOURCE ရရှိ
+
+* Fourier Shader Pass 0–7 — ရရှိပြီး C# နဲ့ ကိုက်ညီ
+
+* Initialization shaders — GLSL variants ရရှိ
+
+* WaveSpectrum lifecycle — တစ်စိတ်တစ်ပိုင်း ရရှိ
+
+* CPU displacement buffers — ရရှိ
+
+* GPU buffer/readback — မပြည့်စုံသေး
+
+* Ocean surface shader — Variant metadata ရှိ၊ အသုံးပြုနေတဲ့ code မသတ်မှတ်ရသေး
+
+လက်ရှိ မင်းဆီက နောက်ထပ် အရေးကြီးဆုံးလိုတာက အချက် ၁၊ ၂၊ ၃ ပါ။ အဲဒီသုံးခုရရင် Spectrum ကနေ Displacement map ထွက်လာတဲ့ လုပ်ငန်းစဉ်ကို တစ်ဆက်တည်း အတည်ပြုနိုင်ဖို့ ပိုနီးလာပါပြီ။ Surface Shader ကိုတော့ အဲဒီ Dataflow ပြည့်စုံပြီးမှ ဆက်စစ်မယ်။
+
+README ကို မပြင်ထားပါဘူး။ နည်းပညာဆိုင်ရာ အချက်အလက်တွေကို TXT မှာပဲ အပြည့်အစုံထည့်မယ်။
+
+------------
