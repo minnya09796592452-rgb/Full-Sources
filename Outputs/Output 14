@@ -1,0 +1,244 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN_OUT="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. EXACT COMPUTEBUFFER ALLOCATION IN WAVESPECTRUM.CS ==="
+=== 1. EXACT COMPUTEBUFFER ALLOCATION IN WAVESPECTRUM.CS ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "m_readBuffer|readDisplacements|ComputeBuffer" "$CLEAN_OUT/CSharp_Scripts/Ceto/" -n -C 3
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-90-             int num = EnabledBuffers();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-91-             if (num != 0)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-92-             {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs:93:                     InterpolatedArray2f[] readDisplacements = GetReadDisplacements();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs:94:                     QueryDisplacements.QueryWaves(query, num, readDisplacements, scaling);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-95-             }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-96-     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-97-}
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-134-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-135-     private FindRangeTask m_findRangeTask;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-136-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:137:     private ComputeBuffer m_readBuffer;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-138-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-139-     private QueryGridScaling m_queryScaling = new QueryGridScaling();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-140-
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-298-                     m_jacobianBuffer.Release();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-299-                     m_jacobianBuffer = null;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-300-             }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:301:             if (m_readBuffer != null)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-302-             {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:303:                     m_readBuffer.Release();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:304:                     m_readBuffer = null;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-305-             }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-306-             if (m_conditions != null && m_conditions[0] != null && m_conditions[0].Done)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-307-             {
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-575-                     Ocean.LogWarning("Trying to read GPU displacement data but the read shader is null");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-576-             }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-577-             bool flag = SystemInfo.graphicsShaderLevel >= 50 && SystemInfo.supportsComputeShaders;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:578:             if ((!disableReadBack && readSdr != null && m_readBuffer != null) & flag)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-579-             {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:580:                     InterpolatedArray2f[] readDisplacements = DisplacementBuffer.GetReadDisplacements();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-581-                     if (numGrids > 0)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-582-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:583:                             CBUtility.ReadFromRenderTexture(m_displacementMaps[0], 3, m_readBuffer, readSdr);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:584:                             m_readBuffer.GetData(readDisplacements[0].Data);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-585-                     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-586-                     else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-587-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:588:                             readDisplacements[0].Clear();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-589-                     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-590-                     if (numGrids > 1)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-591-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:592:                             CBUtility.ReadFromRenderTexture(m_displacementMaps[1], 3, m_readBuffer, readSdr);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:593:                             m_readBuffer.GetData(readDisplacements[1].Data);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-594-                     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-595-                     else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-596-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:597:                             readDisplacements[1].Clear();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-598-                     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-599-                     if (numGrids > 2)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-600-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:601:                             CBUtility.ReadFromRenderTexture(m_displacementMaps[2], 3, m_readBuffer, readSdr);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:602:                             m_readBuffer.GetData(readDisplacements[2].Data);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-603-                     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-604-                     else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-605-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:606:                             readDisplacements[2].Clear();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-607-                     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-608-                     _ = 3;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-609-             }
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-717-             }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-718-             m_slopeBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 2);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-719-             m_jacobianBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 3);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:720:             m_readBuffer = new ComputeBuffer(size * size, 12);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-721-             m_conditions = new WaveSpectrumCondition[2];
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-722-             m_displacementMaps = new RenderTexture[4];
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-723-             m_slopeMaps = new RenderTexture[2];
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. QUERYDISPLACEMENTS GRIDS=4 vs READFROMGPU 3 GRIDS ==="
+=== 2. QUERYDISPLACEMENTS GRIDS=4 vs READFROMGPU 3 GRIDS ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# sed -n '1,95p' "$CLEAN_OUT/CSharp_Scripts/Ceto/QueryDisplacements.cs"
+using System;
+using System.Collections.Generic;
+using Ceto.Common.Containers.Interpolation;
+using Ceto.Common.Threading.Tasks;                                                                                                                           using UnityEngine;
+
+namespace Ceto;
+
+public static class QueryDisplacements
+{
+        public static readonly int CHANNELS = 3;
+
+        public static readonly int GRIDS = 4;
+
+        public static void QueryWaves(WaveQuery query, int enabled, IList<InterpolatedArray2f> displacements, QueryGridScaling scaling)                              {
+                if (displacements.Count != GRIDS)
+                {
+                        int gRIDS = GRIDS;
+                        throw new InvalidOperationException("Query Displacements requires a displacement buffer for each of the " + gRIDS + " grids.");
+                }
+                if (displacements[0].Channels != CHANNELS)
+                {
+                        int gRIDS = CHANNELS;
+                        throw new InvalidOperationException("Query Displacements requires displacement buffers have " + gRIDS + " channels.");
+                }
+                if (query.mode != QUERY_MODE.DISPLACEMENT && query.mode != QUERY_MODE.POSITION)
+                {
+                        return;
+                }
+                float num = query.posX + scaling.offset.x;
+                float num2 = query.posZ + scaling.offset.z;
+                if (scaling.result == null)
+                {
+                        scaling.result = new float[CHANNELS];
+                }
+                switch (enabled)
+                {
+                case 0:
+                        break;
+                default:
+                        if (query.mode != QUERY_MODE.DISPLACEMENT)
+                        {
+                                float num3 = num;
+                                float num4 = num2;
+                                float num5 = num;
+                                float num6 = num2;
+                                float num7 = query.minError;
+                                if (num7 < WaveQuery.MIN_ERROR)
+                                {
+                                        num7 = WaveQuery.MIN_ERROR;
+                                }
+                                num7 *= num7;
+                                int num8 = 0;
+                                float num9;
+                                float num10;
+                                float num13;
+                                do
+                                {
+                                        num5 += num - num3;
+                                        num6 += num2 - num4;
+                                        Sample(query.result.displacement, displacements, query.sampleSpectrum, num5, num6, scaling);
+                                        num9 = query.result.displacement[0].x + query.result.displacement[1].x + query.result.displacement[2].x + query.result.displacement[3].x;
+                                        num10 = query.result.displacement[0].z + query.result.displacement[1].z + query.result.displacement[2].z + query.result.displacement[3].z;
+                                        num3 = num5 + num9;
+                                        num4 = num6 + num10;
+                                        num8++;
+                                        float num11 = num - num3;
+                                        float num12 = num2 - num4;
+                                        num13 = num11 * num11 + num12 * num12;
+                                }
+                                while (num13 > num7 && num8 <= WaveQuery.MAX_ITERATIONS);
+                                query.result.height = query.result.displacement[0].y + query.result.displacement[1].y + query.result.displacement[2].y + query.result.displacement[3].y;
+                                query.result.displacementX = num9;                                                                                                                           query.result.displacementZ = num10;
+                                query.result.iterations = num8;                                                                                                                              query.result.error = num13;
+                                query.result.height = Mathf.Clamp(query.result.height, -40f, 40f);
+                                break;
+                        }
+                        goto case 1;
+                case 1:
+                        SampleHeightOnly(query.result.displacement, displacements, query.sampleSpectrum, num, num2, scaling);                                                        query.result.height = query.result.displacement[0].y + query.result.displacement[1].y + query.result.displacement[2].y + query.result.displacement[3].y;
+                        query.result.displacementX = 0f;
+                        query.result.displacementZ = 0f;
+                        query.result.iterations = 0;
+                        query.result.error = 0f;
+                        query.result.height = Mathf.Clamp(query.result.height, -40f, 40f);
+                        break;
+                }
+        }
+
+        private static void SampleHeightOnly(Vector3[] d, IList<InterpolatedArray2f> displacements, bool[] sample, float x, float z, QueryGridScaling scaling)
+        {
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 3. ALL KERNELS IN COMPUTESHADER PID 186 (READ) ==="
+=== 3. ALL KERNELS IN COMPUTESHADER PID 186 (READ) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+> cs_tree = next(o for o in e0.objects if o.path_id == 186).read_typetree()
+>
+> for k in cs_tree["variants"][-1]["kernels"]:
+>     _, vm = next(iter(k["variantMap"]))
+>     code = bytes(vm.get("code", [])).decode("latin1", errors="ignore")
+>     lines = [l.strip() for l in code.splitlines() if "_Buffer" in l or "texelFetch" in l or "textureLod" in l]
+>     print(f"Kernel '{k['name']}' threads={vm.get('threadGroupSize')}:")
+>     for l in lines[:4]:
+>         print("  ", l)
+> EOF
+Kernel 'read2DC1' threads=[8, 8, 1]:
+   struct _Buffer2DC1_type {
+   layout(std430, binding = 0) buffer _Buffer2DC1 {
+   _Buffer2DC1_type _Buffer2DC1_buf[];
+   u_xlati2 = floatBitsToInt(texelFetch(_Tex2D, ivec2(u_xlatu1.xy), int(u_xlatu1.w)).x);                                                                     Kernel 'read2DC2' threads=[8, 8, 1]:
+   struct _Buffer2DC2_type {
+   layout(std430, binding = 0) buffer _Buffer2DC2 {
+   _Buffer2DC2_type _Buffer2DC2_buf[];
+   u_xlati2.xy = floatBitsToInt(texelFetch(_Tex2D, ivec2(u_xlatu1.xy), int(u_xlatu1.w)).xy);                                                                 Kernel 'read2DC3' threads=[8, 8, 1]:
+   struct _Buffer2DC3_type {
+   layout(std430, binding = 0) buffer _Buffer2DC3 {
+   _Buffer2DC3_type _Buffer2DC3_buf[];
+   u_xlati2.xyz = floatBitsToInt(texelFetch(_Tex2D, ivec2(u_xlatu1.xy), int(u_xlatu1.w)).xyz);
+Kernel 'read2DC4' threads=[8, 8, 1]:                                                                                                                            struct _Buffer2DC4_type {
+   layout(std430, binding = 0) buffer _Buffer2DC4 {
+   _Buffer2DC4_type _Buffer2DC4_buf[];
+   u_xlati1 = floatBitsToInt(texelFetch(_Tex2D, ivec2(u_xlatu1.xy), int(u_xlatu1.w)));
+Kernel 'readSingle2D' threads=[1, 1, 1]:
+   struct _BufferSingle2D_type {
+   layout(std430, binding = 0) buffer _BufferSingle2D {
+   _BufferSingle2D_type _BufferSingle2D_buf[];
+   u_xlati0 = floatBitsToInt(texelFetch(_Tex2D, ivec2(u_xlatu0.xy), int(u_xlatu0.w)));
+Kernel 'readSingleBilinear2D' threads=[1, 1, 1]:
+   struct _BufferSingle2D_type {
+   layout(std430, binding = 0) buffer _BufferSingle2D {
+   _BufferSingle2D_type _BufferSingle2D_buf[];
+   u_xlat0 = textureLod(_Tex2DTEX_with_SMP_LinearClamp, _UV.xy, 0.0);
+Kernel 'read3DC1' threads=[8, 8, 8]:
+   struct _Buffer3DC1_type {
+   layout(std430, binding = 0) buffer _Buffer3DC1 {
+   _Buffer3DC1_type _Buffer3DC1_buf[];
+   u_xlati2 = floatBitsToInt(texelFetch(_Tex3D, ivec3(u_xlatu1.xyz), int(u_xlatu1.w)).x);
+Kernel 'read3DC2' threads=[8, 8, 8]:
+   struct _Buffer3DC2_type {
+   layout(std430, binding = 0) buffer _Buffer3DC2 {
+   _Buffer3DC2_type _Buffer3DC2_buf[];
+   u_xlati2.xy = floatBitsToInt(texelFetch(_Tex3D, ivec3(u_xlatu1.xyz), int(u_xlatu1.w)).xy);
+Kernel 'read3DC3' threads=[8, 8, 8]:
+   struct _Buffer3DC3_type {                                                                                                                                    layout(std430, binding = 0) buffer _Buffer3DC3 {
+   _Buffer3DC3_type _Buffer3DC3_buf[];
+   u_xlati2.xyz = floatBitsToInt(texelFetch(_Tex3D, ivec3(u_xlatu1.xyz), int(u_xlatu1.w)).xyz);
+Kernel 'read3DC4' threads=[8, 8, 8]:
+   struct _Buffer3DC4_type {
+   layout(std430, binding = 0) buffer _Buffer3DC4 {
+   _Buffer3DC4_type _Buffer3DC4_buf[];
+   u_xlati1 = floatBitsToInt(texelFetch(_Tex3D, ivec3(u_xlatu1.xyz), int(u_xlatu1.w)));
+Kernel 'readSingle3D' threads=[1, 1, 1]:
+   struct _BufferSingle3D_type {
+   layout(std430, binding = 0) buffer _BufferSingle3D {
+   _BufferSingle3D_type _BufferSingle3D_buf[];
+   u_xlati0 = floatBitsToInt(texelFetch(_Tex3D, ivec3(u_xlatu0.xyz), int(u_xlatu0.w)));                                                                      Kernel 'readSingleBilinear3D' threads=[1, 1, 1]:
+   struct _BufferSingle3D_type {
+   layout(std430, binding = 0) buffer _BufferSingle3D {
+   _BufferSingle3D_type _BufferSingle3D_buf[];
+   u_xlat0 = textureLod(_Tex3DTEX_with_SMP_LinearClamp, _UV.xyz, 0.0);                                                                                       root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
