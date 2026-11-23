@@ -847,3 +847,99 @@ The visible shader output establishes the calculation structure, but not the fin
 ## 21. Raw Output 5 archive
 
 - [Output 5](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%205) — original terminal output for the butterfly lookup and initialization-shader extraction.
+
+
+## 22. Output 6 — GPU buffer lifecycle, render-texture formats, and WaveSpectrum consumers
+
+Source: [Outputs/Output 6](https://github.com/minnya09796592452-rgb/Full-Sources/blob/658c8306c6899fbc7493a859ede3861522ebf7b5/Outputs/Output%206)
+
+### 22.1 WaveSpectrumBufferGPU structure and initialization bindings
+
+The extracted `WaveSpectrumBufferGPU` source establishes:
+
+- Constructor accepts 1–4 logical buffers and creates a `FourierGPU` instance.
+- Each logical buffer owns a two-slot `RenderTexture[]` ping-pong pair.
+- `GetTexture(idx)` returns black if no valid Fourier result exists, the index is out of range, or that buffer is disabled; otherwise it returns the current ping-pong slot.
+- Initialization binds `Ceto_Spectrum01`, `Ceto_Spectrum23`, `Ceto_WTable`, `Ceto_InverseGridSizes`, `Ceto_GridSizes`, `Ceto_Offset`, and `Ceto_Time` to the selected init material.
+- The active destination textures are populated by `Graphics.Blit` for one target or `RTUtility.MultiTargetBlit` for two to four targets.
+- `Run()` allocates/recreates the enabled ping-pong textures, runs initialization, then invokes the matching 1–4-buffer FourierGPU overload.
+- Sampling changes the final active texture from Point/Clamp to Bilinear/Repeat; disabling sampling restores Point/Clamp.
+
+The constructor's offset is `(1 + 0.5/Size, 1 + 0.5/Size, 0, 0)`. The excerpt confirms this literal value; its precise texel-center rationale should be checked against the shader coordinate convention before reimplementing it.
+
+### 22.2 GPU temporary texture descriptors
+
+The `CreateTextures()` method obtains temporary textures using:
+
+- Dimensions: `Size × Size`
+- Depth buffer: 0
+- Format: `RenderTextureFormat.ARGBFloat`
+- Read/write: `RenderTextureReadWrite.Linear`
+- Filter: Point
+- Wrap: Clamp
+- Anisotropic level: 0
+- Name: `Ceto Wave Spectrum GPU Buffer`
+
+These are the Fourier/init ping-pong textures. Their sampling mode is changed only for the final result while consumers sample it.
+
+### 22.3 DisplacementBufferGPU
+
+The GPU displacement buffer uses exactly three logical buffers. It creates one `InterpolatedArray2f` per `QueryDisplacements.GRIDS`, each with dimensions `size × size`, `QueryDisplacements.CHANNELS` channels, and wrapping enabled. Query/copy/range operations delegate to `QueryDisplacements`.
+
+This establishes a three-buffer GPU displacement path, but the physical meaning of each buffer and the interpolated-array channels still need the `QueryDisplacements` copy/query implementation and copy-shader pass mapping.
+
+### 22.4 WaveSpectrum shader bindings and buffer routing
+
+The displayed `WaveSpectrum.cs` excerpt shows:
+
+- Slope generation chooses init pass `numGrids - 1`, runs the slope GPU buffer, enables sampling, copies buffer 0 into slope map 0, and copies buffer 1 into slope map 1 only when `numGrids > 2`; otherwise slope map 1 is set to black. For `numGrids <= 2`, slope buffer 1 is disabled.
+- Displacement generation enables/disables logical buffers according to displacement enablement and choppyness. When choppyness is zero, buffers 1 and 2 are disabled; when positive, both are enabled. For `numGrids <= 2`, buffer 2 is disabled.
+- Displacement init also selects pass `numGrids - 1`. It copies buffer 0 as the height source and buffers 1/2 as displacement sources through `displacementCopyMat`, using passes 0–4 according to grid index/count.
+- The resulting four displacement maps are published as `Ceto_DisplacementMap0..3`; missing maps are explicitly set to black.
+- After copying, GPU readback is conditionally invoked only when the existing readback path allows it; the excerpt shows the call site but not the full `ReadFromGPU()` implementation.
+
+### 22.5 Persistent map descriptors and buffer allocation
+
+The displayed buffer creation and `CreateRenderTextures()` code establishes:
+
+- GPU displacement buffer: 3 logical buffers.
+- Slope buffer: 2 logical buffers.
+- Jacobian buffer: 3 logical buffers.
+- Readback compute buffer allocation: `size * size` elements with stride 12.
+- Persistent maps: 4 displacement, 2 slope, and 1 foam render textures.
+- All persistent maps use `RenderTextureFormat.ARGBFloat`, `RenderTextureReadWrite.Linear`, dimensions `size × size`, depth 0, Trilinear filtering, Repeat wrapping, anisotropic level 9, and mipmaps enabled.
+
+The output shows allocation of the Jacobian buffer, but does not include the complete Jacobian generation/consumer method. It also does not show the actual texture format/stride interpretation of the readback data beyond the compute-buffer stride value.
+
+### 22.6 Updated evidence status
+
+| Item | Status after Output 6 |
+|---|---|
+| GPU buffer count range and ping-pong layout | Confirmed: 1–4 buffers, two texture slots each |
+| Init material property binding names | Confirmed in WaveSpectrumBufferGPU source |
+| Init target routing | Confirmed: Blit for one target, MultiTargetBlit for 2–4 |
+| Temporary Fourier/init texture format | Confirmed: ARGBFloat, Linear, Point, Clamp |
+| Final sampling state | Confirmed: Bilinear, Repeat; restored to Point/Clamp afterward |
+| GPU displacement buffer count | Confirmed: 3 |
+| Slope / Jacobian GPU buffer counts | Confirmed: 2 / 3 |
+| Persistent map counts | Confirmed: displacement 4, slope 2, foam 1 |
+| Persistent map descriptor | Confirmed: ARGBFloat, Linear, Trilinear, Repeat, mipmaps, aniso 9 |
+| Displacement and slope copy routing | Partially confirmed from WaveSpectrum call sites |
+| Exact RGBA component meanings | Still unverified |
+| Jacobian generation/foam consumer mapping | Still unverified from this output |
+| QueryDisplacements channel semantics | Still requires source inspection |
+| Readback element interpretation | Still requires ReadFromGPU and copy implementation |
+
+### 22.7 Next evidence required
+
+1. Inspect the complete `QueryDisplacements.cs` implementation, especially `CopyAndCreateDisplacements`, `CopyDisplacements`, `MaxRange`, and `QueryWaves`, to map the three GPU buffers to query channels and physical axes.
+2. Extract all `DisplacementCopy`, `SlopeCopy`, and foam/Jacobian shader variants and map their pass indices to the C# call sites, including the special displacement pass 4.
+3. Trace the Jacobian buffer's initialization, sampling, copy, and foam-map consumer path; Output 6 only shows its allocation.
+4. Inspect the full `ReadFromGPU()` implementation and ComputeBuffer read shader to establish the 12-byte element layout and readback semantics.
+5. Match `Spectrum23` binding and `GridSizes` usage against the relevant init shader variants/passes; the displayed PID 154/176/159 GLSL excerpt alone does not establish every pass's sampler usage.
+
+**Evidence boundary:** Output 6 establishes concrete GPU buffer allocation, ping-pong behavior, temporary and persistent render-texture descriptors, init-material property bindings, and displacement/slope routing. It does not yet establish exact channel-to-world-axis semantics, Jacobian-to-foam flow, or GPU readback layout.
+
+## 23. Raw Output 6 archive
+
+- [Output 6](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%206) — original terminal output containing the GPU buffer classes, WaveSpectrum call sites, and render-texture descriptors.
