@@ -582,3 +582,108 @@ This is **not proof** that either component's `fourierSdr` field references Shad
 
 **Evidence boundary:** Output 2 confirms the CPU/GPU butterfly FFT structures and the eight-pass Fourier shader asset. It does not yet provide the shader's arithmetic or prove which serialized component assigns it to `fourierSdr`.
 
+
+
+---
+
+## 16. Fourier task, spectrum initialization, and shader-reference audit — Output 3
+
+Source record: [Output 3 at commit `99eaa324e40cf9bc4fbc3be4727c476c32fa2470`](https://github.com/minnya09796592452-rgb/Full-Sources/tree/99eaa324e40cf9bc4fbc3be4727c476c32fa2470/Output%203)
+
+### 16.1 FourierTask — CPU execution and result packing
+
+The displayed `FourierTask.cs` confirms:
+
+- It is a threaded task and accepts a `WaveSpectrumBufferCPU`, `FourierCPU`, buffer index, and grid count.
+- It obtains the selected buffer's data arrays, result pixels, Texture2D map, and `doublePacked` flag.
+- `Run()` calls `PerformSingleFourier()`; the transform selects `PeformFFT_SinglePacked` or `PeformFFT_DoublePacked` according to `doublePacked`.
+- A non-cancelled transform is required to finish in read-buffer index 1; otherwise it throws an exception.
+- `End()` uploads results using `SetPixels()` and `Apply()`.
+- `ProcessData()` maps Vector4 components into Color channels and writes displacement data for 1–4 grids. The write pattern differs by buffer index and grid count, with horizontal/vertical displacement contributions accumulated into the interpolated displacement arrays.
+
+**Source anomaly to re-check:** the constructor checks `m_index == -1` before assigning `m_index = index`. That means the check observes the field's initial/default value rather than the constructor argument. Record this as a decompiled-code observation; verify against the original assembly/IL before treating it as an intentional guard or behavior.
+
+### 16.2 InitSpectrumDisplacementsTask — confirmed initialization math
+
+The displayed source confirms:
+
+- The task captures `NumGrids`, `Size`, `SpectrumType`, `TimeValue`, and the CPU displacement buffer from the supplied condition.
+- It allocates spectrum arrays and a frequency/time table, with the second spectrum array allocated when more than two grids are used.
+- It obtains three read buffers and configures each buffer's `doublePacked` mode according to the number of grids.
+- When `condition.LastUpdated` changes, it copies the condition's `SpectrumData01`, `SpectrumData23`, and `WTableData` into the task's local arrays.
+- The task dispatches to separate initialization routines for one, two, three, or four grids.
+- For each grid cell, normalized coordinates are converted to signed wrapped coordinates using the 0.5 threshold; the mirrored index is `(size-j)%size + ((size-i)%size)*size`.
+- The initialization combines paired spectrum coefficients with time-dependent cosine/sine terms. Multi-grid paths pack multiple complex components into Vector4 channels.
+- The `CreateKTables()` method builds per-grid wave-vector tables from signed grid coordinates and inverse grid sizes, and stores reciprocal wave-number magnitude (zero when magnitude is zero).
+- The shown displacement-related terms multiply the complex result by wave-vector components and reciprocal magnitude to construct directional components.
+
+**Not yet established:** full mathematical interpretation of each packed channel, exact physical units, spectrum source selection, and parity of every 1–4 grid branch. Those require tracing all task callers and the corresponding shader/data consumers.
+
+### 16.3 Ceto/Fourier shader — program metadata and symbols
+
+The UnityPy parse of `sharedassets0.assets` path ID 178 reports eight fragment subprogram entries:
+
+- Pass 0 → BlobIndex 1
+- Pass 1 → BlobIndex 2
+- Pass 2 → BlobIndex 3
+- Pass 3 → BlobIndex 4
+- Pass 4 → BlobIndex 5
+- Pass 5 → BlobIndex 6
+- Pass 6 → BlobIndex 7
+- Pass 7 → BlobIndex 8
+
+All eight entries report `m_GpuProgramType = 17` in the extraction output. The raw Shader object also contains these embedded symbols: `Ceto_ButterFlyLookUp`, `Ceto_ReadBuffer0`, `Ceto_ReadBuffer1`, `Ceto_ReadBuffer2`, and `Ceto_ReadBuffer3`.
+
+This strengthens the link between the eight FourierGPU passes and the shader's four read-buffer inputs plus butterfly lookup. It still does **not** reveal the actual GPU instruction/program arithmetic, transform sign, or normalization. Blob indices are metadata, not decoded shader source.
+
+### 16.4 Exact serialized PPtr matches — verified references, field semantics pending
+
+The revised scan checks the serialized PPtr byte pattern using both file ID and path ID, and reports these MonoBehaviour references to Shader path ID 178:
+
+| Asset file | MonoBehaviour path ID | File ID | Shader path ID |
+|---|---:|---:|---:|
+| `level0` | 313 | 2 | 178 |
+| `level2` | 271 | 4 | 178 |
+| `level3` | 1250 | 3 | 178 |
+| `level4` | 5585 | 3 | 178 |
+
+These are exact serialized PPtr-pattern matches to the external Shader object, unlike the earlier raw int32 search. However, the output does not decode the MonoBehaviour type/field name or prove that the PPtr occupies the specific `fourierSdr` field. The component type and serialized field layout must still be parsed to establish that semantic assignment.
+
+### 16.5 Updated verification status
+
+| Area | Status |
+|---|---|
+| FourierTask CPU call selection | Confirmed: single/double packed selected by buffer flag |
+| FourierTask output buffer expectation | Confirmed: expects final index 1 when not cancelled |
+| FourierTask displacement channel writes | Visible for 1–4 grid cases; full channel semantics still need mapping |
+| InitSpectrumDisplacementsTask time evolution | Cosine/sine combination of paired spectrum coefficients confirmed |
+| Signed wrapped grid coordinates and mirrored index | Confirmed in displayed code |
+| Per-grid wave-vector tables | Confirmed; reciprocal magnitude stored |
+| Fourier shader subprogram count | Eight entries, BlobIndex 1–8 |
+| Fourier shader embedded symbols | Butterfly lookup and four read-buffer symbols found |
+| Serialized references to Shader PID 178 | Exact PPtr-pattern matches in level0/2/3/4 MonoBehaviours |
+| PPtr field identified as `fourierSdr` | Not yet proven; component/field parsing required |
+| Shader arithmetic, transform direction, normalization | Not yet recovered |
+| Runtime CPU/GPU selection | Not yet verified |
+
+### 16.6 Next evidence required
+
+1. Decode the four referenced MonoBehaviour objects' script/type identity and serialized fields; establish whether the PPtr to path ID 178 is specifically `fourierSdr`.
+2. Decode the eight GPU program blobs for `Ceto/Fourier` and map each program to the corresponding pass and buffer count.
+3. Trace `SpectrumTask` and all callers of `InitSpectrumDisplacementsTask` and `FourierTask`, including scheduling, reset, cancellation, and buffer-index transitions.
+4. Build an explicit channel map for 1-, 2-, 3-, and 4-grid output, connecting `ProcessData()` to the later displacement texture and ocean shader consumers.
+5. Verify the apparent `FourierTask` constructor guard against original IL because the field is checked before the argument is assigned.
+
+**Evidence boundary:** Output 3 adds concrete CPU task and spectrum-initialization behavior, eight Fourier GPU program metadata entries, and exact PPtr-pattern matches to Shader PID 178. It does not yet prove the serialized field name, decode shader arithmetic, or establish the runtime-selected CPU/GPU route.
+
+---
+
+## 17. Raw extraction output archive
+
+The original root-level output files have been collected under [`Outputs/`](https://github.com/minnya09796592452-rgb/Full-Sources/tree/main/Outputs) so later extraction records stay grouped and easy for scripts to consume:
+
+- [Output 1](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%201.txt)
+- [Output 2](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%202.txt)
+- [Output 3](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%203.txt)
+
+These are raw terminal-output records; the README sections above are the human-readable audit. Keep future raw outputs in `Outputs/Output N.txt` and continue appending verified findings here.
