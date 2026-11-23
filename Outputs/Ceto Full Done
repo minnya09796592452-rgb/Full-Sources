@@ -929,3 +929,147 @@ root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN="/stor
 - **Shader PPtrs (`FileID=4` -> `sharedassets0.assets`):** `176` (`InitDisplacement`), `154` (`InitSlope`), `159` (`InitJacobians`), `178` (`Fourier`), `147` (`SlopeCopy`), `181` (`DisplacementCopy`), `150` (`FoamCopy`), `186` (`Read` ComputeShader).                                                                - **Surface Shader Proof:** Across all `Ceto/` shaders in `sharedassets0.assets`, `OceanTopSide_Transparent` (`pid=175`) and `OceanUnderSide_Transparent` (`pid=143`) sample `Ceto_DisplacementMap0..2` in Vertex (`VertBlob=330 (`Ceto_DisplacementMap0..2`), FragBlob=502 (`Ceto_DisplacementMap0..2`) for Keywords `CETO_REFLECTION_ON`, `CETO_UNDERWATER_ON`, `CETO_USE_OCEAN_DEPTHS_BUFFER`, `CETO_USE_4_SPECTRUM_GRIDS`, `DIRECTIONAL`.                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# sed -i 's/in Vertex (`VertBlob=330 (`Ceto_DisplacementMap0..2`),/in Vertex (VertBlob=330 [`Ceto_DisplacementMap0..2`],/' "$CLEAN/CETO_OCEAN_VERIFICATION_RECORD.md" && sed -i 's/FragBlob=502 (`Ceto_DisplacementMap0..2`)/FragBlob=502 [`Ceto_DisplacementMap0..2`])/' "$CLEAN/CETO_OCEAN_VERIFICATION_RECORD.md" && tail -n 3 "$CLEAN/CETO_OCEAN_VERIFICATION_RECORD.md"                                         - `choppyness = Vector4(0.8, 1.1, 0.5, 1.0)`
 - **Shader PPtrs (`FileID=4` -> `sharedassets0.assets`):** `176` (`InitDisplacement`), `154` (`InitSlope`), `159` (`InitJacobians`), `178` (`Fourier`), `147` (`SlopeCopy`), `181` (`DisplacementCopy`), `150` (`FoamCopy`), `186` (`Read` ComputeShader).
 - **Surface Shader Proof:** Across all `Ceto/` shaders in `sharedassets0.assets`, `OceanTopSide_Transparent` (`pid=175`) and `OceanUnderSide_Transparent` (`pid=143`) sample `Ceto_DisplacementMap0..2` in Vertex (VertBlob=330 [`Ceto_DisplacementMap0..2`], FragBlob=502 [`Ceto_DisplacementMap0..2`]) for Keywords `CETO_REFLECTION_ON`, `CETO_UNDERWATER_ON`, `CETO_USE_OCEAN_DEPTHS_BUFFER`, `CETO_USE_4_SPECTRUM_GRIDS`, `DIRECTIONAL`.                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-----------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. DISPLACEMENTBUFFERCPU.CS VS DISPLACEMENTBUFFERGPU.CS ==="
+=== 1. DISPLACEMENTBUFFERCPU.CS VS DISPLACEMENTBUFFERGPU.CS ===                                                                                              root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CETO/DisplacementBufferCPU.cs"
+     1  using System.Collections.Generic;                                                                                                                         2  using Ceto.Common.Containers.Interpolation;
+     3  using Ceto.Common.Threading.Scheduling;                                                                                                                   4  using UnityEngine;
+     5                                                                                                                                                            6  namespace Ceto;
+     7                                                                                                                                                            8  public class DisplacementBufferCPU : WaveSpectrumBufferCPU, IDisplacementBuffer
+     9  {                                                                                                                                                        10          private const int NUM_BUFFERS = 3;
+    11                                                                                                                                                           12          private IList<InterpolatedArray2f[]> m_displacements;
+    13
+    14          public DisplacementBufferCPU(int size, Scheduler scheduler)
+    15                  : base(size, 3, scheduler)
+    16          {
+    17                  int gRIDS = QueryDisplacements.GRIDS;
+    18                  int cHANNELS = QueryDisplacements.CHANNELS;
+    19                  m_displacements = new List<InterpolatedArray2f[]>(2);
+    20                  m_displacements.Add(new InterpolatedArray2f[gRIDS]);
+    21                  m_displacements.Add(new InterpolatedArray2f[gRIDS]);
+    22                  for (int i = 0; i < gRIDS; i++)
+    23                  {
+    24                          m_displacements[0][i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+    25                          m_displacements[1][i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+    26                  }
+    27          }
+    28
+    29          protected override void Initilize(WaveSpectrumCondition condition, float time)
+    30          {
+    31                  InterpolatedArray2f[] writeDisplacements = GetWriteDisplacements();
+    32                  writeDisplacements[0].Clear();
+    33                  writeDisplacements[1].Clear();
+    34                  writeDisplacements[2].Clear();
+    35                  writeDisplacements[3].Clear();
+    36                  if (m_initTask == null)
+    37                  {
+    38                          m_initTask = condition.GetInitSpectrumDisplacementsTask(this, time);
+    39                  }
+    40                  else if (m_initTask.SpectrumType != condition.Key.SpectrumType || m_initTask.NumGrids != condition.Key.NumGrids)
+    41                  {
+    42                          m_initTask = condition.GetInitSpectrumDisplacementsTask(this, time);                                                             43                  }
+    44                  else
+    45                  {
+    46                          m_initTask.Reset(condition, time);
+    47                  }
+    48          }
+    49
+    50          public InterpolatedArray2f[] GetWriteDisplacements()                                                                                             51          {
+    52                  return m_displacements[0];
+    53          }
+    54
+    55          public InterpolatedArray2f[] GetReadDisplacements()
+    56          {
+    57                  return m_displacements[1];
+    58          }
+    59                                                                                                                                                           60          public override void Run(WaveSpectrumCondition condition, float time)
+    61          {
+    62                  SwapDisplacements();
+    63                  base.Run(condition, time);
+    64          }
+    65
+    66          public void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements)
+    67          {                                                                                                                                                68                  QueryDisplacements.CopyAndCreateDisplacements(GetReadDisplacements(), out displacements);
+    69          }
+    70
+    71          public void CopyDisplacements(IList<InterpolatedArray2f> displacements)
+    72          {                                                                                                                                                73                  QueryDisplacements.CopyDisplacements(GetReadDisplacements(), displacements);                                                             74          }
+    75                                                                                                                                                           76          private void SwapDisplacements()
+    77          {                                                                                                                                                78                  InterpolatedArray2f[] value = m_displacements[0];
+    79                  m_displacements[0] = m_displacements[1];                                                                                                 80                  m_displacements[1] = value;
+    81          }                                                                                                                                                82
+    83          public Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale)                                                                                   84          {
+    85                  return QueryDisplacements.MaxRange(GetReadDisplacements(), choppyness, gridScale, null);                                                 86          }
+    87                                                                                                                                                           88          public void QueryWaves(WaveQuery query, QueryGridScaling scaling)
+    89          {                                                                                                                                                90                  int num = EnabledBuffers();
+    91                  if (num != 0)                                                                                                                            92                  {
+    93                          InterpolatedArray2f[] readDisplacements = GetReadDisplacements();                                                                94                          QueryDisplacements.QueryWaves(query, num, readDisplacements, scaling);
+    95                  }                                                                                                                                        96          }
+    97  }                                                                                                                                                    root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "---------------------------------------------------------------"
+---------------------------------------------------------------                                                                                              root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CETO/DisplacementBufferGPU.cs"
+     1  using System.Collections.Generic;                                                                                                                         2  using Ceto.Common.Containers.Interpolation;
+     3  using UnityEngine;                                                                                                                                        4
+     5  namespace Ceto;                                                                                                                                           6
+     7  public class DisplacementBufferGPU : WaveSpectrumBufferGPU, IDisplacementBuffer                                                                           8  {
+     9          private static readonly int NUM_BUFFERS = 3;                                                                                                     10
+    11          private InterpolatedArray2f[] m_displacements;
+    12
+    13          public DisplacementBufferGPU(int size, Shader fourierSdr)
+    14                  : base(size, fourierSdr, NUM_BUFFERS)
+    15          {
+    16                  int gRIDS = QueryDisplacements.GRIDS;                                                                                                    17                  int cHANNELS = QueryDisplacements.CHANNELS;
+    18                  m_displacements = new InterpolatedArray2f[gRIDS];                                                                                        19                  for (int i = 0; i < gRIDS; i++)
+    20                  {
+    21                          m_displacements[i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+    22                  }
+    23          }
+    24
+    25          public InterpolatedArray2f[] GetReadDisplacements()
+    26          {
+    27                  return m_displacements;
+    28          }                                                                                                                                                29
+    30          public void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements)
+    31          {
+    32                  QueryDisplacements.CopyAndCreateDisplacements(m_displacements, out displacements);
+    33          }
+    34
+    35          public void CopyDisplacements(IList<InterpolatedArray2f> displacements)
+    36          {
+    37                  QueryDisplacements.CopyDisplacements(m_displacements, displacements);
+    38          }
+    39
+    40          public Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale)                                                                                   41          {
+    42                  return QueryDisplacements.MaxRange(m_displacements, choppyness, gridScale, null);                                                        43          }                                                                                                                                                44
+    45          public void QueryWaves(WaveQuery query, QueryGridScaling scaling)
+    46          {
+    47                  int num = EnabledBuffers();
+    48                  if (num != 0)
+    49                  {
+    50                          QueryDisplacements.QueryWaves(query, num, m_displacements, scaling);
+    51                  }                                                                                                                                        52          }                                                                                                                                                53  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. SCAN ALL 18 CETO SHADERS IN SHAREDASSETS0 FOR Ceto_DisplacementMap3 ==="
+=== 2. SCAN ALL 18 CETO SHADERS IN SHAREDASSETS0 FOR Ceto_DisplacementMap3 ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re                                                                                                                              > from pathlib import Path
+>                                                                                                                                                            > data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))                                                                                                  >
+> found_any = False                                                                                                                                          > for obj in e0.objects:
+>     if obj.type.name == "Shader":                                                                                                                          >         sh = obj.read()
+>         pf = getattr(sh, "m_ParsedForm", None)                                                                                                             >         name = getattr(pf, "m_Name", "") if pf else ""
+>         if "Ceto/" in name and 15 in list(sh.platforms):                                                                                                   >             p_idx = list(sh.platforms).index(15)
+>             off, clen, dlen = sum(sh.offsets[p_idx]), sum(sh.compressedLengths[p_idx]), sum(sh.decompressedLengths[p_idx])                                 >             dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")
+>             hits = re.findall(r".*Ceto_DisplacementMap3.*", dec)                                                                                           >             if hits:
+>                 found_any = True                                                                                                                           >                 print(f"[FOUND Map3] {name} (pid={obj.path_id}): {len(hits)} hits -> {hits[:3]}")
+> if not found_any:                                                                                                                                          >     print("[PROOF] 0 hits across ALL Ceto/ shaders in sharedassets0.assets — Ceto_DisplacementMap3 is NEVER sampled in any compiled shader!")
+> EOF                                                                                                                                                        [PROOF] 0 hits across ALL Ceto/ shaders in sharedassets0.assets — Ceto_DisplacementMap3 is NEVER sampled in any compiled shader!                             root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"       root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' >> "$CLEAN/CETO_OCEAN_VERIFICATION_RECORD.md"
+> - **CPU vs GPU Path & Map3 Exhaustive Proof:** `DisplacementBufferCPU` double-buffers `InterpolatedArray2f[4]` and populates all 4 grids via `InitSpectrumDisplacementsTask`, whereas `DisplacementBufferGPU` only receives GPU readback for `m_displacements[0..2]` (`m_displacements[3]` remains `0.0f`). Exhaustive scan of all 18 `Ceto/` shaders in `sharedassets0.assets` confirms **0 references** to `Ceto_DisplacementMap3` (`Map0..2` max).                                > EOF
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# tail -n 4 "$CLEAN/CETO_OCEAN_VERIFICATION_RECORD.md"                                     - `choppyness = Vector4(0.8, 1.1, 0.5, 1.0)`
+- **Shader PPtrs (`FileID=4` -> `sharedassets0.assets`):** `176` (`InitDisplacement`), `154` (`InitSlope`), `159` (`InitJacobians`), `178` (`Fourier`), `147` (`SlopeCopy`), `181` (`DisplacementCopy`), `150` (`FoamCopy`), `186` (`Read` ComputeShader).
+- **Surface Shader Proof:** Across all `Ceto/` shaders in `sharedassets0.assets`, `OceanTopSide_Transparent` (`pid=175`) and `OceanUnderSide_Transparent` (`pid=143`) sample `Ceto_DisplacementMap0..2` in Vertex (VertBlob=330 [`Ceto_DisplacementMap0..2`], FragBlob=502 [`Ceto_DisplacementMap0..2`]) for Keywords `CETO_REFLECTION_ON`, `CETO_UNDERWATER_ON`, `CETO_USE_OCEAN_DEPTHS_BUFFER`, `CETO_USE_4_SPECTRUM_GRIDS`, `DIRECTIONAL`.                                          - **CPU vs GPU Path & Map3 Exhaustive Proof:** `DisplacementBufferCPU` double-buffers `InterpolatedArray2f[4]` and populates all 4 grids via `InitSpectrumDisplacementsTask`, whereas `DisplacementBufferGPU` only receives GPU readback for `m_displacements[0..2]` (`m_displacements[3]` remains `0.0f`). Exhaustive scan of all 18 `Ceto/` shaders in `sharedassets0.assets` confirms **0 references** to `Ceto_DisplacementMap3` (`Map0..2` max).
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-------
