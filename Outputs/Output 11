@@ -1,0 +1,117 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# tail -n 55 "$CLEAN_OUT/CSharp_Scripts/Ceto/QueryDisplacements.cs"
+                                        }
+                                }
+                        }
+                }
+                Vector4 zero = Vector4.zero;
+                for (int l = 0; l < gRIDS2; l++)
+                {
+                        zero.x += Mathf.Max(array[l].x, Mathf.Abs(array2[l].x)) * choppyness[l];
+                        zero.y += Mathf.Max(array[l].y, Mathf.Abs(array2[l].y));
+                        zero.z += Mathf.Max(array[l].z, Mathf.Abs(array2[l].z)) * choppyness[l];
+                }
+                zero.x *= gridScale.x;
+                zero.y *= gridScale.y;
+                zero.z *= gridScale.x;
+                return zero;
+        }
+
+        public static void CopyAndCreateDisplacements(IList<InterpolatedArray2f> source, out IList<InterpolatedArray2f> des)
+        {
+                if (source.Count != GRIDS)
+                {
+                        int gRIDS = GRIDS;
+                        throw new InvalidOperationException("Query Displacements requires a displacement buffer for each of the " + gRIDS + " grids.");
+                }
+                if (source[0].Channels != CHANNELS)
+                {
+                        int gRIDS = CHANNELS;
+                        throw new InvalidOperationException("Query Displacements requires displacement buffers have " + gRIDS + " channels.");
+                }
+                int sX = source[0].SX;
+                des = new InterpolatedArray2f[GRIDS];
+                des[0] = new InterpolatedArray2f(source[0].Data, sX, sX, CHANNELS, wrap: true);
+                des[1] = new InterpolatedArray2f(source[1].Data, sX, sX, CHANNELS, wrap: true);
+                des[2] = new InterpolatedArray2f(source[2].Data, sX, sX, CHANNELS, wrap: true);
+                des[3] = new InterpolatedArray2f(source[3].Data, sX, sX, CHANNELS, wrap: true);
+        }
+
+        public static void CopyDisplacements(IList<InterpolatedArray2f> source, IList<InterpolatedArray2f> des)
+        {
+                if (source.Count != GRIDS)
+                {
+                        int gRIDS = GRIDS;
+                        throw new InvalidOperationException("Query Displacements requires a displacement buffer for each of the " + gRIDS + " grids.");
+                }
+                if (source[0].Channels != CHANNELS)
+                {
+                        int gRIDS = CHANNELS;
+                        throw new InvalidOperationException("Query Displacements requires displacement buffers have " + gRIDS + " channels.");
+                }
+                des[0].Copy(source[0].Data);
+                des[1].Copy(source[1].Data);
+                des[2].Copy(source[2].Data);
+                des[3].Copy(source[3].Data);
+        }
+}
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. COMPUTESHADER PID 186 (READ) KERNELS & SHADER PASS ORDERING ==="
+=== 2. COMPUTESHADER PID 186 (READ) KERNELS & SHADER PASS ORDERING ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, struct, re
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> # 1) Inspect ComputeShader PID 186
+> cs_obj = next(o for o in e0.objects if o.path_id == 186)
+> raw_cs = cs_obj.get_raw_data()
+> cs_tree = cs_obj.read_typetree()
+> print("ComputeShader Name:", cs_tree.get("m_Name"))
+> for vi, v in enumerate(cs_tree.get("variants", [])):
+>     print(f"Variant[{vi}] TargetRenderer={v.get('m_TargetRenderer')}, Kernels={len(v.get('m_Kernels', []))}")
+>     for ki, k in enumerate(v.get("m_Kernels", [])):
+>         cbs = [(cb.get("name"), cb.get("byteSize"), [(p.get("name"), p.get("offset"), p.get("cols")) for p in cb.get("params", [])]) for cb in k.get("cbs", [])]
+>         ins = [(b.get("name"), b.get("index")) for b in k.get("inBuffers", [])]
+>         outs = [(b.get("name"), b.get("index")) for b in k.get("outBuffers", [])]
+>         code = bytes(k.get("code", []))
+>         print(f"  Kernel[{ki}] '{k.get('name')}' threads={k.get('threadGroupSize')} code={len(code)}B | in={ins} out={outs} cbs={cbs}")
+>
+> # 2) Verify Shader Serialized Pass Ordering (BlobIndex per Pass)
+> for pid in (178, 181, 150):
+>     sh = next(o.read() for o in e0.objects if o.path_id == pid)
+>     pf = sh.m_ParsedForm
+>     print(f"\nShader '{pf.m_Name}' (pid={pid}) Pass Ordering:")
+>     for pi, ps in enumerate(pf.m_SubShaders[0].m_Passes):
+>         vp = ps.progVertex.m_SubPrograms[0].m_BlobIndex if ps.progVertex.m_SubPrograms else -1
+>         fp = ps.progFragment.m_SubPrograms[0].m_BlobIndex if ps.progFragment.m_SubPrograms else -1
+>         print(f"  Serialized Pass[{pi}] -> VertexBlobIdx={vp}, FragmentBlobIdx={fp}")
+> EOF
+ComputeShader Name: Read
+Variant[0] TargetRenderer=None, Kernels=0
+Variant[1] TargetRenderer=None, Kernels=0
+
+Shader 'Ceto/Fourier' (pid=178) Pass Ordering:
+  Serialized Pass[0] -> VertexBlobIdx=0, FragmentBlobIdx=1
+  Serialized Pass[1] -> VertexBlobIdx=0, FragmentBlobIdx=2
+  Serialized Pass[2] -> VertexBlobIdx=0, FragmentBlobIdx=3
+  Serialized Pass[3] -> VertexBlobIdx=0, FragmentBlobIdx=4
+  Serialized Pass[4] -> VertexBlobIdx=0, FragmentBlobIdx=5
+  Serialized Pass[5] -> VertexBlobIdx=0, FragmentBlobIdx=6
+  Serialized Pass[6] -> VertexBlobIdx=0, FragmentBlobIdx=7
+  Serialized Pass[7] -> VertexBlobIdx=0, FragmentBlobIdx=8
+
+Shader 'Ceto/DisplacementCopy' (pid=181) Pass Ordering:
+  Serialized Pass[0] -> VertexBlobIdx=0, FragmentBlobIdx=1
+  Serialized Pass[1] -> VertexBlobIdx=0, FragmentBlobIdx=2
+  Serialized Pass[2] -> VertexBlobIdx=0, FragmentBlobIdx=3
+  Serialized Pass[3] -> VertexBlobIdx=0, FragmentBlobIdx=4
+  Serialized Pass[4] -> VertexBlobIdx=0, FragmentBlobIdx=5
+
+Shader 'Ceto/FoamCopy' (pid=150) Pass Ordering:
+  Serialized Pass[0] -> VertexBlobIdx=0, FragmentBlobIdx=1
+  Serialized Pass[1] -> VertexBlobIdx=0, FragmentBlobIdx=2
+  Serialized Pass[2] -> VertexBlobIdx=0, FragmentBlobIdx=3
+  Serialized Pass[3] -> VertexBlobIdx=0, FragmentBlobIdx=4
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
