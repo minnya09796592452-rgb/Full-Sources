@@ -3116,3 +3116,68 @@ Output30 ရဲ့ `m_KeywordIndices` mapping က အရင်ထက် မှ�
 မင်းချောတယ်။ ဒါပေမဲ့ အရေးကြီးတာက ဒီတစ်ခါ အလုပ်ကလည်း တကယ်တိုးတက်လာတယ်။
 
 ---------
+
+Worked for 14s
+
+ရပြီဗျာ 🤝💪 ဒီတစ်ခါ Output က Ceto Ocean Surface Shader ကို 3-Grid နဲ့ 4-Grid အခြေအနေခွဲပြီး စစ်ထားတာဖြစ်လို့ အရေးကြီးတယ်။
+
+ဖတ်လို့ရတဲ့အပိုင်းအပေါ် အခြေခံပြီး အချက်တွေကို ခွဲပြမယ်။
+
+### 1\. Runtime Keyword ပြောင်းလဲမှု — CONFIRMED
+
+C# Source ထဲမှာ တကယ်ခေါ်ထားတဲ့ Keyword တွေကို တွေ့ရတယ်။
+
+* `WaveSpectrum.cs` — `CETO_USE_4_SPECTRUM_GRIDS`
+
+* `PlanarReflection.cs` — `CETO_REFLECTION_ON`
+
+* `UnderWater.cs` — `CETO_UNDERWATER_ON`, `CETO_USE_OCEAN_DEPTHS_BUFFER`
+
+အရေးကြီးတာက `CETO_USE_4_SPECTRUM_GRIDS` ကို WaveSpectrum က Enable/Disable လုပ်တဲ့နေရာရှိတယ်။ ဒါကြောင့် Shader ရွေးချယ်မှုမှာ ဒီ Keyword ဟာ တကယ့် C# Runtime Control နဲ့ ချိတ်ဆက်နေတယ်။
+
+### 2\. 3-Grid Shader — အထောက်အထားရပြီ
+
+EXTRACTION CONFIRMED
+
+TopSide PID175 နဲ့ UnderSide PID143 နှစ်ခုလုံးမှာ—
+
+| Shader Stage | Blob Index | Sample                 |
+| ------------ | ---------- | ---------------------- |
+| Vertex       | 44         | DisplacementMap0, 1, 2 |
+| Fragment     | 372        | DisplacementMap0, 1    |
+
+KeywordIndices က `[6, 13]` ဖြစ်တယ်။
+
+ဒီအချက်က 3-Grid အတွက် Vertex Shader က Displacement Map သုံးခုကို တကယ် Sample လုပ်ထားတဲ့ Source ရလာပြီဆိုတာ အတည်ပြုတယ်။
+
+### 3\. 4-Grid Extraction — သတိထားရမယ့်အချက်
+
+Script မှာ `Ceto_DisplacementMap3` ကို Sample လုပ်တဲ့ Vertex Shader ကို ရှာပြီး 4-Grid Variant အဖြစ်ရွေးဖို့ ကြိုးစားထားတယ်။
+
+ဒါပေမဲ့ Code ထဲမှာ Fragment SubProgram ရွေးတဲ့နေရာမှာ ပြဿနာရှိတယ်။
+
+```python
+matching_f["m_BlobIndex"]
+```
+
+`matching_f` က List ဖြစ်လို့ ဒီပုံစံနဲ့ `m_BlobIndex` ကို တိုက်ရိုက်ဖတ်လို့မရဘူး။ ထို့အပြင် fallback ဖြစ်တဲ့ `frag_sps["m_BlobIndex"]` မှာလည်း အလားတူ List ကို Dictionary လို သုံးထားတယ်။
+
+ဒါကြောင့် 4-Grid extraction ရဲ့ `[SAVED]` ရလဒ်ကို မတွေ့ရသေးသရွေ့ အောင်မြင်တယ်လို့ မသတ်မှတ်နိုင်ဘူး။
+
+### 4\. လက်ရှိ Source အခြေအနေ
+
+* TopSide / UnderSide GLSL အပြည့်အစုံ — 11 MB စီ သိမ်းထားတယ်။
+
+* 3-Grid Verified GLSL — နှစ်ခုလုံး ထွက်လာတယ်။
+
+* Runtime Keyword C# Control — တွေ့ရှိပြီး။
+
+* 4-Grid Vertex Variant — ဒီ Output မှာ ပြထားတဲ့အပိုင်းအရ မအတည်ပြုနိုင်သေး။
+
+* 4-Grid Fragment Variant — မအတည်ပြုနိုင်သေး။
+
+နောက်တစ်ဆင့်မှာ လိုတာက 4-Grid extraction ရဲ့ နောက်ဆုံး output ပဲ။ အထူးသဖြင့် `VERIFIED 4-GRID VARIANT`, `Fragment Samples` နဲ့ `[SAVED]` ရလဒ်တွေကို ကြည့်ရမယ်။
+
+ဒီတစ်ခါတော့ Shader ရဲ့ Keyword → Vertex → Fragment လမ်းကြောင်းကို ပိုနီးစပ်လာပြီဗျာ။ 🤝💪
+
+---------
