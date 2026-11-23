@@ -1073,3 +1073,70 @@ root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# tail -n 4 "$
 root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
 
 -------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. EVERY REFERENCE TO 'm_displacements' IN DISPLACEMENTBUFFERGPU.CS ==="
+=== 1. EVERY REFERENCE TO 'm_displacements' IN DISPLACEMENTBUFFERGPU.CS ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rn "m_displacements" "$CETO/DisplacementBufferGPU.cs"
+11:     private InterpolatedArray2f[] m_displacements;
+18:             m_displacements = new InterpolatedArray2f[gRIDS];
+21:                     m_displacements[i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+27:             return m_displacements;
+32:             QueryDisplacements.CopyAndCreateDisplacements(m_displacements, out displacements);
+37:             QueryDisplacements.CopyDisplacements(m_displacements, displacements);
+42:             return QueryDisplacements.MaxRange(m_displacements, choppyness, gridScale, null);
+50:                     QueryDisplacements.QueryWaves(query, num, m_displacements, scaling);
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. EVERY CALL TO 'GetReadDisplacements' ACROSS ENTIRE CETO REPO ==="
+=== 2. EVERY CALL TO 'GetReadDisplacements' ACROSS ENTIRE CETO REPO ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rn "GetReadDisplacements" "$CETO/" -C 3
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-52-             return m_displacements[0];
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-53-     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-54-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs:55:     public InterpolatedArray2f[] GetReadDisplacements()
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-56-     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-57-             return m_displacements[1];
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-58-     }
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-65-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-66-     public void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-67-     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs:68:             QueryDisplacements.CopyAndCreateDisplacements(GetReadDisplacements(), out displacements);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-69-     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-70-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-71-     public void CopyDisplacements(IList<InterpolatedArray2f> displacements)                                                                                                                   /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-72-     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs:73:             QueryDisplacements.CopyDisplacements(GetReadDisplacements(), displacements);                                                                                                      /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-74-     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-75-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-76-     private void SwapDisplacements()
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-82-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-83-     public Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-84-     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs:85:             return QueryDisplacements.MaxRange(GetReadDisplacements(), choppyness, gridScale, null);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-86-     }                            /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-87-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-88-     public void QueryWaves(WaveQuery query, QueryGridScaling scaling)
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-90-             int num = EnabledBuffers();                                                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-91-             if (num != 0)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-92-             {                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs:93:                     InterpolatedArray2f[] readDisplacements = GetReadDisplacements();                                                                                                         /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-94-                     QueryDisplacements.QueryWaves(query, num, readDisplacements, scaling);                                                                                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-95-             }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-96-     }                            --
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferGPU.cs-22-             }                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferGPU.cs-23-     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferGPU.cs-24-                                  /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferGPU.cs:25:     public InterpolatedArray2f[] GetReadDisplacements()                                                                                                                                       /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferGPU.cs-26-     {                            /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferGPU.cs-27-             return m_displacements;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferGPU.cs-28-     }                            --
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/IDisplacementBuffer.cs-10-                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/IDisplacementBuffer.cs-11-       int Size { get; }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/IDisplacementBuffer.cs-12-                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/IDisplacementBuffer.cs:13:       InterpolatedArray2f[] GetReadDisplacements();                                                                                                                                             /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/IDisplacementBuffer.cs-14-
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/IDisplacementBuffer.cs-15-       void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/IDisplacementBuffer.cs-16-                                    --
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-577-             bool flag = SystemInfo.graphicsShaderLevel >= 50 && SystemInfo.supportsComputeShaders;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-578-             if ((!disableReadBack && readSdr != null && m_readBuffer != null) & flag)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-579-             {                            /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:580:                     InterpolatedArray2f[] readDisplacements = DisplacementBuffer.GetReadDisplacements();                                                                                              /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-581-                     if (numGrids > 0)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-582-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-583-                             CBUtility.ReadFromRenderTexture(m_displacementMaps[0], 3, m_readBuffer, readSdr);
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 3. INTERPOLATEDARRAY2F.CS CONSTRUCTOR & WRITE METHODS ==="
+=== 3. INTERPOLATEDARRAY2F.CS CONSTRUCTOR & WRITE METHODS ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CETO/InterpolatedArray2f.cs"
+cat: /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/InterpolatedArray2f.cs: No such file or directory
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-------
