@@ -943,3 +943,83 @@ The output shows allocation of the Jacobian buffer, but does not include the com
 ## 23. Raw Output 6 archive
 
 - [Output 6](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%206) — original terminal output containing the GPU buffer classes, WaveSpectrum call sites, and render-texture descriptors.
+
+
+## 24. Output 7 — displacement, slope, and foam copy shader audit
+
+Source: [Output 7](https://github.com/minnya09796592452-rgb/Full-Sources/blob/224df9603527d9e7fc1b89315ce1e605616d741c/Outputs/Output%207)
+
+### 24.1 Shader assets recovered
+
+The extraction selected three Unity Shader assets from `sharedassets0.assets` and decompressed their platform-15 payloads:
+
+| Shader | Path ID | Extracted fragment variants |
+|---|---:|---:|
+| `Ceto/SlopeCopy` | 147 | 1 |
+| `Ceto/FoamCopy` | 150 | 4 |
+| `Ceto/DisplacementCopy` | 181 | 5 |
+
+These are readable GLSL fragment programs translated from the platform-15 shader payload. The output does not include the corresponding C# call-site excerpt, so the exact pass-index-to-fragment-index mapping must still be cross-checked against `WaveSpectrum.cs` and the shader's serialized pass order.
+
+### 24.2 SlopeCopy — direct texture copy
+
+The single fragment declares `Ceto_SlopeBuffer`, samples it at `vs_TEXCOORD0.xy`, and writes the sampled RGBA value unchanged to `SV_Target0`.
+
+This establishes a direct sample-and-copy shader body. It does not itself perform slope differentiation or smoothing; those operations, if any, occur upstream or in other passes.
+
+### 24.3 DisplacementCopy — explicit channel routing
+
+All five fragments sample one or two source textures and write a four-component destination:
+
+| Fragment | Destination X | Destination Y | Destination Z | Destination W |
+|---:|---|---|---|---|
+| 0 | DisplacementBuffer.x | HeightBuffer.x | DisplacementBuffer.y | 0 |
+| 1 | DisplacementBuffer.z | HeightBuffer.y | DisplacementBuffer.w | 0 |
+| 2 | DisplacementBuffer.x | HeightBuffer.z | DisplacementBuffer.y | 0 |
+| 3 | DisplacementBuffer.z | HeightBuffer.w | DisplacementBuffer.w | 0 |
+| 4 | HeightBuffer.z | HeightBuffer.x | HeightBuffer.w | 0 |
+
+The table records literal GLSL component routing; it deliberately does not assign world-axis names to X/Y/Z or infer which grid each fragment represents. Fragment 4 is structurally distinct: it samples only `Ceto_HeightBuffer` and writes its `z, x, w` components into destination `xyz`.
+
+This output provides the shader-side half of the channel map. To close the mapping, match each fragment to the exact `displacementCopyMat` pass selected for each grid count and then trace the source buffer channels back to their initialization/Fourier producers.
+
+### 24.4 FoamCopy — multi-buffer polynomial combination
+
+All four fragments declare `Ceto_FoamChoppyness` and `Ceto_FoamCoverage`. They sample one, two, or three Jacobian-buffer textures depending on the variant and write a scalar/vector result with unused trailing channels set to zero in the lower-count variants.
+
+- Fragment 0 samples `Ceto_JacobianBuffer0` and combines its `x,y,z` components with the scalar choppyness component and foam coverage. Its final scalar includes a negative squared term derived from the scaled `z` component.
+- Fragment 1 samples Jacobian buffers 0 and 1. It uses choppyness `xy`, combines buffer-0 `xy/zw` lanes, and applies a final negative squared term derived from buffer 1 `xy`.
+- Fragment 2 samples buffers 0, 1, and 2, uses choppyness `xyz`, and writes three result components. Each component combines the corresponding values from the three sampled buffers and a negative squared term from buffer 2.
+- Fragment 3 is the four-component form: it samples buffers 0, 1, and 2, performs component-wise operations using `Ceto_FoamChoppyness`, adds `Ceto_FoamCoverage`, and writes the resulting vec4.
+
+The extracted arithmetic confirms that foam-copy output is built from Jacobian-buffer samples, choppyness, and coverage. It does **not** by itself establish the semantic names of the Jacobian channels or prove the physical interpretation of the resulting scalar/vector as a particular determinant or foam persistence model.
+
+### 24.5 Updated evidence status
+
+| Item | Status after Output 7 |
+|---|---|
+| SlopeCopy fragment body | Confirmed: direct RGBA sample/copy |
+| DisplacementCopy fragment count | Confirmed: five variants |
+| DisplacementCopy source-to-destination component routing | Confirmed literally for fragments 0–4 |
+| Special single-source fragment 4 | Confirmed |
+| FoamCopy fragment count | Confirmed: four variants |
+| FoamCopy Jacobian sampler count | Confirmed: one, two, or three samplers across variants |
+| FoamCopy dependence on choppyness and coverage | Confirmed |
+| Exact pass-index-to-fragment mapping | Not yet cross-verified |
+| Channel-to-world-axis / grid meaning | Not yet verified |
+| Jacobian channel semantics and full foam model | Not yet verified |
+| Slope generation math | Not provided by SlopeCopy; upstream init/generation still needs tracing |
+
+### 24.6 Next evidence required
+
+1. Re-open the complete `WaveSpectrum.cs` copy call sites and map each `displacementCopyMat.SetPass(...)` index to the corresponding shader fragment in the serialized pass order.
+2. Extract the C# foam-copy invocation and map its selected pass to the one-, two-, three-, and four-component FoamCopy variants.
+3. Trace each Jacobian buffer's initialization shader output and Fourier lanes into the exact sampler/channel consumed by FoamCopy.
+4. Join the displacement-copy component routing with `QueryDisplacements.cs` and the ocean shader's displacement-map sampling to assign grid, axis, and channel semantics without guessing.
+5. Inspect any slope-map consumers and smoothing passes separately; the SlopeCopy fragment itself is only a direct copy.
+
+**Evidence boundary:** Output 7 establishes the readable copy-shader arithmetic and explicit component routing. It advances the buffer/channel audit, but does not independently establish pass ordering, world-axis labels, Jacobian semantics, or the complete foam-generation pipeline.
+
+## 25. Raw Output 7 archive
+
+- [Output 7](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%207) — original terminal output containing the platform-15 GLSL fragments for SlopeCopy, FoamCopy, and DisplacementCopy.
