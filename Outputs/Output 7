@@ -1,0 +1,374 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> targets = ("Ceto/DisplacementCopy", "Ceto/SlopeCopy", "Ceto/FoamCopy")
+> for obj in e0.objects:
+>     if obj.type.name == "Shader":
+>         sh = obj.read()
+>         pf = getattr(sh, "m_ParsedForm", None)
+>         name = getattr(pf, "m_Name", "") if pf else ""
+>         if name in targets:
+>             print(f"\n--- {name} (pid={obj.path_id}) ---")
+>             p_idx = list(sh.platforms).index(15)
+>             off = sh.offsets[p_idx][0]
+>             clen = sh.compressedLengths[p_idx][0]
+>             dlen = sh.decompressedLengths[p_idx][0]
+>             dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")
+>             frags = [s for s in re.findall(r"(#version[\s\S]*?\n\})", dec) if "SV_Target" in s or "gl_FragData" in s]
+>             for fi, f in enumerate(frags):
+>                 print(f"[Frag {fi}]\n{f.strip()}")
+> EOF
+
+--- Ceto/SlopeCopy (pid=147) ---
+[Frag 0]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_SlopeBuffer;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+void main()
+{
+    SV_Target0 = texture(Ceto_SlopeBuffer, vs_TEXCOORD0.xy);
+    return;
+}
+
+--- Ceto/FoamCopy (pid=150) ---
+[Frag 0]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_FoamChoppyness;
+uniform         float Ceto_FoamCoverage;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_JacobianBuffer0;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;                                                                                                                                                float u_xlat1;
+float u_xlat3;                                                                                                                                               void main()
+{
+    u_xlat0 = texture(Ceto_JacobianBuffer0, vs_TEXCOORD0.xy);
+    u_xlat3 = Ceto_FoamChoppyness.x * u_xlat0.x + Ceto_FoamCoverage;
+    u_xlat3 = Ceto_FoamChoppyness.x * u_xlat0.y + u_xlat3;
+    u_xlat0.xy = u_xlat0.xy * Ceto_FoamChoppyness.xx;
+    u_xlat0.x = u_xlat0.x * Ceto_FoamChoppyness.x;
+    u_xlat0.x = u_xlat0.x * u_xlat0.y + u_xlat3;
+    u_xlat1 = Ceto_FoamChoppyness.x * Ceto_FoamChoppyness.x;
+    u_xlat1 = u_xlat0.z * u_xlat1;
+    SV_Target0.x = (-u_xlat1) * u_xlat1 + u_xlat0.x;
+    SV_Target0.yzw = vec3(0.0, 0.0, 0.0);
+    return;
+}
+[Frag 1]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_FoamChoppyness;
+uniform         float Ceto_FoamCoverage;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_JacobianBuffer0;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_JacobianBuffer1;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec2 u_xlat4;
+void main()
+{
+    u_xlat0 = texture(Ceto_JacobianBuffer0, vs_TEXCOORD0.xy);
+    u_xlat1.xy = Ceto_FoamChoppyness.xy * u_xlat0.xy + vec2(Ceto_FoamCoverage);
+    u_xlat1.xy = Ceto_FoamChoppyness.xy * u_xlat0.zw + u_xlat1.xy;
+    u_xlat0 = u_xlat0 * Ceto_FoamChoppyness.xyxy;
+    u_xlat0.xy = u_xlat0.xy * Ceto_FoamChoppyness.xy;
+    u_xlat0.xy = u_xlat0.xy * u_xlat0.zw + u_xlat1.xy;
+    u_xlat4.xy = Ceto_FoamChoppyness.xy * Ceto_FoamChoppyness.xy;
+    u_xlat1 = texture(Ceto_JacobianBuffer1, vs_TEXCOORD0.xy);
+    u_xlat4.xy = u_xlat4.xy * u_xlat1.xy;
+    SV_Target0.xy = (-u_xlat4.xy) * u_xlat4.xy + u_xlat0.xy;
+    SV_Target0.zw = vec2(0.0, 0.0);
+    return;
+}
+[Frag 2]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_FoamChoppyness;
+uniform         float Ceto_FoamCoverage;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_JacobianBuffer0;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_JacobianBuffer1;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_JacobianBuffer2;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;                                                                                                                                                vec3 u_xlat1;
+vec4 u_xlat2;
+void main()
+{
+    u_xlat0 = texture(Ceto_JacobianBuffer0, vs_TEXCOORD0.xy);
+    u_xlat1.xyz = u_xlat0.xyz * Ceto_FoamChoppyness.xyz;                                                                                                         u_xlat0.xyz = Ceto_FoamChoppyness.xyz * u_xlat0.xyz + vec3(Ceto_FoamCoverage);
+    u_xlat1.xyz = u_xlat1.xyz * Ceto_FoamChoppyness.xyz;
+    u_xlat2 = texture(Ceto_JacobianBuffer1, vs_TEXCOORD0.xy);
+    u_xlat0.xyz = Ceto_FoamChoppyness.xyz * u_xlat2.xyz + u_xlat0.xyz;
+    u_xlat2.xyz = u_xlat2.xyz * Ceto_FoamChoppyness.xyz;
+    u_xlat0.xyz = u_xlat1.xyz * u_xlat2.xyz + u_xlat0.xyz;
+    u_xlat1.xyz = Ceto_FoamChoppyness.xyz * Ceto_FoamChoppyness.xyz;
+    u_xlat2 = texture(Ceto_JacobianBuffer2, vs_TEXCOORD0.xy);
+    u_xlat1.xyz = u_xlat1.xyz * u_xlat2.xyz;
+    SV_Target0.xyz = (-u_xlat1.xyz) * u_xlat1.xyz + u_xlat0.xyz;
+    SV_Target0.w = 0.0;
+    return;
+}
+[Frag 3]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define HLSLCC_ENABLE_UNIFORM_BUFFERS 1
+#if HLSLCC_ENABLE_UNIFORM_BUFFERS
+#define UNITY_UNIFORM
+#else
+#define UNITY_UNIFORM uniform
+#endif
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else                                                                                                                                                        #define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+uniform         vec4 Ceto_FoamChoppyness;
+uniform         float Ceto_FoamCoverage;
+UNITY_LOCATION(0) uniform  sampler2D Ceto_JacobianBuffer0;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_JacobianBuffer1;
+UNITY_LOCATION(2) uniform  sampler2D Ceto_JacobianBuffer2;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+vec4 u_xlat1;
+vec4 u_xlat2;
+void main()
+{
+    u_xlat0 = texture(Ceto_JacobianBuffer0, vs_TEXCOORD0.xy);
+    u_xlat1 = u_xlat0 * Ceto_FoamChoppyness;
+    u_xlat0 = Ceto_FoamChoppyness * u_xlat0 + vec4(Ceto_FoamCoverage);
+    u_xlat1 = u_xlat1 * Ceto_FoamChoppyness;
+    u_xlat2 = texture(Ceto_JacobianBuffer1, vs_TEXCOORD0.xy);
+    u_xlat0 = Ceto_FoamChoppyness * u_xlat2 + u_xlat0;
+    u_xlat2 = u_xlat2 * Ceto_FoamChoppyness;
+    u_xlat0 = u_xlat1 * u_xlat2 + u_xlat0;
+    u_xlat1 = Ceto_FoamChoppyness * Ceto_FoamChoppyness;
+    u_xlat2 = texture(Ceto_JacobianBuffer2, vs_TEXCOORD0.xy);
+    u_xlat1 = u_xlat1 * u_xlat2;
+    SV_Target0 = (-u_xlat1) * u_xlat1 + u_xlat0;
+    return;
+}
+
+--- Ceto/DisplacementCopy (pid=181) ---
+[Frag 0]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_HeightBuffer;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_DisplacementBuffer;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+void main()
+{
+    u_xlat0 = texture(Ceto_DisplacementBuffer, vs_TEXCOORD0.xy);
+    SV_Target0.xz = u_xlat0.xy;
+    u_xlat0 = texture(Ceto_HeightBuffer, vs_TEXCOORD0.xy);
+    SV_Target0.y = u_xlat0.x;
+    SV_Target0.w = 0.0;
+    return;
+}
+[Frag 1]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_HeightBuffer;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_DisplacementBuffer;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+void main()
+{
+    u_xlat0 = texture(Ceto_DisplacementBuffer, vs_TEXCOORD0.xy);
+    SV_Target0.xz = u_xlat0.zw;
+    u_xlat0 = texture(Ceto_HeightBuffer, vs_TEXCOORD0.xy);
+    SV_Target0.y = u_xlat0.y;
+    SV_Target0.w = 0.0;
+    return;
+}
+[Frag 2]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_HeightBuffer;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_DisplacementBuffer;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+void main()
+{
+    u_xlat0 = texture(Ceto_DisplacementBuffer, vs_TEXCOORD0.xy);
+    SV_Target0.xz = u_xlat0.xy;
+    u_xlat0 = texture(Ceto_HeightBuffer, vs_TEXCOORD0.xy);
+    SV_Target0.y = u_xlat0.z;
+    SV_Target0.w = 0.0;
+    return;
+}
+[Frag 3]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_HeightBuffer;
+UNITY_LOCATION(1) uniform  sampler2D Ceto_DisplacementBuffer;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+void main()
+{
+    u_xlat0 = texture(Ceto_DisplacementBuffer, vs_TEXCOORD0.xy);
+    SV_Target0.xz = u_xlat0.zw;
+    u_xlat0 = texture(Ceto_HeightBuffer, vs_TEXCOORD0.xy);
+    SV_Target0.y = u_xlat0.w;
+    SV_Target0.w = 0.0;
+    return;
+}
+[Frag 4]
+#version 150
+#extension GL_ARB_explicit_attrib_location : require
+#ifdef GL_ARB_shader_bit_encoding
+#extension GL_ARB_shader_bit_encoding : enable
+#endif
+
+#define UNITY_SUPPORTS_UNIFORM_LOCATION 1
+#if UNITY_SUPPORTS_UNIFORM_LOCATION
+#define UNITY_LOCATION(x) layout(location = x)
+#define UNITY_BINDING(x) layout(binding = x, std140)
+#else
+#define UNITY_LOCATION(x)
+#define UNITY_BINDING(x) layout(std140)
+#endif
+UNITY_LOCATION(0) uniform  sampler2D Ceto_HeightBuffer;
+in  vec2 vs_TEXCOORD0;
+layout(location = 0) out vec4 SV_Target0;
+vec4 u_xlat0;
+void main()
+{
+    u_xlat0 = texture(Ceto_HeightBuffer, vs_TEXCOORD0.xy);
+    SV_Target0.xyz = u_xlat0.zxw;
+    SV_Target0.w = 0.0;
+    return;
+}
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
