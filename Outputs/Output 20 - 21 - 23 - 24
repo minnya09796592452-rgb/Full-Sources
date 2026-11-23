@@ -1,0 +1,774 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, lz4.block, re                                                                                                                              > from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> out_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/Ocean_Surface_Shaders")
+> out_dir.mkdir(parents=True, exist_ok=True)                                                                                                                 >
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> targets = (
+>     "Ceto/OceanTopSide_Transparent",
+>     "Ceto/OceanUnderSide_Transparent",
+>     "Ceto/OceanBottom",                                                                                                                                    >     "Ceto/OceanDepth",
+>     "Ceto/OceanMask",                                                                                                                                      >     "Ceto/OceanMaskFlipped",
+>     "Ceto/NormalFade",                                                                                                                                     > )
+>                                                                                                                                                            > for obj in e0.objects:
+>     if obj.type.name == "Shader":                                                                                                                          >         sh = obj.read()
+>         pf = getattr(sh, "m_ParsedForm", None)                                                                                                             >         name = getattr(pf, "m_Name", "") if pf else ""
+>         if name in targets and 15 in list(sh.platforms):
+>             p_idx = list(sh.platforms).index(15)
+>             off = sum(sh.offsets[p_idx])
+>             clen = sum(sh.compressedLengths[p_idx])
+>             dlen = sum(sh.decompressedLengths[p_idx])
+>             dec = lz4.block.decompress(bytes(sh.compressedBlob)[off:off+clen], uncompressed_size=dlen).decode("latin1", errors="ignore")
+>             shaders = re.findall(r"(#version[\s\S]*?\n\})", dec)
+>             verts = [s for s in shaders if "gl_Position" in s]
+>             frags = [s for s in shaders if "SV_Target" in s or "gl_FragData" in s]
+>             safe_name = name.replace("/", "_") + f"_pid{obj.path_id}.glsl"
+>             out_path = out_dir / safe_name
+>             blocks = [f"// Shader: {name} (pid={obj.path_id}) | Total Verts={len(verts)}, Frags={len(frags)}\n"]
+>             for idx, v in enumerate(verts):
+>                 blocks.append(f"// ==================== VERTEX VARIANT #{idx} ====================\n{v.strip()}\n")
+>             for idx, f in enumerate(frags):
+>                 blocks.append(f"// ==================== FRAGMENT VARIANT #{idx} ====================\n{f.strip()}\n")
+>             out_path.write_text("\n".join(blocks))
+>             print(f"[SAVED] {safe_name} -> Verts={len(verts)}, Frags={len(frags)}, Size={out_path.stat().st_size}B")
+> EOF
+[SAVED] Ceto_OceanBottom_pid139.glsl -> Verts=1, Frags=1, Size=1760B
+[SAVED] Ceto_OceanMaskFlipped_pid142.glsl -> Verts=5, Frags=5, Size=35734B
+[SAVED] Ceto_OceanUnderSide_Transparent_pid143.glsl -> Verts=352, Frags=352, Size=10923790B
+[SAVED] Ceto_NormalFade_pid160.glsl -> Verts=2, Frags=2, Size=5312B
+[SAVED] Ceto_OceanMask_pid168.glsl -> Verts=5, Frags=5, Size=35727B
+[SAVED] Ceto_OceanTopSide_Transparent_pid175.glsl -> Verts=352, Frags=352, Size=10823072B
+[SAVED] Ceto_OceanDepth_pid179.glsl -> Verts=9, Frags=9, Size=41958B
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+------------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN_OUT="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. ALL OCCURRENCES OF 'readDisplacements' ACROSS ENTIRE CETO SOURCE ==="
+=== 1. ALL OCCURRENCES OF 'readDisplacements' ACROSS ENTIRE CETO SOURCE ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rn "readDisplacements" "$CLEAN_OUT/CSharp_Scripts/Ceto/" -C 4
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-89-     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-90-             int num = EnabledBuffers();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-91-             if (num != 0)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-92-             {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs:93:                     InterpolatedArray2f[] readDisplacements = GetReadDisplacements();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs:94:                     QueryDisplacements.QueryWaves(query, num, readDisplacements, scaling);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-95-             }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-96-     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs-97-}
+--
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-576-             }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-577-             bool flag = SystemInfo.graphicsShaderLevel >= 50 && SystemInfo.supportsComputeShaders;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-578-             if ((!disableReadBack && readSdr != null && m_readBuffer != null) & flag)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-579-             {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:580:                     InterpolatedArray2f[] readDisplacements = DisplacementBuffer.GetReadDisplacements();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-581-                     if (numGrids > 0)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-582-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-583-                             CBUtility.ReadFromRenderTexture(m_displacementMaps[0], 3, m_readBuffer, readSdr);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:584:                             m_readBuffer.GetData(readDisplacements[0].Data);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-585-                     }                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-586-                     else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-587-                     {                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:588:                             readDisplacements[0].Clear();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-589-                     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-590-                     if (numGrids > 1)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-591-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-592-                             CBUtility.ReadFromRenderTexture(m_displacementMaps[1], 3, m_readBuffer, readSdr);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:593:                             m_readBuffer.GetData(readDisplacements[1].Data);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-594-                     }                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-595-                     else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-596-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:597:                             readDisplacements[1].Clear();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-598-                     }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-599-                     if (numGrids > 2)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-600-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-601-                             CBUtility.ReadFromRenderTexture(m_displacementMaps[2], 3, m_readBuffer, readSdr);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:602:                             m_readBuffer.GetData(readDisplacements[2].Data);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-603-                     }                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-604-                     else
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-605-                     {
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:606:                             readDisplacements[2].Clear();
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-607-                     }                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-608-                     _ = 3;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-609-             }
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs-610-     }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. CHECK HOW CPU vs GPU PATH POPULATES DISPLACEMENTS ==="
+=== 2. CHECK HOW CPU vs GPU PATH POPULATES DISPLACEMENTS ===                                                                                                 root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CLEAN_OUT/CSharp_Scripts/Ceto/DisplacementBufferCPU.cs"
+     1  using System.Collections.Generic;
+     2  using Ceto.Common.Containers.Interpolation;
+     3  using Ceto.Common.Threading.Scheduling;
+     4  using UnityEngine;
+     5
+     6  namespace Ceto;
+     7
+     8  public class DisplacementBufferCPU : WaveSpectrumBufferCPU, IDisplacementBuffer
+     9  {
+    10          private const int NUM_BUFFERS = 3;
+    11
+    12          private IList<InterpolatedArray2f[]> m_displacements;
+    13
+    14          public DisplacementBufferCPU(int size, Scheduler scheduler)
+    15                  : base(size, 3, scheduler)
+    16          {
+    17                  int gRIDS = QueryDisplacements.GRIDS;
+    18                  int cHANNELS = QueryDisplacements.CHANNELS;
+    19                  m_displacements = new List<InterpolatedArray2f[]>(2);
+    20                  m_displacements.Add(new InterpolatedArray2f[gRIDS]);
+    21                  m_displacements.Add(new InterpolatedArray2f[gRIDS]);
+    22                  for (int i = 0; i < gRIDS; i++)
+    23                  {
+    24                          m_displacements[0][i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+    25                          m_displacements[1][i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+    26                  }
+    27          }
+    28
+    29          protected override void Initilize(WaveSpectrumCondition condition, float time)
+    30          {
+    31                  InterpolatedArray2f[] writeDisplacements = GetWriteDisplacements();
+    32                  writeDisplacements[0].Clear();
+    33                  writeDisplacements[1].Clear();
+    34                  writeDisplacements[2].Clear();                                                                                                           35                  writeDisplacements[3].Clear();
+    36                  if (m_initTask == null)                                                                                                                  37                  {
+    38                          m_initTask = condition.GetInitSpectrumDisplacementsTask(this, time);
+    39                  }
+    40                  else if (m_initTask.SpectrumType != condition.Key.SpectrumType || m_initTask.NumGrids != condition.Key.NumGrids)                         41                  {
+    42                          m_initTask = condition.GetInitSpectrumDisplacementsTask(this, time);                                                             43                  }
+    44                  else
+    45                  {
+    46                          m_initTask.Reset(condition, time);
+    47                  }
+    48          }
+    49                                                                                                                                                           50          public InterpolatedArray2f[] GetWriteDisplacements()
+    51          {
+    52                  return m_displacements[0];
+    53          }
+    54                                                                                                                                                           55          public InterpolatedArray2f[] GetReadDisplacements()
+    56          {
+    57                  return m_displacements[1];
+    58          }                                                                                                                                                59
+    60          public override void Run(WaveSpectrumCondition condition, float time)                                                                            61          {
+    62                  SwapDisplacements();
+    63                  base.Run(condition, time);
+    64          }
+    65                                                                                                                                                           66          public void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements)
+    67          {
+    68                  QueryDisplacements.CopyAndCreateDisplacements(GetReadDisplacements(), out displacements);
+    69          }                                                                                                                                                70
+    71          public void CopyDisplacements(IList<InterpolatedArray2f> displacements)
+    72          {
+    73                  QueryDisplacements.CopyDisplacements(GetReadDisplacements(), displacements);                                                             74          }
+    75
+    76          private void SwapDisplacements()                                                                                                                 77          {
+    78                  InterpolatedArray2f[] value = m_displacements[0];                                                                                        79                  m_displacements[0] = m_displacements[1];
+    80                  m_displacements[1] = value;
+    81          }                                                                                                                                                82
+    83          public Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale)
+    84          {
+    85                  return QueryDisplacements.MaxRange(GetReadDisplacements(), choppyness, gridScale, null);                                                 86          }
+    87                                                                                                                                                           88          public void QueryWaves(WaveQuery query, QueryGridScaling scaling)
+    89          {
+    90                  int num = EnabledBuffers();
+    91                  if (num != 0)
+    92                  {                                                                                                                                        93                          InterpolatedArray2f[] readDisplacements = GetReadDisplacements();
+    94                          QueryDisplacements.QueryWaves(query, num, readDisplacements, scaling);
+    95                  }
+    96          }
+    97  }                                                                                                                                                    root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+---------------------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN_OUT="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. OCEAN.CS FRAME EXECUTION LOOP (UPDATE / RENDER) ==="
+=== 1. OCEAN.CS FRAME EXECUTION LOOP (UPDATE / RENDER) ===                                                                                                   root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "void Start|void Update|void OnRenderObject|m_waveSpectrum|QueryWaves|SampleHeight" "$CLEAN_OUT/CSharp_Scripts/Ceto/Ocean.cs" -A 12 | head -n 65                                                                                            202:    private void Start()
+203-    {
+204-            try
+205-            {
+206-                    Matrix4x4 identity = Matrix4x4.identity;                                                                                             207-                    identity.m00 = 2f;
+208-                    identity.m03 = -1f;                                                                                                                  209-                    identity.m11 = 2f;
+210-                    identity.m13 = -1f;
+211-                    for (int i = 0; i < 4; i++)
+212-                    {
+213-                            identity[1, i] = 0f - identity[1, i];                                                                                        214-                    }
+--                                                                                                                                                           283:    private void Update()
+284-    {                                                                                                                                                    285-            try
+286-            {                                                                                                                                            287-                    WindDirVector = CalculateWindDirVector();
+288-                    Projection.TightFit = tightProjectionFit;                                                                                            289-                    UpdateOceanScheduler();
+290-                    OverlayManager.Update();                                                                                                             291-                    specularRoughness = Mathf.Clamp01(specularRoughness);
+292-                    specularIntensity = Mathf.Max(0f, specularIntensity);
+293-                    minFresnel = Mathf.Clamp01(minFresnel);
+294-                    fresnelPower = Mathf.Max(0f, fresnelPower);
+295-                    foamIntensity = Math.Max(0f, foamIntensity);
+--
+466:    private void UpdateOceanScheduler()
+467-    {
+468-            try
+469-            {
+470-                    if (m_scheduler != null)
+471-                    {
+472-                            m_scheduler.DisableMultithreading = DISABLE_ALL_MULTITHREADING;
+473-                            m_scheduler.CheckForException();
+474-                            m_scheduler.Update();
+475-                    }
+476-            }
+477-            catch (Exception ex)
+478-            {
+--
+576:    public void SetQueryWavesSampling(bool overlays, bool grid0, bool grid1, bool grid2, bool grid3)
+577-    {
+578-            m_query.sampleOverlay = overlays;
+579-            m_query.sampleSpectrum[0] = grid0;
+580-            m_query.sampleSpectrum[1] = grid1;
+581-            m_query.sampleSpectrum[2] = grid2;
+582-            m_query.sampleSpectrum[3] = grid3;
+583-    }
+584-
+585-    public Vector3 QueryNormal(float x, float z)
+586-    {
+587-            float num = 0.5f;
+588:            float num2 = QueryWaves(x - num, z);
+589:            float num3 = QueryWaves(x, z - num);
+590:            float num4 = QueryWaves(x + num, z);
+591:            float num5 = QueryWaves(x, z + num);
+592-            float num6 = num2 - num4;
+593-            float num7 = num3 - num5;
+594-            return new Vector3(num6, Mathf.Sqrt(1f - num6 * num6 - num7 * num7), num7);
+595-    }
+596-
+597:    public float QueryWaves(float x, float z)
+598-    {
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. WAVESPECTRUMCONDITION.CS (BASE CONDITION & GRID SIZES / CHOPPYNESS) ==="
+=== 2. WAVESPECTRUMCONDITION.CS (BASE CONDITION & GRID SIZES / CHOPPYNESS) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CLEAN_OUT/CSharp_Scripts/Ceto/WaveSpectrumCondition.cs"
+     1  using System;
+     2  using UnityEngine;
+     3
+     4  namespace Ceto;
+     5
+     6  public abstract class WaveSpectrumCondition
+     7  {
+     8          public bool Done { get; set; }
+     9
+    10          public Vector4 GridSizes { get; protected set; }
+    11
+    12          public Vector4 Choppyness { get; protected set; }
+    13
+    14          public Vector4 WaveAmps { get; protected set; }
+    15
+    16          public WaveSpectrumConditionKey Key { get; protected set; }
+    17
+    18          public Texture2D Spectrum01 { get; private set; }
+    19
+    20          public Color[] SpectrumData01 { get; private set; }
+    21                                                                                                                                                           22          public Texture2D Spectrum23 { get; private set; }
+    23                                                                                                                                                           24          public Color[] SpectrumData23 { get; private set; }
+    25
+    26          public Texture2D WTable { get; private set; }
+    27
+    28          public Color[] WTableData { get; private set; }
+    29
+    30          public int LastUpdated { get; set; }
+    31
+    32          public bool SupportsJacobians { get; protected set; }
+    33                                                                                                                                                           34          public WaveSpectrumCondition(int size, int numGrids)
+    35          {
+    36                  GridSizes = Vector4.one;
+    37                  Choppyness = Vector4.one;
+    38                  WaveAmps = Vector4.one;
+    39                  SpectrumData01 = new Color[size * size];
+    40                  if (numGrids > 2)
+    41                  {
+    42                          SpectrumData23 = new Color[size * size];
+    43                  }
+    44                  WTableData = new Color[size * size];
+    45                  LastUpdated = -1;                                                                                                                        46                  SupportsJacobians = true;
+    47          }
+    48
+    49          public abstract SpectrumTask GetCreateSpectrumConditionTask();
+    50
+    51          public InitSpectrumDisplacementsTask GetInitSpectrumDisplacementsTask(DisplacementBufferCPU buffer, float time)
+    52          {
+    53                  return new InitSpectrumDisplacementsTask(buffer, this, time);
+    54          }
+    55
+    56          public Vector4 InverseGridSizes()                                                                                                                57          {
+    58                  float num = MathF.PI * 2f * (float)Key.Size;
+    59                  return new Vector4(num / GridSizes.x, num / GridSizes.y, num / GridSizes.z, num / GridSizes.w);
+    60          }
+    61
+    62          public void Release()
+    63          {
+    64                  if (Spectrum01 != null)
+    65                  {
+    66                          UnityEngine.Object.Destroy(Spectrum01);
+    67                          Spectrum01 = null;
+    68                  }
+    69                  if (Spectrum23 != null)
+    70                  {
+    71                          UnityEngine.Object.Destroy(Spectrum23);
+    72                          Spectrum23 = null;
+    73                  }
+    74                  if (WTable != null)
+    75                  {
+    76                          UnityEngine.Object.Destroy(WTable);
+    77                          WTable = null;
+    78                  }
+    79          }
+    80
+    81          public void CreateTextures()
+    82          {
+    83                  if (Spectrum01 == null)
+    84                  {
+    85                          Spectrum01 = new Texture2D(Key.Size, Key.Size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+    86                          Spectrum01.filterMode = FilterMode.Point;
+    87                          Spectrum01.wrapMode = TextureWrapMode.Repeat;
+    88                          Spectrum01.hideFlags = HideFlags.HideAndDontSave;
+    89                          Spectrum01.name = "Ceto Spectrum01 Condition";
+    90                  }                                                                                                                                        91                  if (Spectrum23 == null && Key.NumGrids > 2)
+    92                  {                                                                                                                                        93                          Spectrum23 = new Texture2D(Key.Size, Key.Size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+    94                          Spectrum23.filterMode = FilterMode.Point;
+    95                          Spectrum23.wrapMode = TextureWrapMode.Repeat;
+    96                          Spectrum23.hideFlags = HideFlags.HideAndDontSave;                                                                                97                          Spectrum23.name = "Ceto Spectrum23 Condition";
+    98                  }                                                                                                                                        99                  if (WTable == null)
+   100                  {
+   101                          WTable = new Texture2D(Key.Size, Key.Size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+   102                          WTable.filterMode = FilterMode.Point;
+   103                          WTable.wrapMode = TextureWrapMode.Clamp;
+   104                          WTable.hideFlags = HideFlags.HideAndDontSave;
+   105                          WTable.name = "Ceto Wave Spectrum GPU WTable";                                                                                  106                  }
+   107          }
+   108
+   109          public void Apply(Color[] spectrum01, Color[] spectrum23, Color[] wtable)
+   110          {                                                                                                                                               111                  if (Spectrum01 != null && spectrum01 != null)
+   112                  {
+   113                          Spectrum01.SetPixels(spectrum01);
+   114                          Spectrum01.Apply();                                                                                                             115                          Array.Copy(spectrum01, SpectrumData01, spectrum01.Length);
+   116                  }                                                                                                                                       117                  if (Spectrum23 != null && spectrum23 != null)
+   118                  {
+   119                          Spectrum23.SetPixels(spectrum23);
+   120                          Spectrum23.Apply();
+   121                          Array.Copy(spectrum23, SpectrumData23, spectrum23.Length);                                                                      122                  }
+   123                  if (WTable != null && wtable != null)
+   124                  {
+   125                          WTable.SetPixels(wtable);                                                                                                       126                          WTable.Apply();
+   127                          Array.Copy(wtable, WTableData, wtable.Length);
+   128                  }
+   129          }                                                                                                                                               130  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 3. WAVESPECTRUMBUFFER.CS (PRODUCER / CONSUMER BASE & DONE/SCHEDULING) ==="     === 3. WAVESPECTRUMBUFFER.CS (PRODUCER / CONSUMER BASE & DONE/SCHEDULING) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CLEAN_OUT/CSharp_Scripts/Ceto/WaveSpectrumBuffer.cs"                                 1  using UnityEngine;
+     2
+     3  namespace Ceto;                                                                                                                                           4
+     5  public abstract class WaveSpectrumBuffer
+     6  {
+     7          public abstract bool Done { get; }                                                                                                                8
+     9          public abstract int Size { get; }                                                                                                                10
+    11          public abstract bool IsGPU { get; }
+    12
+    13          public float TimeValue { get; protected set; }
+    14                                                                                                                                                           15          public bool HasRun { get; protected set; }
+    16
+    17          public bool BeenSampled { get; set; }
+    18
+    19          public Material InitMaterial { get; set; }                                                                                                       20
+    21          public int InitPass { get; set; }                                                                                                                22
+    23          public abstract Texture GetTexture(int idx);
+    24
+    25          public WaveSpectrumBuffer()
+    26          {                                                                                                                                                27          }
+    28
+    29          protected abstract void Initilize(WaveSpectrumCondition condition, float time);
+    30
+    31          public abstract void Run(WaveSpectrumCondition condition, float time);                                                                           32
+    33          public abstract void EnableBuffer(int idx);                                                                                                      34
+    35          public abstract void DisableBuffer(int idx);
+    36
+    37          public abstract int EnabledBuffers();
+    38                                                                                                                                                           39          public abstract bool IsEnabledBuffer(int i);
+    40
+    41          public virtual void Release()
+    42          {
+    43          }
+    44
+    45          public virtual void EnableSampling()                                                                                                             46          {
+    47          }                                                                                                                                                48
+    49          public virtual void DisableSampling()                                                                                                            50          {
+    51          }                                                                                                                                                52  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+----------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CLEAN_OUT="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN"   root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat -n "$CLEAN_OUT/CSharp_Scripts/Ceto.Common.Threading.Scheduling/Scheduler.cs" 2>/dev/null || find "$CLEAN_OUT/CSharp_Scripts" -name "Scheduler.cs" -exec cat -n {} +                                                                                    1  using System;
+     2  using System.Collections;
+     3  using System.Collections.Generic;
+     4  using System.Diagnostics;
+     5  using System.Threading;
+     6  using Ceto.Common.Threading.Tasks;
+     7
+     8  namespace Ceto.Common.Threading.Scheduling;
+     9                                                                                                                                                           10  public class Scheduler : IScheduler
+    11  {
+    12          private LinkedList<IThreadedTask> m_scheduledTasks;
+    13
+    14          private LinkedList<IThreadedTask> m_finishedTasks;
+    15
+    16          private LinkedList<IThreadedTask> m_runningTasks;
+    17
+    18          private LinkedList<IThreadedTask> m_waitingTasks;
+    19
+    20          private ICoroutine m_coroutine;                                                                                                                  21
+    22          private Exception m_exception;
+    23
+    24          private readonly object m_lock = new object();
+    25
+    26          private LinkedList<IThreadedTask> m_haveRan;
+    27
+    28          private volatile bool m_shutingDown;
+    29
+    30          public int TasksRanThisUpdate { get; private set; }
+    31
+    32          public int TasksFinishedThisUpdate { get; private set; }
+    33
+    34          public int MaxTasksPerUpdate { get; private set; }
+    35
+    36          public int MaxFinishPerUpdate { get; private set; }
+    37
+    38          public float MaxWaitTime { get; set; }
+    39
+    40          public float MinWaitTime { get; set; }
+    41
+    42          public bool DisableMultithreading { get; set; }
+    43
+    44          public bool ShutingDown
+    45          {
+    46                  set
+    47                  {
+    48                          m_shutingDown = value;
+    49                  }
+    50          }
+    51
+    52          public Scheduler()
+    53          {
+    54                  MaxWaitTime = 1000f;
+    55                  MinWaitTime = 100f;
+    56                  m_coroutine = null;
+    57                  MaxTasksPerUpdate = 100;
+    58                  MaxFinishPerUpdate = 100;
+    59                  m_scheduledTasks = new LinkedList<IThreadedTask>();
+    60                  m_finishedTasks = new LinkedList<IThreadedTask>();
+    61                  m_runningTasks = new LinkedList<IThreadedTask>();
+    62                  m_waitingTasks = new LinkedList<IThreadedTask>();
+    63                  m_haveRan = new LinkedList<IThreadedTask>();
+    64          }
+    65
+    66          public Scheduler(int maxTasksPerUpdate, int maxFinishPerUpdate, ICoroutine coroutine)
+    67          {
+    68                  MaxWaitTime = 1000f;                                                                                                                     69                  MinWaitTime = 100f;
+    70                  m_coroutine = coroutine;                                                                                                                 71                  MaxTasksPerUpdate = Math.Max(1, maxTasksPerUpdate);
+    72                  MaxFinishPerUpdate = Math.Max(1, maxFinishPerUpdate);
+    73                  m_scheduledTasks = new LinkedList<IThreadedTask>();
+    74                  m_finishedTasks = new LinkedList<IThreadedTask>();
+    75                  m_runningTasks = new LinkedList<IThreadedTask>();
+    76                  m_waitingTasks = new LinkedList<IThreadedTask>();
+    77                  m_haveRan = new LinkedList<IThreadedTask>();
+    78          }
+    79
+    80          public void Update()                                                                                                                             81          {
+    82                  TasksRanThisUpdate = 0;                                                                                                                  83                  TasksFinishedThisUpdate = 0;
+    84                  FinishTasks();                                                                                                                           85                  while (TasksRanThisUpdate < MaxTasksPerUpdate)
+    86                  {
+    87                          if (ScheduledTasks() > 0)
+    88                          {
+    89                                  IThreadedTask value = m_scheduledTasks.First.Value;
+    90                                  m_scheduledTasks.RemoveFirst();
+    91                                  RunTask(value);                                                                                                          92                          }                                                                                                                                93                          CheckForException();
+    94                          if (ScheduledTasks() == 0)
+    95                          {
+    96                                  break;
+    97                          }
+    98                  }
+    99                  FinishTasks();
+   100          }
+   101
+   102          private void RunTask(IThreadedTask task)
+   103          {                                                                                                                                               104                  lock (m_lock)
+   105                  {
+   106                          TasksRanThisUpdate++;
+   107                          if (!task.IsThreaded || DisableMultithreading)
+   108                          {
+   109                                  task.Start();
+   110                                  IEnumerator enumerator = task.Run();
+   111                                  if (enumerator != null)
+   112                                  {
+   113                                          if (m_coroutine == null)
+   114                                          {
+   115                                                  throw new InvalidOperationException("Scheduler trying to run a coroutine task when coroutine interface is null");
+   116                                          }
+   117                                          m_coroutine.RunCoroutine(enumerator);
+   118                                          if (!IsFinishing(task))
+   119                                          {
+   120                                                  m_runningTasks.AddLast(task);
+   121                                          }
+   122                                  }
+   123                                  else
+   124                                  {
+   125                                          task.End();
+   126                                  }
+   127                          }
+   128                          else                                                                                                                            129                          {
+   130                                  task.Start();
+   131                                  m_runningTasks.AddLast(task);
+   132                                  ThreadPool.QueueUserWorkItem(RunThreaded, task);
+   133                          }                                                                                                                               134                  }
+   135          }
+   136
+   137          private void RunThreaded(object o)
+   138          {
+   139                  if (!(o is IThreadedTask threadedTask))                                                                                                 140                  {
+   141                          Throw(new InvalidCastException("Object is not a ITask or is null"));
+   142                          return;
+   143                  }
+   144                  try
+   145                  {
+   146                          threadedTask.Run();
+   147                  }
+   148                  catch (Exception e)
+   149                  {
+   150                          Throw(e);
+   151                  }
+   152          }
+   153
+   154          public void FinishTasks()
+   155          {
+   156                  if (TasksFinishedThisUpdate >= MaxFinishPerUpdate)
+   157                  {
+   158                          return;
+   159                  }
+   160                  lock (m_lock)
+   161                  {
+   162                          m_haveRan.Clear();
+   163                          LinkedList<IThreadedTask>.Enumerator enumerator = m_runningTasks.GetEnumerator();
+   164                          while (enumerator.MoveNext())
+   165                          {                                                                                                                               166                                  IThreadedTask current = enumerator.Current;
+   167                                  if (current.Ran)
+   168                                  {
+   169                                          m_haveRan.AddLast(current);
+   170                                  }
+   171                          }
+   172                          LinkedList<IThreadedTask>.Enumerator enumerator2 = m_haveRan.GetEnumerator();
+   173                          while (enumerator2.MoveNext())
+   174                          {
+   175                                  Finished(enumerator2.Current);
+   176                          }
+   177                          if (m_finishedTasks.Count == 0)
+   178                          {                                                                                                                               179                                  return;
+   180                          }
+   181                          IThreadedTask threadedTask = m_finishedTasks.First.Value;
+   182                          m_finishedTasks.RemoveFirst();
+   183                          while (threadedTask != null)                                                                                                    184                          {
+   185                                  threadedTask.End();                                                                                                     186                                  TasksFinishedThisUpdate++;
+   187                                  if (m_finishedTasks.Count == 0 || TasksFinishedThisUpdate >= MaxFinishPerUpdate)                                        188                                  {
+   189                                          threadedTask = null;                                                                                            190                                          continue;
+   191                                  }                                                                                                                       192                                  threadedTask = m_finishedTasks.First.Value;
+   193                                  m_finishedTasks.RemoveFirst();                                                                                          194                          }                                                                                                                               195                          m_haveRan.Clear();                                                                                                              196                  }
+   197          }                                                                                                                                               198
+   199          public bool HasTasks()                                                                                                                          200          {
+   201                  if (ScheduledTasks() <= 0 && RunningTasks() <= 0 && FinishingTasks() <= 0)                                                              202                  {
+   203                          return WaitingTasks() > 0;                                                                                                      204                  }
+   205                  return true;                                                                                                                            206          }
+   207                                                                                                                                                          208          public void Cancel(IThreadedTask task)                                                                                                          209          {                                                                                                                                               210                  lock (m_lock)                                                                                                                           211                  {                                                                                                                                       212                          if (m_scheduledTasks.Contains(task))
+   213                          {                                                                                                                               214                                  task.Cancel();
+   215                                  m_scheduledTasks.Remove(task);                                                                                          216                          }
+   217                          else if (m_waitingTasks.Contains(task))                                                                                         218                          {
+   219                                  task.Cancel();                                                                                                          220                                  m_waitingTasks.Remove(task);                                                                                            221                          }                                                                                                                               222                  }
+   223          }                                                                                                                                               224
+   225          public void CancelAllTasks()                                                                                                                    226          {
+   227                  lock (m_lock)                                                                                                                           228                  {
+   229                          m_scheduledTasks.Clear();                                                                                                       230                          m_waitingTasks.Clear();
+   231                          foreach (IThreadedTask runningTask in m_runningTasks)                                                                           232                          {
+   233                                  runningTask.Cancel();                                                                                                   234                          }                                                                                                                               235                          Stopwatch stopwatch = new Stopwatch();                                                                                          236                          stopwatch.Start();                                                                                                              237                          bool flag = false;                                                                                                              238                          while (!flag && (float)stopwatch.ElapsedMilliseconds < MaxWaitTime)                                                             239                          {                                                                                                                               240                                  flag = true;                                                                                                            241                                  foreach (IThreadedTask runningTask2 in m_runningTasks)                                                                  242                                  {
+   243                                          if (!runningTask2.Ran)                                                                                          244                                          {
+   245                                                  flag = false;                                                                                           246                                                  break;
+   247                                          }                                                                                                               248                                  }
+   249                          }                                                                                                                               250                          while ((float)stopwatch.ElapsedMilliseconds < MinWaitTime)
+   251                          {                                                                                                                               252                          }
+   253                          m_runningTasks.Clear();                                                                                                         254                          m_finishedTasks.Clear();                                                                                                        255                  }                                                                                                                                       256          }                                                                                                                                               257                                                                                                                                                          258          public bool Contains(IThreadedTask task)                                                                                                        259          {                                                                                                                                               260                  if (IsScheduled(task))                                                                                                                  261                  {                                                                                                                                       262                          return true;                                                                                                                    263                  }                                                                                                                                       264                  if (IsWaiting(task))                                                                                                                    265                  {                                                                                                                                       266                          return true;                                                                                                                    267                  }                                                                                                                                       268                  if (IsRunning(task))
+   269                  {                                                                                                                                       270                          return true;
+   271                  }                                                                                                                                       272                  if (IsFinishing(task))
+   273                  {                                                                                                                                       274                          return true;
+   275                  }                                                                                                                                       276                  return false;
+   277          }                                                                                                                                               278
+   279          public int ScheduledTasks()                                                                                                                     280          {                                                                                                                                               281                  int num = 0;                                                                                                                            282                  lock (m_lock)
+   283                  {                                                                                                                                       284                          return m_scheduledTasks.Count;                                                                                                  285                  }
+   286          }                                                                                                                                               287
+   288          public int RunningTasks()                                                                                                                       289          {
+   290                  int num = 0;
+   291                  lock (m_lock)
+   292                  {
+   293                          return m_runningTasks.Count;
+   294                  }
+   295          }
+   296
+   297          public int WaitingTasks()
+   298          {
+   299                  int num = 0;
+   300                  lock (m_lock)
+   301                  {
+   302                          return m_waitingTasks.Count;
+   303                  }
+   304          }
+   305
+   306          public int FinishingTasks()
+   307          {
+   308                  int num = 0;
+   309                  lock (m_lock)
+   310                  {
+   311                          return m_finishedTasks.Count;
+   312                  }
+   313          }
+   314
+   315          public int Tasks()
+   316          {
+   317                  return RunningTasks() + ScheduledTasks() + WaitingTasks() + FinishingTasks();
+   318          }
+   319
+   320          public bool IsScheduled(IThreadedTask task)
+   321          {
+   322                  lock (m_lock)
+   323                  {                                                                                                                                       324                          return m_scheduledTasks.Contains(task);
+   325                  }
+   326          }
+   327
+   328          public bool IsRunning(IThreadedTask task)
+   329          {
+   330                  lock (m_lock)
+   331                  {
+   332                          return m_runningTasks.Contains(task);
+   333                  }
+   334          }
+   335
+   336          public bool IsWaiting(IThreadedTask task)
+   337          {
+   338                  lock (m_lock)
+   339                  {
+   340                          return m_waitingTasks.Contains(task);
+   341                  }
+   342          }
+   343
+   344          public bool IsFinishing(IThreadedTask task)
+   345          {
+   346                  lock (m_lock)
+   347                  {
+   348                          return m_finishedTasks.Contains(task);
+   349                  }
+   350          }
+   351
+   352          public void Add(IThreadedTask task)
+   353          {
+   354                  lock (m_lock)
+   355                  {
+   356                          if (!m_shutingDown)
+   357                          {
+   358                                  task.Scheduler = this;
+   359                                  m_scheduledTasks.AddLast(task);
+   360                          }
+   361                  }
+   362          }
+   363
+   364          public void Run(IThreadedTask task)
+   365          {
+   366                  lock (m_lock)
+   367                  {
+   368                          if (!m_shutingDown)
+   369                          {
+   370                                  task.Scheduler = this;
+   371                                  if (TasksRanThisUpdate >= MaxTasksPerUpdate)
+   372                                  {
+   373                                          Add(task);
+   374                                  }
+   375                                  else                                                                                                                    376                                  {
+   377                                          RunTask(task);                                                                                                  378                                  }
+   379                          }
+   380                  }
+   381          }
+   382
+   383          public void AddWaiting(IThreadedTask task)
+   384          {
+   385                  lock (m_lock)
+   386                  {
+   387                          if (!m_shutingDown)
+   388                          {
+   389                                  task.Scheduler = this;
+   390                                  m_waitingTasks.AddLast(task);
+   391                          }
+   392                  }
+   393          }
+   394
+   395          public void Finished(IThreadedTask task)
+   396          {
+   397                  lock (m_lock)
+   398                  {
+   399                          m_runningTasks.Remove(task);
+   400                          if (!m_shutingDown && !task.NoFinish && !task.Cancelled)
+   401                          {
+   402                                  m_finishedTasks.AddLast(task);
+   403                          }
+   404                  }
+   405          }
+   406
+   407          public void CheckForException()
+   408          {
+   409                  lock (m_lock)
+   410                  {
+   411                          if (m_exception != null)
+   412                          {
+   413                                  Exception exception = m_exception;
+   414                                  m_exception = null;
+   415                                  throw exception;
+   416                          }
+   417                  }
+   418          }
+   419
+   420          public void Throw(Exception e)
+   421          {
+   422                  lock (m_lock)
+   423                  {
+   424                          m_exception = e;
+   425                  }
+   426          }                                                                                                                                               427
+   428          public void StopWaiting(IThreadedTask task, bool run)
+   429          {
+   430                  lock (m_lock)                                                                                                                           431                  {                                                                                                                                       432                          if (!m_shutingDown)
+   433                          {
+   434                                  m_waitingTasks.Remove(task);
+   435                                  if (run)
+   436                                  {
+   437                                          RunTask(task);
+   438                                  }
+   439                                  else
+   440                                  {
+   441                                          m_scheduledTasks.AddLast(task);
+   442                                  }
+   443                          }
+   444                  }
+   445          }
+   446
+   447          public void Clear()
+   448          {
+   449                  if (RunningTasks() > 0)
+   450                  {
+   451                          throw new InvalidOperationException("Can not clear the scheduler when there are running tasks.");
+   452                  }
+   453                  m_scheduledTasks.Clear();
+   454                  m_runningTasks.Clear();
+   455                  m_finishedTasks.Clear();
+   456                  m_waitingTasks.Clear();
+   457                  m_exception = null;
+   458          }
+   459  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-------
+
+
+
