@@ -1,76 +1,82 @@
 
 
-## 30. Output 11 — four-grid query-array copying and serialized shader pass metadata
+## 32. Output 12–13 — InterpolatedArray2f storage and Read shader identity
 
-Source: [Output 11](https://github.com/minnya09796592452-rgb/Full-Sources/blob/6c8b507266fda7c550349c122def080a0a009a7c/Outputs/Output%2011)
+Source: [Output 12–13](https://github.com/minnya09796592452-rgb/Full-Sources/blob/c572d94ee211c05ef18fe01bdd36113df0538152/Outputs/Output%2012%20-%2013)
 
-### 30.1 QueryDisplacements.CopyAndCreateDisplacements
+### 32.1 InterpolatedArray2f — storage layout
 
-The supplied method checks that the source list contains exactly `GRIDS` entries and that `source[0].Channels` equals `CHANNELS`. It then creates a four-entry destination array, with each destination constructed from the corresponding source `Data`:
+The complete supplied class shows that `InterpolatedArray2f.Data` is a `float[]`. Its backing array length is:
 
-- `des[0]` from `source[0].Data`
-- `des[1]` from `source[1].Data`
-- `des[2]` from `source[2].Data`
-- `des[3]` from `source[3].Data`
+`SX * SY * Channels`
 
-Each destination uses `sX × sX`, `CHANNELS`, and `wrap: true`. The dimension `sX` is taken from `source[0].SX`.
+The indexer and Get/Set methods use interleaved channel-major-per-pixel indexing:
 
-### 30.2 QueryDisplacements.CopyDisplacements
+`(x + y * SX) * Channels + channel`
 
-The copy method repeats the same source-count and first-buffer channel-count checks, then copies all four data arrays individually:
+For each pixel, all channel values are contiguous. The constructor taking an existing `float[]` allocates a same-sized backing array and copies the input into it. The class also exposes `SX`, `SY`, and `Channels`.
 
-`des[0].Copy(source[0].Data)` through `des[3].Copy(source[3].Data)`.
+This confirms the CPU query-array element storage is 32-bit float data, with channels interleaved for each pixel. The displayed interpolation method performs bilinear interpolation over the four neighboring samples; coordinate conversion depends on `HalfPixelOffset`.
 
-This confirms that the CPU query-array copy helpers explicitly handle all four grid slots. It does not prove that the GPU readback path fills all four slots: Output 8's displayed `ReadFromGPU` body still showed readback only for grids 0–2. Also, the methods shown validate the channel count of source[0], not separately each source entry; no additional validation should be inferred.
+### 32.2 WaveSpectrum.readSdr → ComputeShader PID 186 reference
 
-### 30.3 ComputeShader PID 186 — Read object has no parsed kernels
+Output 12–13 examines the serialized `WaveSpectrum` MonoBehaviour at `level2` path ID 271. Searching its raw bytes for the serialized PPtr pair `fileID=4, pathID=186` returns true at offset 180. In the context of the inspected assets, this supports the reference from that WaveSpectrum object to `sharedassets0.assets` path ID 186.
 
-Output 11 directly reads path ID 186 from `sharedassets0.assets`. UnityPy reports:
+Combined with Output 11's PID 186 object name `Read`, this is substantially stronger than the earlier name-only match and supports identifying PID 186 as the referenced Read ComputeShader candidate. The raw-byte search is the evidence supplied here; a decoded named-field PPtr printout was not included, so retain that qualification.
 
-- Name: `Read`
-- Variant[0]: `Kernels=0`
-- Variant[1]: `Kernels=0`
+### 32.3 Read ComputeShader kernel inventory
 
-Therefore, the earlier PID 186 name match is **not** sufficient to identify a usable parsed compute shader containing `read2DC3`. The output provides no kernel declarations, thread-group sizes, resource bindings, or kernel code. The relationship between `CBUtility.readSdr` and this serialized object remains unproven; the Readback kernel implementation and the 12-byte destination element layout remain unresolved.
+The re-inspected typetree exposes two variants. Both list the following kernels:
 
-### 30.4 Serialized pass-to-program blob ordering
+- `read2DC1`, `read2DC2`, `read2DC3`, `read2DC4`
+- `readSingle2D`, `readSingleBilinear2D`
+- `read3DC1`, `read3DC2`, `read3DC3`, `read3DC4`
+- `readSingle3D`, `readSingleBilinear3D`
 
-Output 11 inspects the first SubShader's serialized passes and reports these mappings:
+The earlier Output 11 zero-kernel result came from reading the `m_Kernels` key, while this output reads the parsed typetree's lowercase `kernels` key. The later output therefore corrects the earlier inspection method; it does not mean the asset changed.
 
-| Shader | Path ID | Serialized pass | Vertex blob index | Fragment blob index |
-|---|---:|---:|---:|---:|
-| Ceto/Fourier | 178 | 0–7 | 0 | 1–8 respectively |
-| Ceto/DisplacementCopy | 181 | 0–4 | 0 | 1–5 respectively |
-| Ceto/FoamCopy | 150 | 0–3 | 0 | 1–4 respectively |
+### 32.4 read2DC3 — recovered GLSL kernel
 
-This confirms the serialized pass order and the fragment-program BlobIndex for each pass. It strengthens the pass-order audit from Outputs 7–9. It does not, by itself, decode the fragment programs or assign world-axis/grid semantics to their channels.
+For variant 1, the `read2DC3` kernel's `variantMap` provides GLSL with:
 
-### 30.5 Updated evidence status
+- Local workgroup size: `8 × 8 × 1`
+- Input sampler: `sampler2D _Tex2D`
+- Output storage buffer: `_Buffer2DC3`
+- Output element structure: `uint[3] value`
+- Bounds guard: global invocation X < `_Width`, Y < `_Height`
+- Linear destination index: `y * _Width + x`
+- Source read: `texelFetch(_Tex2D, ivec2(x,y), 0).xyz`
+- Conversion: `floatBitsToInt` for the three sampled float components, then each 32-bit bit pattern is written into the three uint slots.
 
-| Item | Status after Output 11 |
+The shader therefore writes three 32-bit words per pixel, i.e. 12 bytes per output element. This matches the three-channel readback dispatch selected by Output 9's `CBUtility.ReadFromRenderTexture` call site and explains the observed 12-byte stride at the shader-output level.
+
+**Important distinction:** The GLSL declares the destination words as `uint[3]`, while `InterpolatedArray2f.Data` is a `float[]`. The kernel uses `floatBitsToInt`, which preserves each sampled float's bit pattern in a 32-bit integer word. The supplied output does not show the C# `ComputeBuffer` allocation declaration/stride or a runtime readback test, so the exact managed buffer declaration remains to be independently verified even though the GPU payload width and float-array storage width now align.
+
+### 32.5 Updated evidence status
+
+| Item | Status after Output 12–13 |
 |---|---|
-| CPU query-array creation | Confirmed: four source grids are wrapped into four destination arrays |
-| CPU query-array copying | Confirmed: all four grid Data arrays are copied |
-| Query-array dimensions/wrapping | Confirmed: source[0].SX used for both dimensions; wrap true |
-| Per-entry channel validation | Only source[0].Channels is checked in the shown methods |
-| PID 186 Read compute kernels | Not recovered: both parsed variants report zero kernels |
-| PID 186 as CBUtility.readSdr | Unproven; name-only match is insufficient |
-| Fourier serialized pass order | Confirmed: passes 0–7 map to fragment BlobIndex 1–8 |
-| DisplacementCopy serialized pass order | Confirmed: passes 0–4 map to fragment BlobIndex 1–5 |
-| FoamCopy serialized pass order | Confirmed: passes 0–3 map to fragment BlobIndex 1–4 |
-| Readback 12-byte element layout | Still unresolved |
-| Fourth-grid GPU readback | Still not shown by the supplied ReadFromGPU excerpt |
+| InterpolatedArray2f backing storage | Confirmed: float[] |
+| Per-pixel channel layout | Confirmed: interleaved, index `(x + y*SX)*Channels + c` |
+| WaveSpectrum PID 186 reference | Supported by raw serialized PPtr byte-pair match at offset 180; decoded field-level proof not printed |
+| Read ComputeShader kernel inventory | Confirmed from lowercase `kernels` typetree field; 12 kernel names per variant |
+| read2DC3 workgroup size | Confirmed: 8×8×1 |
+| read2DC3 source sampling | Confirmed: texelFetch at integer pixel coordinates, mip 0 |
+| read2DC3 output structure | Confirmed: three 32-bit uint words per pixel |
+| 12-byte GPU output element width | Confirmed: 3 × 4-byte words |
+| GPU word ↔ CPU float bit-pattern compatibility | Supported by `floatBitsToInt` and float[] storage; managed ComputeBuffer declaration/runtime transfer still to verify |
+| Fourth-grid GPU readback | Still not shown; ReadFromGPU explicitly reads maps 0–2 |
 
-### 30.6 Next evidence required
+### 32.6 Next evidence required
 
-1. Trace the actual serialized Shader/ComputeShader reference assigned to `CBUtility.readSdr`; do not rely on the name `Read` or PID 186 alone.
-2. Recover the readback kernel source from the correct asset/program representation, if present, and identify its output buffer element type.
-3. Inspect the declaration and allocation of `m_readBuffer`, plus the exact storage type of `InterpolatedArray2f.Data`, to resolve the 12-byte stride.
-4. Trace the CPU and GPU `DisplacementBuffer` query paths side by side, especially how grid 3 is populated when GPU readback only shows three grids.
-5. Use the newly confirmed serialized BlobIndex order when joining the C# pass calls to the already extracted Fourier, DisplacementCopy, and FoamCopy program payloads.
+1. Extract the remaining read kernels, especially `read2DC1/2/4` and the single-channel variants, to compare their output layouts and filtering behavior.
+2. Decode the WaveSpectrum MonoBehaviour's named PPtr fields and identify exactly which field points to PID 186, rather than relying only on the raw byte-pair match.
+3. Recover the C# `ComputeBuffer` constructor/allocation line for `m_readBuffer`, including count, stride, and element type.
+4. Trace why GPU readback reads only displacement maps 0–2 while CPU query arrays and copy helpers support four grids.
+5. Confirm the readback data ordering with an actual runtime sample or a fully traced buffer copy path before assigning physical meaning to the three channels.
 
-**Evidence boundary:** Output 11 closes the four-grid CPU copy-helper behavior and verifies serialized pass-to-blob ordering for three Ceto shaders. It also weakens the earlier PID 186 Read candidate: the parsed object exposes zero kernels in both variants. It does not resolve the readback shader identity, kernel body, 12-byte data structure, or fourth-grid GPU path.
+**Evidence boundary:** Output 12–13 recovers the Read kernel inventory and the actual three-channel read2DC3 GLSL body. It establishes a 12-byte, three-word GPU output per pixel and the float[] CPU query storage. The exact managed ComputeBuffer declaration and fourth-grid GPU handling remain open.
 
-## 31. Raw Output 11 archive
+## 33. Raw Output 12–13 archive
 
-- [Output 11](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%2011) — original terminal output containing the four-grid QueryDisplacements copy helpers, PID 186 Read ComputeShader inspection, and serialized pass/fragment BlobIndex tables.
+- [Output 12–13](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%2012%20-%2013) — original terminal output containing InterpolatedArray2f, WaveSpectrum-to-Read reference check, Read kernel inventory, and read2DC3 GLSL.
