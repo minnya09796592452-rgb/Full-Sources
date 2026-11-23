@@ -1,0 +1,1023 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# for f in \
+>   WaveSpectrumConditionKey.cs \
+>   UnifiedSpectrumConditionKey.cs \
+>   PhillipsSpectrumConditionKey.cs \                                                                                                                        >   UnifiedPhillipsSpectrumCondition.cs \
+>   SpectrumTask.cs \
+>   InitSpectrumDisplacementsTask.cs; do                                                                                                                     >   if [ -f "$CETO/$f" ]; then
+>     echo "==================== $f ===================="                                                                                                    >     cat -n "$CETO/$f"
+>   else
+>     echo "[NOT FOUND]: $f"                                                                                                                                 >   fi
+> done
+==================== WaveSpectrumConditionKey.cs ====================
+     1  using System;                                                                                                                                             2
+     3  namespace Ceto;                                                                                                                                           4
+     5  public abstract class WaveSpectrumConditionKey : IEquatable<WaveSpectrumConditionKey>
+     6  {
+     7          public int Size { get; private set; }
+     8                                                                                                                                                            9          public int NumGrids { get; private set; }
+    10
+    11          public float WindDir { get; private set; }
+    12
+    13          public SPECTRUM_TYPE SpectrumType { get; private set; }                                                                                          14
+    15          public WaveSpectrumConditionKey(int size, float windDir, SPECTRUM_TYPE spectrumType, int numGrids)                                               16          {
+    17                  Size = size;
+    18                  NumGrids = numGrids;
+    19                  WindDir = windDir;
+    20                  SpectrumType = spectrumType;                                                                                                             21          }
+    22
+    23          protected abstract bool Matches(WaveSpectrumConditionKey k);
+    24
+    25          protected abstract int AddToHashCode(int hashcode);                                                                                              26                                                                                                                                                           27          public static bool operator ==(WaveSpectrumConditionKey k1, WaveSpectrumConditionKey k2)                                                         28          {
+    29                  if ((object)k1 == k2)
+    30                  {
+    31                          return true;
+    32                  }                                                                                                                                        33                  if ((object)k1 == null || (object)k2 == null)
+    34                  {                                                                                                                                        35                          return false;
+    36                  }
+    37                  if (k1.Size != k2.Size)
+    38                  {
+    39                          return false;                                                                                                                    40                  }
+    41                  if (k1.NumGrids != k2.NumGrids)                                                                                                          42                  {
+    43                          return false;                                                                                                                    44                  }
+    45                  if (k1.WindDir != k2.WindDir)                                                                                                            46                  {
+    47                          return false;                                                                                                                    48                  }
+    49                  if (k1.SpectrumType != k2.SpectrumType)                                                                                                  50                  {
+    51                          return false;
+    52                  }
+    53                  return k1.Matches(k2);
+    54          }
+    55
+    56          public static bool operator !=(WaveSpectrumConditionKey k1, WaveSpectrumConditionKey k2)
+    57          {
+    58                  return !(k1 == k2);
+    59          }
+    60
+    61          public override bool Equals(object o)
+    62          {
+    63                  WaveSpectrumConditionKey waveSpectrumConditionKey = o as WaveSpectrumConditionKey;
+    64                  if (waveSpectrumConditionKey == null)
+    65                  {
+    66                          return false;
+    67                  }
+    68                  return waveSpectrumConditionKey == this;
+    69          }
+    70
+    71          public bool Equals(WaveSpectrumConditionKey k)
+    72          {
+    73                  return k == this;
+    74          }
+    75
+    76          public override int GetHashCode()
+    77          {
+    78                  int num = 23;
+    79                  num = num * 37 + Size.GetHashCode();
+    80                  num = num * 37 + NumGrids.GetHashCode();
+    81                  num = num * 37 + WindDir.GetHashCode();
+    82                  num = num * 37 + SpectrumType.GetHashCode();
+    83                  return AddToHashCode(num);
+    84          }
+    85  }
+==================== UnifiedSpectrumConditionKey.cs ====================
+     1  namespace Ceto;
+     2
+     3  public class UnifiedSpectrumConditionKey : WaveSpectrumConditionKey
+     4  {
+     5          public float WindSpeed { get; private set; }
+     6
+     7          public float WaveAge { get; private set; }
+     8
+     9          public UnifiedSpectrumConditionKey(float windSpeed, float waveAge, int size, float windDir, SPECTRUM_TYPE spectrumType, int numGrids)
+    10                  : base(size, windDir, spectrumType, numGrids)
+    11          {
+    12                  WindSpeed = windSpeed;
+    13                  WaveAge = waveAge;
+    14          }
+    15
+    16          protected override bool Matches(WaveSpectrumConditionKey k)
+    17          {
+    18                  UnifiedSpectrumConditionKey unifiedSpectrumConditionKey = k as UnifiedSpectrumConditionKey;
+    19                  if (unifiedSpectrumConditionKey == null)
+    20                  {
+    21                          return false;
+    22                  }
+    23                  if (WindSpeed != unifiedSpectrumConditionKey.WindSpeed)
+    24                  {
+    25                          return false;
+    26                  }
+    27                  if (WaveAge != unifiedSpectrumConditionKey.WaveAge)
+    28                  {
+    29                          return false;
+    30                  }
+    31                  return true;                                                                                                                             32          }
+    33                                                                                                                                                           34          protected override int AddToHashCode(int hashcode)
+    35          {
+    36                  hashcode = hashcode * 37 + WindSpeed.GetHashCode();
+    37                  hashcode = hashcode * 37 + WaveAge.GetHashCode();
+    38                  return hashcode;
+    39          }
+    40
+    41          public override string ToString()
+    42          {
+    43                  return $"[UnifiedSpectrumConditionKey WindSpeed={WindSpeed}, WaveAge={WaveAge}, Size={Size}, WindDir={WindDir}, Type={SpectrumType}, NumGrids={NumGrids}";
+    44          }
+    45  }
+==================== PhillipsSpectrumConditionKey.cs ====================
+     1  namespace Ceto;
+     2
+     3  public class PhillipsSpectrumConditionKey : WaveSpectrumConditionKey
+     4  {
+     5          public float WindSpeed { get; private set; }
+     6
+     7          public PhillipsSpectrumConditionKey(float windSpeed, int size, float windDir, SPECTRUM_TYPE spectrumType, int numGrids)
+     8                  : base(size, windDir, spectrumType, numGrids)                                                                                             9          {
+    10                  WindSpeed = windSpeed;
+    11          }
+    12
+    13          protected override bool Matches(WaveSpectrumConditionKey k)
+    14          {
+    15                  PhillipsSpectrumConditionKey phillipsSpectrumConditionKey = k as PhillipsSpectrumConditionKey;
+    16                  if (phillipsSpectrumConditionKey == null)
+    17                  {
+    18                          return false;
+    19                  }                                                                                                                                        20                  if (WindSpeed != phillipsSpectrumConditionKey.WindSpeed)
+    21                  {
+    22                          return false;
+    23                  }
+    24                  return true;
+    25          }
+    26
+    27          protected override int AddToHashCode(int hashcode)
+    28          {
+    29                  hashcode = hashcode * 37 + WindSpeed.GetHashCode();
+    30                  return hashcode;
+    31          }
+    32
+    33          public override string ToString()
+    34          {
+    35                  return $"[PhillipsSpectrumConditionKey WindSpeed={WindSpeed}, Size={Size}, WindDir={WindDir}, Type={SpectrumType}, NumGrids={NumGrids}";
+    36          }
+    37  }
+==================== UnifiedPhillipsSpectrumCondition.cs ====================
+     1  using System;
+     2  using UnityEngine;
+     3
+     4  namespace Ceto;
+     5
+     6  public class UnifiedPhillipsSpectrumCondition : WaveSpectrumCondition
+     7  {
+     8          public UnifiedPhillipsSpectrumCondition(int size, float windSpeed, float windDir, float waveAge, int numGrids)
+     9                  : base(size, numGrids)
+    10          {
+    11                  if (numGrids < 1 || numGrids > 4)
+    12                  {
+    13                          throw new ArgumentException("UnifiedPhillipsSpectrumCondition must have 1 to 4 grids not " + numGrids);
+    14                  }                                                                                                                                        15                  Key = new UnifiedSpectrumConditionKey(windSpeed, waveAge, size, windDir, SPECTRUM_TYPE.UNIFIED_PHILLIPS, numGrids);
+    16                  switch (numGrids)                                                                                                                        17                  {
+    18                  case 1:
+    19                          GridSizes = new Vector4(772f, 1f, 1f, 1f);
+    20                          Choppyness = new Vector4(2.3f, 1f, 1f, 1f);                                                                                      21                          WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+    22                          break;                                                                                                                           23                  case 2:
+    24                          GridSizes = new Vector4(772f, 97f, 1f, 1f);
+    25                          Choppyness = new Vector4(2.3f, 1.2f, 1f, 1f);
+    26                          WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+    27                          break;
+    28                  case 3:
+    29                          GridSizes = new Vector4(1372f, 392f, 31f, 1f);                                                                                   30                          Choppyness = new Vector4(2.3f, 2.1f, 1f, 1f);
+    31                          WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+    32                          break;
+    33                  case 4:
+    34                          GridSizes = new Vector4(1372f, 392f, 31f, 4f);                                                                                   35                          Choppyness = new Vector4(2.3f, 2.1f, 1f, 0.9f);
+    36                          WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+    37                          break;
+    38                  }                                                                                                                                        39          }
+    40                                                                                                                                                           41          public override SpectrumTask GetCreateSpectrumConditionTask()
+    42          {
+    43                  UnifiedSpectrumConditionKey unifiedSpectrumConditionKey = Key as UnifiedSpectrumConditionKey;
+    44                  UnifiedSpectrum unifiedSpectrum = new UnifiedSpectrum(unifiedSpectrumConditionKey.WindSpeed, unifiedSpectrumConditionKey.WindDir, unifiedSpectrumConditionKey.WaveAge);                                                                                                                               45                  PhillipsSpectrum phillipsSpectrum = new PhillipsSpectrum(unifiedSpectrumConditionKey.WindSpeed, unifiedSpectrumConditionKey.WindDir);
+    46                  if (Key.NumGrids == 1)
+    47                  {
+    48                          return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, null, null, null });                    49                  }
+    50                  if (Key.NumGrids == 2)
+    51                  {
+    52                          return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, phillipsSpectrum, null, null });        53                  }
+    54                  if (Key.NumGrids == 3)
+    55                  {                                                                                                                                        56                          return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, unifiedSpectrum, phillipsSpectrum, null });                                                                                                                                                          57                  }
+    58                  return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, unifiedSpectrum, phillipsSpectrum, unifiedSpectrum });                                                                                                                                                       59          }
+    60  }
+==================== SpectrumTask.cs ====================
+     1  using System;                                                                                                                                             2  using System.Collections;
+     3  using Ceto.Common.Threading.Tasks;                                                                                                                        4  using UnityEngine;
+     5
+     6  namespace Ceto;
+     7
+     8  public class SpectrumTask : ThreadedTask                                                                                                                  9  {
+    10          public const float GRAVITY = 9.818286f;
+    11
+    12          public const float WAVE_CM = 0.23f;
+    13                                                                                                                                                           14          public const float WAVE_KM = 370f;
+    15                                                                                                                                                           16          private Color[] m_spectrum01;
+    17
+    18          private Color[] m_spectrum23;
+    19
+    20          private Color[] m_wtable;                                                                                                                        21
+    22          private ISpectrum[] m_spectrums;
+    23
+    24          private System.Random m_rnd;
+    25                                                                                                                                                           26          private SPECTRUM_DISTRIBUTION m_distibution;
+    27                                                                                                                                                           28          public int Size { get; private set; }
+    29
+    30          public int NumGrids { get; private set; }
+    31
+    32          public Vector4 GridSizes { get; private set; }                                                                                                   33
+    34          public Vector4 InverseGridSizes { get; private set; }
+    35
+    36          public Vector4 WaveAmps { get; private set; }
+    37
+    38          protected WaveSpectrumCondition Condition { get; private set; }
+    39                                                                                                                                                           40          public SpectrumTask(WaveSpectrumCondition condition, bool multiThreadTask, ISpectrum[] spectrums)
+    41                  : base(multiThreadTask)                                                                                                                  42          {
+    43                  if (spectrums == null || spectrums.Length != 4)                                                                                          44                  {
+    45                          throw new ArgumentException("Spectrums array must have a length of 4");                                                          46                  }
+    47                  m_spectrums = spectrums;                                                                                                                 48                  Condition = condition;                                                                                                                   49                  Size = condition.Key.Size;                                                                                                               50                  GridSizes = condition.GridSizes;
+    51                  WaveAmps = condition.WaveAmps;
+    52                  NumGrids = condition.Key.NumGrids;
+    53                  m_rnd = new System.Random(0);
+    54                  m_distibution = SPECTRUM_DISTRIBUTION.LINEAR;
+    55                  float num = MathF.PI * 2f * (float)Size;
+    56                  InverseGridSizes = new Vector4(num / GridSizes.x, num / GridSizes.y, num / GridSizes.z, num / GridSizes.w);
+    57                  m_spectrum01 = new Color[Size * Size];
+    58                  if (NumGrids > 2)                                                                                                                        59                  {
+    60                          m_spectrum23 = new Color[Size * Size];
+    61                  }
+    62                  m_wtable = new Color[Size * Size];
+    63          }
+    64
+    65          protected float RandomNumber()
+    66          {
+    67                  return m_distibution switch
+    68                  {
+    69                          SPECTRUM_DISTRIBUTION.LINEAR => (float)m_rnd.NextDouble(),                                                                       70                          SPECTRUM_DISTRIBUTION.GAUSSIAN => GaussianRandomNumber(),
+    71                          _ => (float)m_rnd.NextDouble(),
+    72                  };
+    73          }
+    74
+    75          private float GaussianRandomNumber()
+    76          {
+    77                  float num;
+    78                  float num3;
+    79                  do
+    80                  {
+    81                          num = 2f * (float)m_rnd.NextDouble() - 1f;
+    82                          float num2 = 2f * (float)m_rnd.NextDouble() - 1f;
+    83                          num3 = num * num + num2 * num2;
+    84                  }
+    85                  while (num3 >= 1f);
+    86                  num3 = Mathf.Sqrt(-2f * Mathf.Log(num3) / num3);
+    87                  return num * num3;
+    88          }
+    89
+    90          public override void Start()
+    91          {
+    92                  base.Start();
+    93                  Condition.CreateTextures();
+    94                  Condition.Done = false;
+    95          }
+    96
+    97          public override IEnumerator Run()
+    98          {
+    99                  CreateWTable();
+   100                  GenerateWavesSpectrum();
+   101                  FinishedRunning();
+   102                  return null;
+   103          }
+   104
+   105          public override void End()
+   106          {
+   107                  base.End();
+   108                  Condition.Apply(m_spectrum01, m_spectrum23, m_wtable);
+   109                  Condition.LastUpdated = Time.frameCount;
+   110                  Condition.Done = true;
+   111          }
+   112
+   113          private float GetSpectrumSample(float i, float j, float dk, float kMin, float amp, ISpectrum spectrum)
+   114          {
+   115                  if (spectrum == null)
+   116                  {
+   117                          return 0f;                                                                                                                      118                  }
+   119                  float num = i * dk;                                                                                                                     120                  float num2 = j * dk;
+   121                  float num3 = 0f;
+   122                  if (Math.Abs(num) >= kMin || Math.Abs(num2) >= kMin)
+   123                  {
+   124                          num3 = Mathf.Sqrt(spectrum.Spectrum(num, num2) * amp * 0.5f) * dk;
+   125                          if (float.IsNaN(num3) || float.IsInfinity(num3))
+   126                          {
+   127                                  num3 = 0f;
+   128                          }
+   129                  }                                                                                                                                       130                  return num3;
+   131          }                                                                                                                                               132
+   133          private void GenerateWavesSpectrum()                                                                                                            134          {
+   135                  int size = Size;
+   136                  int num = size / 2;
+   137                  float num2 = size;
+   138                  int numGrids = NumGrids;
+   139                  float num3 = MathF.PI * 2f;
+   140                  float kMin = MathF.PI / GridSizes.x;                                                                                                    141                  float kMin2 = MathF.PI * num2 / GridSizes.x;                                                                                            142                  float kMin3 = MathF.PI * num2 / GridSizes.y;
+   143                  float kMin4 = MathF.PI * num2 / GridSizes.z;
+   144                  float dk = num3 / GridSizes.x;
+   145                  float dk2 = num3 / GridSizes.y;
+   146                  float dk3 = num3 / GridSizes.z;
+   147                  float dk4 = num3 / GridSizes.w;
+   148                  float x = WaveAmps.x;
+   149                  float y = WaveAmps.y;
+   150                  float z = WaveAmps.z;
+   151                  float w = WaveAmps.w;
+   152                  Vector4 vector = default;                                                                                                               153                  for (int i = 0; i < size; i++)
+   154                  {
+   155                          for (int j = 0; j < size; j++)
+   156                          {
+   157                                  if (Cancelled)
+   158                                  {
+   159                                          return;
+   160                                  }
+   161                                  int num4 = j + i * size;
+   162                                  float i2 = ((j >= num) ? ((float)j - num2) : ((float)j));
+   163                                  float j2 = ((i >= num) ? ((float)i - num2) : ((float)i));
+   164                                  if (numGrids > 0)                                                                                                       165                                  {
+   166                                          float f = RandomNumber() * num3;
+   167                                          vector.x = GetSpectrumSample(i2, j2, dk, kMin, x, m_spectrums[0]);
+   168                                          m_spectrum01[num4].r = vector.x * Mathf.Cos(f) * 1.4142135f;
+   169                                          m_spectrum01[num4].g = vector.x * Mathf.Sin(f) * 1.4142135f;
+   170                                  }
+   171                                  if (numGrids > 1)
+   172                                  {
+   173                                          float f = RandomNumber() * num3;
+   174                                          vector.y = GetSpectrumSample(i2, j2, dk2, kMin2, y, m_spectrums[1]);
+   175                                          m_spectrum01[num4].b = vector.y * Mathf.Cos(f) * 1.4142135f;
+   176                                          m_spectrum01[num4].a = vector.y * Mathf.Sin(f) * 1.4142135f;
+   177                                  }
+   178                                  if (numGrids > 2)                                                                                                       179                                  {
+   180                                          float f = RandomNumber() * num3;
+   181                                          vector.z = GetSpectrumSample(i2, j2, dk3, kMin3, z, m_spectrums[2]);
+   182                                          m_spectrum23[num4].r = vector.z * Mathf.Cos(f) * 1.4142135f;
+   183                                          m_spectrum23[num4].g = vector.z * Mathf.Sin(f) * 1.4142135f;                                                    184                                  }
+   185                                  if (numGrids > 3)
+   186                                  {
+   187                                          float f = RandomNumber() * num3;
+   188                                          vector.w = GetSpectrumSample(i2, j2, dk4, kMin4, w, m_spectrums[3]);
+   189                                          m_spectrum23[num4].b = vector.w * Mathf.Cos(f) * 1.4142135f;                                                    190                                          m_spectrum23[num4].a = vector.w * Mathf.Sin(f) * 1.4142135f;
+   191                                  }
+   192                          }
+   193                  }
+   194          }
+   195
+   196          private void CreateWTable()
+   197          {
+   198                  int size = Size;
+   199                  float num = size;
+   200                  float num2 = 1f / num;
+   201                  int numGrids = NumGrids;
+   202                  Vector4 vector = default;
+   203                  vector.x = InverseGridSizes.x * InverseGridSizes.x;
+   204                  vector.y = InverseGridSizes.y * InverseGridSizes.y;
+   205                  vector.z = InverseGridSizes.z * InverseGridSizes.z;
+   206                  vector.w = InverseGridSizes.w * InverseGridSizes.w;
+   207                  float num3 = 136900f;
+   208                  Vector2 vector2 = default;
+   209                  Vector2 vector3 = default;
+   210                  Vector2 vector4 = default;
+   211                  for (int i = 0; i < size; i++)
+   212                  {
+   213                          for (int j = 0; j < size; j++)
+   214                          {
+   215                                  if (Cancelled)                                                                                                          216                                  {
+   217                                          return;
+   218                                  }
+   219                                  int num4 = j + i * size;
+   220                                  vector2.x = (float)j * num2;
+   221                                  vector2.y = (float)i * num2;
+   222                                  vector3.x = ((vector2.x > 0.5f) ? (vector2.x - 1f) : vector2.x);
+   223                                  vector3.y = ((vector2.y > 0.5f) ? (vector2.y - 1f) : vector2.y);
+   224                                  vector4.x = vector3.x * vector3.x;
+   225                                  vector4.y = vector3.y * vector3.y;
+   226                                  if (numGrids > 0)
+   227                                  {
+   228                                          float num5 = Mathf.Sqrt(vector4.x * vector.x + vector4.y * vector.x);                                           229                                          float r = Mathf.Sqrt(9.818286f * num5 * (1f + num5 * num5 / num3));
+   230                                          m_wtable[num4].r = r;
+   231                                  }
+   232                                  if (numGrids > 1)
+   233                                  {                                                                                                                       234                                          float num6 = Mathf.Sqrt(vector4.x * vector.y + vector4.y * vector.y);
+   235                                          float g = Mathf.Sqrt(9.818286f * num6 * (1f + num6 * num6 / num3));                                             236                                          m_wtable[num4].g = g;
+   237                                  }                                                                                                                       238                                  if (numGrids > 2)
+   239                                  {                                                                                                                       240                                          float num7 = Mathf.Sqrt(vector4.x * vector.z + vector4.y * vector.z);
+   241                                          float b = Mathf.Sqrt(9.818286f * num7 * (1f + num7 * num7 / num3));                                             242                                          m_wtable[num4].b = b;
+   243                                  }                                                                                                                       244                                  if (numGrids > 3)                                                                                                       245                                  {                                                                                                                       246                                          float num8 = Mathf.Sqrt(vector4.x * vector.w + vector4.y * vector.w);
+   247                                          float a = Mathf.Sqrt(9.818286f * num8 * (1f + num8 * num8 / num3));                                             248                                          m_wtable[num4].a = a;
+   249                                  }                                                                                                                       250                          }
+   251                  }                                                                                                                                       252          }
+   253  }                                                                                                                                                    ==================== InitSpectrumDisplacementsTask.cs ====================
+     1  using System;                                                                                                                                             2  using System.Collections;
+     3  using Ceto.Common.Threading.Tasks;                                                                                                                        4  using UnityEngine;                                                                                                                                        5                                                                                                                                                            6  namespace Ceto;                                                                                                                                           7                                                                                                                                                            8  public class InitSpectrumDisplacementsTask : ThreadedTask
+     9  {                                                                                                                                                        10          private Color[] m_spectrum01;
+    11                                                                                                                                                           12          private Color[] m_spectrum23;
+    13                                                                                                                                                           14          private Color[] m_wtable;
+    15                                                                                                                                                           16          private Vector3[] m_ktable1;                                                                                                                     17                                                                                                                                                           18          private Vector3[] m_ktable2;
+    19                                                                                                                                                           20          private Vector3[] m_ktable3;
+    21                                                                                                                                                           22          private Vector3[] m_ktable4;
+    23                                                                                                                                                           24          public int NumGrids { get; private set; }
+    25                                                                                                                                                           26          public int Size { get; private set; }
+    27                                                                                                                                                           28          public int LastUpdated { get; protected set; }
+    29                                                                                                                                                           30          public float TimeValue { get; protected set; }                                                                                                   31                                                                                                                                                           32          public SPECTRUM_TYPE SpectrumType { get; private set; }                                                                                          33                                                                                                                                                           34          protected DisplacementBufferCPU Buffer { get; private set; }                                                                                     35                                                                                                                                                           36          protected Vector4[] Data0 { get; set; }                                                                                                          37                                                                                                                                                           38          protected Vector4[] Data1 { get; set; }
+    39                                                                                                                                                           40          protected Vector4[] Data2 { get; set; }
+    41                                                                                                                                                           42          public InitSpectrumDisplacementsTask(DisplacementBufferCPU buffer, WaveSpectrumCondition condition, float time)
+    43                  : base(isThreaded: true)                                                                                                                 44          {
+    45                  Buffer = buffer;                                                                                                                         46                  NumGrids = condition.Key.NumGrids;
+    47                  Size = condition.Key.Size;                                                                                                               48                  SpectrumType = condition.Key.SpectrumType;
+    49                  TimeValue = time;                                                                                                                        50                  Reset(condition, time);                                                                                                                  51                  CreateKTables(condition.InverseGridSizes());                                                                                             52          }                                                                                                                                                53                                                                                                                                                           54          public void Reset(WaveSpectrumCondition condition, float time)                                                                                   55          {                                                                                                                                                56                  if (condition.Key.SpectrumType != SpectrumType)                                                                                          57                  {                                                                                                                                        58                          throw new InvalidOperationException("Trying to reset a Unified InitSpectrum task with wrong condition type = " + condition.Key.SpectrumType);                                                                                                                                                 59                  }                                                                                                                                        60                  if (condition.Key.Size != Size)                                                                                                          61                  {                                                                                                                                        62                          throw new InvalidOperationException("Trying to reset a Unified InitSpectrum task with wrong condition size = " + condition.Key.Size);
+    63                  }                                                                                                                                        64                  base.Reset();
+    65                  int num = Size * Size;                                                                                                                   66                  if (m_spectrum01 == null)
+    67                  {                                                                                                                                        68                          m_spectrum01 = new Color[num];
+    69                  }                                                                                                                                        70                  if (m_spectrum23 == null && NumGrids > 2)
+    71                  {                                                                                                                                        72                          m_spectrum23 = new Color[num];
+    73                  }                                                                                                                                        74                  if (m_wtable == null)                                                                                                                    75                  {                                                                                                                                        76                          m_wtable = new Color[num];
+    77                  }                                                                                                                                        78                  TimeValue = time;                                                                                                                        79                  Data0 = Buffer.GetReadBuffer(0);
+    80                  Data1 = Buffer.GetReadBuffer(1);                                                                                                         81                  Data2 = Buffer.GetReadBuffer(2);
+    82                  WaveSpectrumBufferCPU.Buffer buffer = Buffer.GetBuffer(0);                                                                               83                  WaveSpectrumBufferCPU.Buffer buffer2 = Buffer.GetBuffer(1);
+    84                  WaveSpectrumBufferCPU.Buffer buffer3 = Buffer.GetBuffer(2);
+    85                  if (buffer != null)
+    86                  {
+    87                          if (NumGrids > 2)
+    88                          {
+    89                                  buffer.doublePacked = true;
+    90                          }
+    91                          else
+    92                          {
+    93                                  buffer.doublePacked = false;
+    94                          }
+    95                  }
+    96                  if (buffer2 != null)
+    97                  {
+    98                          if (NumGrids > 1)
+    99                          {
+   100                                  buffer2.doublePacked = true;
+   101                          }
+   102                          else
+   103                          {
+   104                                  buffer2.doublePacked = false;
+   105                          }
+   106                  }
+   107                  if (buffer3 != null)
+   108                  {
+   109                          if (NumGrids > 3)
+   110                          {
+   111                                  buffer3.doublePacked = true;
+   112                          }
+   113                          else
+   114                          {
+   115                                  buffer3.doublePacked = false;
+   116                          }
+   117                  }                                                                                                                                       118                  if (LastUpdated != condition.LastUpdated)
+   119                  {
+   120                          LastUpdated = condition.LastUpdated;
+   121                          if (m_spectrum01 != null && condition.SpectrumData01 != null)
+   122                          {
+   123                                  Array.Copy(condition.SpectrumData01, m_spectrum01, num);
+   124                          }
+   125                          if (m_spectrum23 != null && condition.SpectrumData23 != null)
+   126                          {
+   127                                  Array.Copy(condition.SpectrumData23, m_spectrum23, num);
+   128                          }
+   129                          if (m_wtable != null && condition.WTableData != null)
+   130                          {
+   131                                  Array.Copy(condition.WTableData, m_wtable, num);
+   132                          }
+   133                  }
+   134          }
+   135
+   136          public override IEnumerator Run()
+   137          {
+   138                  if (NumGrids == 1)
+   139                  {
+   140                          InitilizeGrids1();
+   141                  }
+   142                  else if (NumGrids == 2)
+   143                  {
+   144                          InitilizeGrids2();
+   145                  }
+   146                  else if (NumGrids == 3)
+   147                  {
+   148                          InitilizeGrids3();
+   149                  }
+   150                  else if (NumGrids == 4)
+   151                  {
+   152                          InitilizeGrids4();
+   153                  }
+   154                  FinishedRunning();
+   155                  return null;
+   156          }
+   157
+   158          private void InitilizeGrids1()
+   159          {
+   160                  int size = Size;
+   161                  float num = 1f / (float)size;
+   162                  Vector2 vector = default;
+   163                  Vector2 vector2 = default;
+   164                  Vector2 vector3 = default;
+   165                  Vector2 vector5 = default;
+   166                  for (int i = 0; i < size; i++)
+   167                  {
+   168                          for (int j = 0; j < size; j++)
+   169                          {                                                                                                                               170                                  if (Cancelled)
+   171                                  {                                                                                                                       172                                          return;
+   173                                  }
+   174                                  vector.x = (float)j * num;
+   175                                  vector.y = (float)i * num;
+   176                                  vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+   177                                  vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+   178                                  int num2 = j + i * size;
+   179                                  int num3 = (size - j) % size + (size - i) % size * size;
+   180                                  Color color = m_spectrum01[num2];
+   181                                  Color color2 = m_spectrum01[num3];
+   182                                  float f = m_wtable[num2].r * TimeValue;
+   183                                  float num4 = Mathf.Cos(f);
+   184                                  float num5 = Mathf.Sin(f);
+   185                                  vector3.x = (color.r + color2.r) * num4 - (color.g + color2.g) * num5;
+   186                                  vector3.y = (color.r - color2.r) * num5 + (color.g - color2.g) * num4;
+   187                                  if (Data0 != null)
+   188                                  {
+   189                                          Data0[num2].x = vector3.x;
+   190                                          Data0[num2].y = vector3.y;
+   191                                          Data0[num2].z = 0f;
+   192                                          Data0[num2].w = 0f;
+   193                                  }
+   194                                  if (Data1 != null)
+   195                                  {
+   196                                          Vector3 vector4 = m_ktable1[num2];
+   197                                          vector5.x = 0f - vector4.x * vector3.y - vector4.y * vector3.x;
+   198                                          vector5.y = vector4.x * vector3.x - vector4.y * vector3.y;
+   199                                          Data1[num2].x = vector5.x * vector4.z;
+   200                                          Data1[num2].y = vector5.y * vector4.z;
+   201                                          Data1[num2].z = 0f;
+   202                                          Data1[num2].w = 0f;
+   203                                  }
+   204                          }
+   205                  }
+   206          }
+   207
+   208          private void InitilizeGrids2()
+   209          {
+   210                  int size = Size;
+   211                  float num = 1f / (float)size;
+   212                  Vector2 vector = default;
+   213                  Vector2 vector2 = default;
+   214                  Vector2 vector3 = default;
+   215                  Vector2 vector4 = default;
+   216                  Vector2 vector7 = default;
+   217                  Vector2 vector8 = default;
+   218                  for (int i = 0; i < size; i++)
+   219                  {
+   220                          for (int j = 0; j < size; j++)                                                                                                  221                          {
+   222                                  if (Cancelled)
+   223                                  {
+   224                                          return;                                                                                                         225                                  }                                                                                                                       226                                  vector.x = (float)j * num;
+   227                                  vector.y = (float)i * num;
+   228                                  vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+   229                                  vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+   230                                  int num2 = j + i * size;
+   231                                  int num3 = (size - j) % size + (size - i) % size * size;
+   232                                  Color color = m_spectrum01[num2];
+   233                                  Color color2 = m_spectrum01[num3];
+   234                                  Color color3 = m_wtable[num2];
+   235                                  color3.r *= TimeValue;
+   236                                  color3.g *= TimeValue;
+   237                                  float num4 = Mathf.Cos(color3.r);
+   238                                  float num5 = Mathf.Sin(color3.r);
+   239                                  vector3.x = (color.r + color2.r) * num4 - (color.g + color2.g) * num5;
+   240                                  vector3.y = (color.r - color2.r) * num5 + (color.g - color2.g) * num4;
+   241                                  num4 = Mathf.Cos(color3.g);
+   242                                  num5 = Mathf.Sin(color3.g);
+   243                                  vector4.x = (color.b + color2.b) * num4 - (color.a + color2.a) * num5;
+   244                                  vector4.y = (color.b - color2.b) * num5 + (color.a - color2.a) * num4;
+   245                                  if (Data0 != null)
+   246                                  {
+   247                                          Data0[num2].x = vector3.x + (0f - vector4.y);
+   248                                          Data0[num2].y = vector3.y + vector4.x;
+   249                                          Data0[num2].z = 0f;
+   250                                          Data0[num2].w = 0f;
+   251                                  }
+   252                                  if (Data1 != null)
+   253                                  {
+   254                                          Vector3 vector5 = m_ktable1[num2];
+   255                                          Vector3 vector6 = m_ktable2[num2];
+   256                                          vector7.x = 0f - vector5.x * vector3.y - vector5.y * vector3.x;
+   257                                          vector7.y = vector5.x * vector3.x - vector5.y * vector3.y;
+   258                                          vector8.x = 0f - vector6.x * vector4.y - vector6.y * vector4.x;
+   259                                          vector8.y = vector6.x * vector4.x - vector6.y * vector4.y;
+   260                                          Data1[num2].x = vector7.x * vector5.z;                                                                          261                                          Data1[num2].y = vector7.y * vector5.z;
+   262                                          Data1[num2].z = vector8.x * vector6.z;
+   263                                          Data1[num2].w = vector8.y * vector6.z;
+   264                                  }                                                                                                                       265                          }
+   266                  }
+   267          }
+   268
+   269          private void InitilizeGrids3()
+   270          {
+   271                  int size = Size;
+   272                  float num = 1f / (float)size;
+   273                  Vector2 vector = default;
+   274                  Vector2 vector2 = default;
+   275                  Vector2 vector3 = default;
+   276                  Vector2 vector4 = default;
+   277                  Vector2 vector5 = default;
+   278                  Vector2 vector8 = default;
+   279                  Vector2 vector9 = default;
+   280                  Vector2 vector11 = default;
+   281                  for (int i = 0; i < size; i++)
+   282                  {
+   283                          for (int j = 0; j < size; j++)
+   284                          {
+   285                                  if (Cancelled)
+   286                                  {
+   287                                          return;                                                                                                         288                                  }                                                                                                                       289                                  vector.x = (float)j * num;
+   290                                  vector.y = (float)i * num;
+   291                                  vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+   292                                  vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+   293                                  int num2 = j + i * size;
+   294                                  int num3 = (size - j) % size + (size - i) % size * size;
+   295                                  Color color = m_spectrum01[num2];
+   296                                  Color color2 = m_spectrum23[num2];
+   297                                  Color color3 = m_spectrum01[num3];
+   298                                  Color color4 = m_spectrum23[num3];
+   299                                  Color color5 = m_wtable[num2];
+   300                                  color5.r *= TimeValue;
+   301                                  color5.g *= TimeValue;
+   302                                  color5.b *= TimeValue;
+   303                                  color5.a *= TimeValue;
+   304                                  float num4 = Mathf.Cos(color5.r);
+   305                                  float num5 = Mathf.Sin(color5.r);
+   306                                  vector3.x = (color.r + color3.r) * num4 - (color.g + color3.g) * num5;
+   307                                  vector3.y = (color.r - color3.r) * num5 + (color.g - color3.g) * num4;
+   308                                  num4 = Mathf.Cos(color5.g);
+   309                                  num5 = Mathf.Sin(color5.g);
+   310                                  vector4.x = (color.b + color3.b) * num4 - (color.a + color3.a) * num5;
+   311                                  vector4.y = (color.b - color3.b) * num5 + (color.a - color3.a) * num4;                                                  312                                  num4 = Mathf.Cos(color5.b);
+   313                                  num5 = Mathf.Sin(color5.b);
+   314                                  vector5.x = (color2.r + color4.r) * num4 - (color2.g + color4.g) * num5;
+   315                                  vector5.y = (color2.r - color4.r) * num5 + (color2.g - color4.g) * num4;
+   316                                  if (Data0 != null)
+   317                                  {
+   318                                          Data0[num2].x = vector3.x + (0f - vector4.y);
+   319                                          Data0[num2].y = vector3.y + vector4.x;
+   320                                          Data0[num2].z = vector5.x;
+   321                                          Data0[num2].w = vector5.y;
+   322                                  }
+   323                                  if (Data1 != null)
+   324                                  {
+   325                                          Vector3 vector6 = m_ktable1[num2];
+   326                                          Vector3 vector7 = m_ktable2[num2];
+   327                                          vector8.x = 0f - vector6.x * vector3.y - vector6.y * vector3.x;
+   328                                          vector8.y = vector6.x * vector3.x - vector6.y * vector3.y;                                                      329                                          vector9.x = 0f - vector7.x * vector4.y - vector7.y * vector4.x;
+   330                                          vector9.y = vector7.x * vector4.x - vector7.y * vector4.y;
+   331                                          Data1[num2].x = vector8.x * vector6.z;
+   332                                          Data1[num2].y = vector8.y * vector6.z;
+   333                                          Data1[num2].z = vector9.x * vector7.z;
+   334                                          Data1[num2].w = vector9.y * vector7.z;
+   335                                  }
+   336                                  if (Data2 != null)
+   337                                  {
+   338                                          Vector3 vector10 = m_ktable3[num2];
+   339                                          vector11.x = 0f - vector10.x * vector5.y - vector10.y * vector5.x;
+   340                                          vector11.y = vector10.x * vector5.x - vector10.y * vector5.y;
+   341                                          Data2[num2].x = vector11.x * vector10.z;
+   342                                          Data2[num2].y = vector11.y * vector10.z;
+   343                                          Data2[num2].z = 0f;
+   344                                          Data2[num2].w = 0f;
+   345                                  }
+   346                          }
+   347                  }
+   348          }
+   349
+   350          private void InitilizeGrids4()
+   351          {
+   352                  int size = Size;
+   353                  float num = 1f / (float)size;
+   354                  Vector2 vector = default;
+   355                  Vector2 vector2 = default;
+   356                  Vector2 vector3 = default;
+   357                  Vector2 vector4 = default;
+   358                  Vector2 vector5 = default;
+   359                  Vector2 vector6 = default;
+   360                  Vector2 vector9 = default;
+   361                  Vector2 vector10 = default;
+   362                  Vector2 vector13 = default;
+   363                  Vector2 vector14 = default;
+   364                  for (int i = 0; i < size; i++)
+   365                  {
+   366                          for (int j = 0; j < size; j++)
+   367                          {
+   368                                  if (Cancelled)
+   369                                  {
+   370                                          return;
+   371                                  }
+   372                                  vector.x = (float)j * num;
+   373                                  vector.y = (float)i * num;
+   374                                  vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+   375                                  vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+   376                                  int num2 = j + i * size;
+   377                                  int num3 = (size - j) % size + (size - i) % size * size;
+   378                                  Color color = m_spectrum01[num2];
+   379                                  Color color2 = m_spectrum23[num2];
+   380                                  Color color3 = m_spectrum01[num3];
+   381                                  Color color4 = m_spectrum23[num3];
+   382                                  Color color5 = m_wtable[num2];
+   383                                  color5.r *= TimeValue;
+   384                                  color5.g *= TimeValue;
+   385                                  color5.b *= TimeValue;
+   386                                  color5.a *= TimeValue;
+   387                                  float num4 = Mathf.Cos(color5.r);
+   388                                  float num5 = Mathf.Sin(color5.r);
+   389                                  vector3.x = (color.r + color3.r) * num4 - (color.g + color3.g) * num5;
+   390                                  vector3.y = (color.r - color3.r) * num5 + (color.g - color3.g) * num4;
+   391                                  num4 = Mathf.Cos(color5.g);
+   392                                  num5 = Mathf.Sin(color5.g);
+   393                                  vector4.x = (color.b + color3.b) * num4 - (color.a + color3.a) * num5;
+   394                                  vector4.y = (color.b - color3.b) * num5 + (color.a - color3.a) * num4;
+   395                                  num4 = Mathf.Cos(color5.b);
+   396                                  num5 = Mathf.Sin(color5.b);
+   397                                  vector5.x = (color2.r + color4.r) * num4 - (color2.g + color4.g) * num5;
+   398                                  vector5.y = (color2.r - color4.r) * num5 + (color2.g - color4.g) * num4;
+   399                                  num4 = Mathf.Cos(color5.a);
+   400                                  num5 = Mathf.Sin(color5.a);
+   401                                  vector6.x = (color2.b + color4.b) * num4 - (color2.a + color4.a) * num5;
+   402                                  vector6.y = (color2.b - color4.b) * num5 + (color2.a - color4.a) * num4;
+   403                                  if (Data0 != null)
+   404                                  {
+   405                                          Data0[num2].x = vector3.x + (0f - vector4.y);
+   406                                          Data0[num2].y = vector3.y + vector4.x;
+   407                                          Data0[num2].z = vector5.x + (0f - vector6.y);
+   408                                          Data0[num2].w = vector5.y + vector6.x;
+   409                                  }
+   410                                  if (Data1 != null)
+   411                                  {
+   412                                          Vector3 vector7 = m_ktable1[num2];
+   413                                          Vector3 vector8 = m_ktable2[num2];
+   414                                          vector9.x = 0f - vector7.x * vector3.y - vector7.y * vector3.x;
+   415                                          vector9.y = vector7.x * vector3.x - vector7.y * vector3.y;
+   416                                          vector10.x = 0f - vector8.x * vector4.y - vector8.y * vector4.x;
+   417                                          vector10.y = vector8.x * vector4.x - vector8.y * vector4.y;
+   418                                          Data1[num2].x = vector9.x * vector7.z;
+   419                                          Data1[num2].y = vector9.y * vector7.z;
+   420                                          Data1[num2].z = vector10.x * vector8.z;
+   421                                          Data1[num2].w = vector10.y * vector8.z;
+   422                                  }
+   423                                  if (Data2 != null)
+   424                                  {
+   425                                          Vector3 vector11 = m_ktable3[num2];
+   426                                          Vector3 vector12 = m_ktable4[num2];
+   427                                          vector13.x = 0f - vector11.x * vector5.y - vector11.y * vector5.x;
+   428                                          vector13.y = vector11.x * vector5.x - vector11.y * vector5.y;
+   429                                          vector14.x = 0f - vector12.x * vector6.y - vector12.y * vector6.x;
+   430                                          vector14.y = vector12.x * vector6.x - vector12.y * vector6.y;
+   431                                          Data2[num2].x = vector13.x * vector11.z;
+   432                                          Data2[num2].y = vector13.y * vector11.z;
+   433                                          Data2[num2].z = vector14.x * vector12.z;
+   434                                          Data2[num2].w = vector14.y * vector12.z;
+   435                                  }
+   436                          }                                                                                                                               437                  }
+   438          }
+   439
+   440          private void CreateKTables(Vector4 inverseGridSizes)
+   441          {
+   442                  int size = Size;
+   443                  float num = 1f / (float)size;
+   444                  int numGrids = NumGrids;
+   445                  if (numGrids > 0)
+   446                  {
+   447                          m_ktable1 = new Vector3[size * size];
+   448                  }
+   449                  if (numGrids > 1)
+   450                  {
+   451                          m_ktable2 = new Vector3[size * size];
+   452                  }
+   453                  if (numGrids > 2)
+   454                  {
+   455                          m_ktable3 = new Vector3[size * size];
+   456                  }
+   457                  if (numGrids > 3)
+   458                  {
+   459                          m_ktable4 = new Vector3[size * size];
+   460                  }
+   461                  Vector2 vector = default;
+   462                  Vector2 vector2 = default;
+   463                  Vector2 vector3 = default;
+   464                  Vector2 vector4 = default;
+   465                  Vector2 vector5 = default;
+   466                  Vector2 vector6 = default;
+   467                  for (int i = 0; i < size; i++)
+   468                  {
+   469                          for (int j = 0; j < size; j++)
+   470                          {
+   471                                  vector.x = (float)j * num;
+   472                                  vector.y = (float)i * num;
+   473                                  vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+   474                                  vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+   475                                  int num2 = j + i * size;                                                                                                476                                  if (numGrids > 0)
+   477                                  {
+   478                                          vector3.x = vector2.x * inverseGridSizes.x;
+   479                                          vector3.y = vector2.y * inverseGridSizes.x;
+   480                                          float num3 = Mathf.Sqrt(vector3.x * vector3.x + vector3.y * vector3.y);
+   481                                          float z = ((num3 == 0f) ? 0f : (1f / num3));
+   482                                          m_ktable1[num2].x = vector3.x;
+   483                                          m_ktable1[num2].y = vector3.y;
+   484                                          m_ktable1[num2].z = z;
+   485                                  }
+   486                                  if (numGrids > 1)
+   487                                  {
+   488                                          vector4.x = vector2.x * inverseGridSizes.y;
+   489                                          vector4.y = vector2.y * inverseGridSizes.y;
+   490                                          float num4 = Mathf.Sqrt(vector4.x * vector4.x + vector4.y * vector4.y);
+   491                                          float z2 = ((num4 == 0f) ? 0f : (1f / num4));
+   492                                          m_ktable2[num2].x = vector4.x;
+   493                                          m_ktable2[num2].y = vector4.y;
+   494                                          m_ktable2[num2].z = z2;
+   495                                  }
+   496                                  if (numGrids > 2)
+   497                                  {
+   498                                          vector5.x = vector2.x * inverseGridSizes.z;
+   499                                          vector5.y = vector2.y * inverseGridSizes.z;
+   500                                          float num5 = Mathf.Sqrt(vector5.x * vector5.x + vector5.y * vector5.y);
+   501                                          float z3 = ((num5 == 0f) ? 0f : (1f / num5));
+   502                                          m_ktable3[num2].x = vector5.x;
+   503                                          m_ktable3[num2].y = vector5.y;
+   504                                          m_ktable3[num2].z = z3;
+   505                                  }
+   506                                  if (numGrids > 3)
+   507                                  {
+   508                                          vector6.x = vector2.x * inverseGridSizes.w;
+   509                                          vector6.y = vector2.y * inverseGridSizes.w;
+   510                                          float num6 = Mathf.Sqrt(vector6.x * vector6.x + vector6.y * vector6.y);
+   511                                          float z4 = ((num6 == 0f) ? 0f : (1f / num6));
+   512                                          m_ktable4[num2].x = vector6.x;
+   513                                          m_ktable4[num2].y = vector6.y;
+   514                                          m_ktable4[num2].z = z4;
+   515                                  }
+   516                          }
+   517                  }
+   518          }
+   519  }
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+---------------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. RUNTIME SHADER KEYWORDS & MATERIALS IN OCEAN.CS / PROJECTEDGRID.CS ==="
+=== 1. RUNTIME SHADER KEYWORDS & MATERIALS IN OCEAN.CS / PROJECTEDGRID.CS ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword|oceanTopSide|oceanUnderSide|CETO_" "$CETO/Ocean.cs" "$CETO/ProjectedGrid.cs"
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:51:     public Material oceanTopSideMat;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:53:     public Material oceanUnderSideMat;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:224:                    if (oceanTopSideMat != null)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:226:                            grid.topRenderer[i].sharedMaterial = oceanTopSideMat;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:234:                    if (oceanUnderSideMat != null)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:236:                            grid.underRenderer[j].sharedMaterial = oceanUnderSideMat;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:347:                                    if (oceanTopSideMat != null)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:349:                                        oceanTopSideMat.SetInt("_CullFace", isFlipped ? num2 : num);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:351:                                    if (oceanUnderSideMat != null)                                                                                                                                    /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:353:                                        oceanUnderSideMat.SetInt("_CullFace", isFlipped ? num : num2);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:358:                                    if (oceanTopSideMat != null)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:360:                                        oceanTopSideMat.SetInt("_CullFace", num);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:362:                                    if (oceanUnderSideMat != null)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:364:                                        oceanUnderSideMat.SetInt("_CullFace", num2);
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:402:                    if (oceanTopSideMat != null)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:411:                            meshRenderer.sharedMaterial = oceanTopSideMat;
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:424:                    if ((bool)oceanUnderSideMat)
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/ProjectedGrid.cs:434:                            meshRenderer2.sharedMaterial = oceanUnderSideMat;
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. SERIALIZED MATERIALS POINTING TO TOPSIDE (175) & UNDERSIDE (143) ==="
+=== 2. SERIALIZED MATERIALS POINTING TO TOPSIDE (175) & UNDERSIDE (143) ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> # Map all Ceto shader path_ids in sharedassets0.assets
+> ceto_shaders = {}
+> for obj in e0.objects:
+>     if obj.type.name == "Shader":
+>         sh = obj.read()
+>         pf = getattr(sh, "m_ParsedForm", None)
+>         name = getattr(pf, "m_Name", "") if pf else ""
+>         if "Ceto/Ocean" in name:
+>             ceto_shaders[obj.path_id] = name
+> print("Ceto Ocean Shaders in sharedassets0.assets:", ceto_shaders)
+>
+> # Scan all asset files for Material objects referencing those Shader PIDs
+> for p in sorted(data_dir.glob("*")):
+>     if p.suffix in (".resS", ".resource", ".info") or p.is_dir():
+>         continue
+>     try:
+>         env = UnityPy.load(str(p))
+>         # Find fileID for sharedassets0.assets
+>         s0_fids = [0] if p.name == "sharedassets0.assets" else [
+>             idx + 1 for idx, ext in enumerate(env.file.externals) if "sharedassets0.assets" in ext.path.lower()                                            >         ]
+>         if not s0_fids:
+>             continue
+>         for obj in env.objects:
+>             if obj.type.name == "Material":
+>                 mat = obj.read()
+>                 sh_ptr = getattr(mat, "m_Shader", None)
+>                 if sh_ptr and sh_ptr.m_FileID in s0_fids and sh_ptr.m_PathID in ceto_shaders:
+>                     kws = getattr(mat, "m_ShaderKeywords", [])
+>                     rq = getattr(mat, "m_CustomRenderQueue", -1)
+>                     print(f"[MATERIAL MATCH] {p.name} -> Material '{mat.m_Name}' (pid={obj.path_id})")
+>                     print(f"   Shader: {ceto_shaders[sh_ptr.m_PathID]} (s0 pid={sh_ptr.m_PathID})")
+>                     print(f"   m_ShaderKeywords: {list(kws)} | RenderQueue={rq}")
+>     except Exception:
+>         pass
+> EOF
+Ceto Ocean Shaders in sharedassets0.assets: {139: 'Ceto/OceanBottom', 142: 'Ceto/OceanMaskFlipped', 143: 'Ceto/OceanUnderSide_Transparent', 168: 'Ceto/OceanMask', 175: 'Ceto/OceanTopSide_Transparent', 179: 'Ceto/OceanDepth'}
+[MATERIAL MATCH] sharedassets0.assets -> Material 'OceanTopSide_Transparent' (pid=2)
+   Shader: Ceto/OceanTopSide_Transparent (s0 pid=175)
+   m_ShaderKeywords: [] | RenderQueue=-1
+[MATERIAL MATCH] sharedassets0.assets -> Material 'OceanUnderSide_Transparent' (pid=3)
+   Shader: Ceto/OceanUnderSide_Transparent (s0 pid=143)
+   m_ShaderKeywords: [] | RenderQueue=-1
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-----------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# CETO="/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 1. ALL RUNTIME SHADER KEYWORDS IN CETO C# SOURCE ==="
+=== 1. ALL RUNTIME SHADER KEYWORDS IN CETO C# SOURCE ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# grep -rnE "EnableKeyword|DisableKeyword" "$CETO/" -n
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:61:          Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:67:          Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:146:                         Shader.DisableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:150:                 Shader.EnableKeyword("CETO_REFLECTION_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:190:                                 Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/PlanarReflection.cs:224:         Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:245:             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:350:                             Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/WaveSpectrum.cs:354:                             Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:118:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:134:                       Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:206:                               Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");                                                                                                                     /storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:217:                               Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:334:                               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:350:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:392:                               Shader.DisableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:396:                       Shader.EnableKeyword("CETO_UNDERWATER_ON");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:430:                                       Shader.DisableKeyword("CETO_STERO_CAMERA");
+/storage/emulated/0/Download/Stranded-Deep-Original/ORIGINAL_SOURCES_CLEAN/CSharp_Scripts/Ceto/UnderWater.cs:452:               Shader.DisableKeyword("CETO_STERO_CAMERA");
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# echo "=== 2. EXTRACT PASSES & KEYWORD VARIANTS FOR PID 175 & 143 ==="
+=== 2. EXTRACT PASSES & KEYWORD VARIANTS FOR PID 175 & 143 ===
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy
+> from pathlib import Path
+>
+> data_dir = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> e0 = UnityPy.load(str(data_dir / "sharedassets0.assets"))
+>
+> for pid, label in ((175, "OceanTopSide_Transparent"), (143, "OceanUnderSide_Transparent")):
+>     sh = next(o.read() for o in e0.objects if o.path_id == pid)
+>     pf = sh.m_ParsedForm
+>     name_map = {idx: name for name, idx in pf.m_NameIndices.items()} if hasattr(pf, "m_NameIndices") else {}
+>     print(f"\n=== {label} (pid={pid}) | SubShaders={len(pf.m_SubShaders)} ===")
+>     for pi, ps in enumerate(pf.m_SubShaders[0].m_Passes):
+>         vp_list = ps.progVertex.m_SubPrograms or []
+>         fp_list = ps.progFragment.m_SubPrograms or []
+>         print(f"  Pass[{pi}] name='{ps.m_Name}' -> VertProgs={len(vp_list)}, FragProgs={len(fp_list)}")
+>         for i, sp in enumerate(fp_list[:10]):
+>             gkw = [name_map.get(k, str(k)) for k in (sp.m_GlobalKeywordIndices or [])]
+>             lkw = [name_map.get(k, str(k)) for k in (sp.m_LocalKeywordIndices or [])]
+>             print(f"    FragProg[{i}] BlobIdx={sp.m_BlobIndex} | GlobalKW={gkw} | LocalKW={lkw}")
+> EOF
+
+=== OceanTopSide_Transparent (pid=175) | SubShaders=1 ===
+  Pass[0] name='' -> VertProgs=0, FragProgs=0
+  Pass[1] name='' -> VertProgs=704, FragProgs=160                                                                                                                FragProg[0] BlobIdx=352 | GlobalKW=[] | LocalKW=[]
+    FragProg[1] BlobIdx=353 | GlobalKW=[] | LocalKW=[]
+    FragProg[2] BlobIdx=354 | GlobalKW=[] | LocalKW=[]
+    FragProg[3] BlobIdx=355 | GlobalKW=[] | LocalKW=[]
+    FragProg[4] BlobIdx=356 | GlobalKW=[] | LocalKW=[]
+    FragProg[5] BlobIdx=357 | GlobalKW=[] | LocalKW=[]
+    FragProg[6] BlobIdx=358 | GlobalKW=[] | LocalKW=[]
+    FragProg[7] BlobIdx=359 | GlobalKW=[] | LocalKW=[]
+    FragProg[8] BlobIdx=360 | GlobalKW=[] | LocalKW=[]
+    FragProg[9] BlobIdx=361 | GlobalKW=[] | LocalKW=[]
+
+=== OceanUnderSide_Transparent (pid=143) | SubShaders=1 ===
+  Pass[0] name='' -> VertProgs=704, FragProgs=160
+    FragProg[0] BlobIdx=352 | GlobalKW=[] | LocalKW=[]
+    FragProg[1] BlobIdx=353 | GlobalKW=[] | LocalKW=[]
+    FragProg[2] BlobIdx=354 | GlobalKW=[] | LocalKW=[]                                                                                                           FragProg[3] BlobIdx=355 | GlobalKW=[] | LocalKW=[]
+    FragProg[4] BlobIdx=356 | GlobalKW=[] | LocalKW=[]
+    FragProg[5] BlobIdx=357 | GlobalKW=[] | LocalKW=[]                                                                                                           FragProg[6] BlobIdx=358 | GlobalKW=[] | LocalKW=[]
+    FragProg[7] BlobIdx=359 | GlobalKW=[] | LocalKW=[]
+    FragProg[8] BlobIdx=360 | GlobalKW=[] | LocalKW=[]
+    FragProg[9] BlobIdx=361 | GlobalKW=[] | LocalKW=[]
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+----------
