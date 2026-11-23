@@ -768,3 +768,82 @@ The extracted text contains the one-buffer, two-buffer, three-buffer, and four-b
 - [Output 4.txt](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%204.txt) — original terminal output archived alongside Outputs 1–3.
 - [Fourier DXBC/GLSL blobs](https://github.com/minnya09796592452-rgb/Full-Sources/tree/main/Outputs/Fourier_DXBC_Blobs) — extracted platform payloads and readable GLSL dump.
 
+
+
+## 20. Output 5 — Butterfly lookup equations and initialization shader audit
+
+Source: [Outputs/Output 5](https://github.com/minnya09796592452-rgb/Full-Sources/blob/84a33d339d85ba3a9b954b37f363e82bf8a31bb1/Outputs/Output%205)
+
+### 20.1 Butterfly lookup generation — C# evidence
+
+The Output 5 excerpt exposes the core of `FourierCPU.ComputeButterflyLookupTable()`:
+
+- For stage `i`, it computes `num = 2^(passes-1-i)` and `num2 = 2^i`.
+- For each butterfly pair, the unpermuted source indices are `num3 = j*num2*2+k` and `num4 = j*num2*2+num2+k`.
+- Stage 0 applies `BitReverse()` to both source indices; later stages use the direct indices.
+- Twiddle components are generated as `wr = cos(2π*k*num/fsize)` and `wi = sin(2π*k*num/fsize)`.
+- The lookup entry is stored at `num3 + i*size`, with `j1`, `j2`, `wr`, and `wi`.
+
+This confirms the lookup's index and twiddle construction in the displayed CPU source. It does **not**, by itself, prove the final transform sign convention or normalization; those depend on how the butterfly consumes the twiddle and how the pipeline scales its outputs.
+
+### 20.2 InitDisplacement — Shader PID 154
+
+The extracted platform-15 GLSL declares `Ceto_Offset`, `Ceto_InverseGridSizes`, `Ceto_Time`, `Ceto_Spectrum01`, and `Ceto_WTable`.
+
+Observed operations:
+
+1. Convert each texture coordinate component from the upper half of [0,1] to a negative wrapped coordinate, then multiply by the inverse grid size.
+2. Sample `Ceto_Spectrum01` at `Ceto_Offset - uv` and at `uv`, using LOD 0.
+3. Form component-wise sum and difference of those two samples.
+4. Sample `Ceto_WTable`; multiply its red component by `Ceto_Time`; evaluate sine and cosine.
+5. Combine the sum/difference values with sine/cosine into a two-component intermediate.
+6. Write that intermediate to `SV_Target0.xy`; derive two additional components using the wrapped wave-vector coordinates and reciprocal wave-vector magnitude, with a zero-magnitude guard, and write them to `SV_Target0.zw`.
+
+The shader output component roles are not yet tied to named runtime buffer fields, so do not label them as specific physical displacement axes without the consumer-side mapping.
+
+### 20.3 InitSlope — Shader PID 176
+
+This shader uses the same wrapped-coordinate construction, spectrum pair sampling, sum/difference, WTable time phase, and sine/cosine combination as InitDisplacement. It then multiplies the intermediate by the wrapped coordinate components and writes the resulting two-component derivative-like values to `SV_Target0.xy`; `SV_Target0.zw` is explicitly zero.
+
+This is direct evidence of a slope-initialization shader variant, but the exact world-axis convention and downstream channel interpretation still require tracing the texture consumers and render-target setup.
+
+### 20.4 InitJacobians — Shader PID 159
+
+The GLSL additionally declares `Ceto_FoamAmount`. It:
+
+- constructs three wrapped/inverse-grid coordinate terms;
+- forms a normalized coordinate-derived vector with a zero-length guard;
+- samples the mirrored and direct spectrum coordinates and multiplies both sample pairs by `Ceto_FoamAmount`;
+- samples WTable and computes the time phase using sine/cosine;
+- writes a scalar derived from the spectrum/time combination multiplied across the constructed vector into `SV_Target0`.
+
+The visible shader output establishes the calculation structure, but not the final Jacobian determinant interpretation or foam-generation meaning. Those require matching the shader output to the actual target format and later consumers.
+
+### 20.5 Updated evidence status
+
+| Item | Status after Output 5 |
+|---|---|
+| Butterfly source-index pairing | Confirmed in displayed FourierCPU source |
+| Stage-0 bit reversal vs later direct indexing | Confirmed in displayed source |
+| Twiddle cosine/sine construction | Confirmed in displayed source |
+| InitDisplacement spectrum pairing and time-phase arithmetic | Extracted from PID 154 GLSL |
+| InitSlope derivative-like output arithmetic | Extracted from PID 176 GLSL |
+| InitJacobians coordinate/spectrum/time arithmetic | Extracted from PID 159 GLSL |
+| Exact physical meaning of output channels | Still unverified |
+| Exact Jacobian determinant / foam interpretation | Still unverified |
+| Full Fourier sign convention and normalization | Still unverified |
+| Runtime texture formats, bindings, and consumer mapping | Still required |
+
+### 20.6 Next evidence required
+
+1. Trace the C# call sites that bind `Ceto_Spectrum01`, `Ceto_WTable`, `Ceto_Offset`, `Ceto_InverseGridSizes`, `Ceto_Time`, and `Ceto_FoamAmount` for each initialization material.
+2. Extract the render-texture creation descriptors and confirm formats, dimensions, filtering, wrapping, and which shader writes each target.
+3. Trace the resulting displacement, slope, and Jacobian textures into their copy/readback and ocean-material consumers to establish exact channel semantics.
+4. Inspect the complete InitJacobians shader variants/passes and the downstream foam calculation before assigning a mathematical Jacobian/foam formula.
+5. Continue Fourier normalization and sign analysis by combining the confirmed lookup equations with the complete GPU/CPU butterfly execution and all pre/post scale factors.
+
+**Evidence boundary:** Output 5 adds concrete C# butterfly lookup equations and three initialization shader bodies. It advances the source-level reconstruction of displacement, slope, and Jacobian initialization, but does not yet close runtime bindings, output-channel meanings, texture formats, or the full Fourier convention.
+
+## 21. Raw Output 5 archive
+
+- [Output 5](https://github.com/minnya09796592452-rgb/Full-Sources/blob/main/Outputs/Output%205) — original terminal output for the butterfly lookup and initialization-shader extraction.
