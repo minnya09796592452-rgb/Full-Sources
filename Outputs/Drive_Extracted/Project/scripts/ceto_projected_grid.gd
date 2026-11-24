@@ -16,9 +16,6 @@ extends MeshInstance3D
 
 var _projection_solver: CetoProjectionSolver
 var _last_viewport_size := Vector2i.ZERO
-var _last_camera_id := 0
-var _last_camera_transform := Transform3D.IDENTITY
-var _last_projection := Projection()
 
 
 func _ready() -> void:
@@ -47,7 +44,9 @@ func _resolution_to_number(resolution: int) -> int:
 
 func _choose_group_size(resolution: int, requested_group: int, width: int, height: int) -> int:
 	if requested_group == -1:
-		return -1
+		if int(width / resolution) * int(height / resolution) <= 65000:
+			return -1
+		requested_group = 128
 	var candidates := [128, 196, 256, 512]
 	var candidate_index := candidates.find(requested_group)
 	if candidate_index < 0:
@@ -163,10 +162,10 @@ func _update_projection() -> void:
 		return
 	mat.set_shader_parameter("Ceto_Interpolation", result.interpolation)
 	mat.set_shader_parameter("Ceto_ProjectorVP", result.projector_vp)
-	mat.set_shader_parameter("Ceto_GridEdgeBorder", 200.0)
+	mat.set_shader_parameter("Ceto_GridEdgeBorder", border_length)
 	mat.set_shader_parameter("Ceto_ScreenGridSize", Vector2(
-		float(mesh_resolution) / maxf(float(_last_viewport_size.x), 1.0),
-		float(mesh_resolution) / maxf(float(_last_viewport_size.y), 1.0)
+		float(_resolution_to_number(mesh_resolution)) / maxf(float(_last_viewport_size.x), 1.0),
+		float(_resolution_to_number(mesh_resolution)) / maxf(float(_last_viewport_size.y), 1.0)
 	))
 	# Unity Ceto values: 2 = back-face culling (top), 1 = front-face culling (under).
 	var cull_face := 1 if camera.global_position.y < sea_level else 2
