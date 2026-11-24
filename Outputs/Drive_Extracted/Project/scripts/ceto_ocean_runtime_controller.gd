@@ -89,7 +89,7 @@ func _start_fft_update() -> void:
 	if _fft_thread_started or _pipeline == null:
 		return
 	var ocean_time := _elapsed * wave_speed
-	var error := _fft_thread.start(_run_fft_update.bind(ocean_time))
+	var error := _fft_thread.start(_run_fft_update.bind(ocean_time), Thread.PRIORITY_LOW)
 	if error != OK:
 		push_error("CetoOceanRuntimeController: could not start FFT worker thread (error %d)." % error)
 		return
@@ -113,7 +113,7 @@ func _collect_completed_fft() -> void:
 		return
 	var snapshot: Array = []
 	for grid in latest:
-		snapshot.append((grid as PackedFloat32Array).duplicate())
+		snapshot.append(grid.duplicate())
 	if not _has_snapshot:
 		_previous_grids = snapshot.duplicate(true)
 		_current_grids = snapshot
