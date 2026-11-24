@@ -30,6 +30,18 @@ var last_range_matrix := Projection()
 var last_frustum_points: Array[Vector3] = []
 
 
+func is_double() -> bool:
+	return true
+
+
+func _precision(value: float) -> float:
+	if is_double():
+		return value
+	var packed := PackedFloat32Array()
+	packed.append(value)
+	return packed[0]
+
+
 func update_projection(camera: Camera3D, level: float, displacement: float = 0.0) -> Dictionary:
 	if camera == null:
 		return {}
@@ -212,7 +224,7 @@ func _multiply(a: Array, b: Array) -> Array:
 		for column in range(4):
 			var value := 0.0
 			for k in range(4):
-				value += a[row * 4 + k] * b[k * 4 + column]
+				value = _precision(value + _precision(a[row * 4 + k] * b[k * 4 + column]))
 			result[row * 4 + column] = value
 	return result
 
@@ -221,7 +233,7 @@ func _mul_vector(m: Array, v: Array) -> Array:
 	var result: Array = [0.0, 0.0, 0.0, 0.0]
 	for row in range(4):
 		for column in range(4):
-			result[row] += m[row * 4 + column] * v[column]
+			result[row] = _precision(result[row] + _precision(m[row * 4 + column] * v[column]))
 	return result
 
 
@@ -247,13 +259,13 @@ func _inverse(source: Array) -> Array:
 			a[pivot] = swap
 		var divisor: float = a[column][column]
 		for j in range(8):
-			a[column][j] /= divisor
+			a[column][j] = _precision(a[column][j] / divisor)
 		for row in range(4):
 			if row == column:
 				continue
 			var factor: float = a[row][column]
 			for j in range(8):
-				a[row][j] -= factor * a[column][j]
+				a[row][j] = _precision(a[row][j] - _precision(factor * a[column][j]))
 	var result: Array = []
 	result.resize(16)
 	for row in range(4):
