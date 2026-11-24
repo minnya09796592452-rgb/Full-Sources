@@ -1,0 +1,115 @@
+> EOF
+=== SOURCE FILE: /storage/emulated/0/Download/Stranded-Deep-Original/DXVK_TRANSLATION_DUMP/ACTIVE_LIT_SHADERS_FULL/decompiled_shaders/resources.assets_3068_Beam_Team_Atmosphere_Atmosphere_BRDF.shader ===
+--- Line 86 ---
+084: uniform    float Rg;
+085: uniform    float Rt;
+086: uniform    float RES_R;
+087: uniform    float RES_MU;
+088: uniform    float RES_MU_S;
+089: uniform    float RES_NU;
+090: uniform    vec3 _SunDirection;
+--- Line 87 ---
+085: uniform    float Rt;
+086: uniform    float RES_R;
+087: uniform    float RES_MU;
+088: uniform    float RES_MU_S;
+089: uniform    float RES_NU;
+090: uniform    vec3 _SunDirection;
+091: uniform    float _MieG;
+--- Line 88 ---
+086: uniform    float RES_R;
+087: uniform    float RES_MU;
+088: uniform    float RES_MU_S;
+089: uniform    float RES_NU;
+090: uniform    vec3 _SunDirection;
+091: uniform    float _MieG;
+092: uniform    vec3 _SunPosition;
+--- Line 89 ---
+087: uniform    float RES_MU;
+088: uniform    float RES_MU_S;
+089: uniform    float RES_NU;
+090: uniform    vec3 _SunDirection;
+091: uniform    float _MieG;
+092: uniform    vec3 _SunPosition;
+093: uniform    float _StormFade;
+--- Line 95 ---
+093: uniform    float _StormFade;
+094: uniform    vec3 _PolarisingColor;
+095: UNITY_LOCATION(0) uniform  sampler3D _Inscatter;
+096: in  vec2 vs_TEXCOORD0;
+097: layout(location = 0) out vec4 SV_Target0;
+098: vec4 u_xlat0;
+099: vec4 u_xlat1;
+--- Line 157 ---
+155:         u_xlatb10 = 0.0<u_xlat8.y;
+156:         u_xlatb2 = u_xlatb10 && u_xlatb2;
+157:         u_xlat10.xy = vec2(0.5, 0.5) / vec2(RES_MU, RES_MU_S);
+158:         u_xlat3.w = (-u_xlat10.x) + 0.5;
+159:         u_xlat1.y = u_xlat1.z * u_xlat1.z;
+160:         u_xlat1.w = u_xlat10.x + 0.5;
+161:         u_xlat3.x = float(1.0);
+--- Line 166 ---
+164:         u_xlat1.x = -1.0;
+165:         u_xlat3 = (bool(u_xlatb2)) ? u_xlat3 : u_xlat1;
+166:         u_xlat1.x = 0.5 / RES_R;
+167:         u_xlat5 = u_xlat8.x / u_xlat1.z;
+168:         u_xlat9 = float(1.0) / RES_R;
+169:         u_xlat9 = (-u_xlat9) + 1.0;
+170:         u_xlat1.w = u_xlat5 * u_xlat9 + u_xlat1.x;
+--- Line 168 ---
+166:         u_xlat1.x = 0.5 / RES_R;
+167:         u_xlat5 = u_xlat8.x / u_xlat1.z;
+168:         u_xlat9 = float(1.0) / RES_R;
+169:         u_xlat9 = (-u_xlat9) + 1.0;
+170:         u_xlat1.w = u_xlat5 * u_xlat9 + u_xlat1.x;
+171:         u_xlat8.xy = u_xlat8.xy + u_xlat3.zy;
+172:         u_xlat12 = sqrt(u_xlat8.y);
+--- Line 175 ---
+173:         u_xlat12 = u_xlat2.y * u_xlat3.x + u_xlat12;
+174:         u_xlat8.x = u_xlat12 / u_xlat8.x;
+175:         u_xlat2.xy = vec2(1.0, 1.0) / vec2(RES_MU, RES_MU_S);
+176:         u_xlat2.xy = (-u_xlat2.xy) + vec2(0.5, 1.0);
+177:         u_xlat1.z = u_xlat8.x * u_xlat2.x + u_xlat3.w;
+178:         u_xlat4.x = max(u_xlat4.x, -0.197500005);
+179:         u_xlat4.x = u_xlat4.x * 5.34962368;
+--- Line 202 ---
+200:         u_xlat8.x = u_xlat0.x + 1.0;
+201:         u_xlat8.x = u_xlat8.x * 0.5;
+202:         u_xlat12 = RES_NU + -1.0;
+203:         u_xlat2.x = u_xlat12 * u_xlat8.x;
+204:         u_xlat2.x = floor(u_xlat2.x);
+205:         u_xlat8.x = u_xlat8.x * u_xlat12 + (-u_xlat2.x);
+206:         u_xlat4.x = u_xlat4.x + u_xlat2.x;
+--- Line 207 ---
+205:         u_xlat8.x = u_xlat8.x * u_xlat12 + (-u_xlat2.x);
+206:         u_xlat4.x = u_xlat4.x + u_xlat2.x;
+207:         u_xlat1.y = u_xlat4.x / RES_NU;
+208:         u_xlat12 = (-u_xlat8.x) + 1.0;
+209:         u_xlat2.xyz = vec3(u_xlat12) * u_xlat1.yzw;
+210:         u_xlat2 = textureLod(_Inscatter, u_xlat2.xyz, 0.0);
+211:         u_xlat4.x = u_xlat4.x + 1.0;
+--- Line 210 ---
+208:         u_xlat12 = (-u_xlat8.x) + 1.0;
+209:         u_xlat2.xyz = vec3(u_xlat12) * u_xlat1.yzw;
+210:         u_xlat2 = textureLod(_Inscatter, u_xlat2.xyz, 0.0);
+211:         u_xlat4.x = u_xlat4.x + 1.0;
+212:         u_xlat1.x = u_xlat4.x / RES_NU;
+213:         u_xlat4.xyz = u_xlat8.xxx * u_xlat1.xzw;
+214:         u_xlat1 = textureLod(_Inscatter, u_xlat4.xyz, 0.0);
+--- Line 212 ---
+210:         u_xlat2 = textureLod(_Inscatter, u_xlat2.xyz, 0.0);
+211:         u_xlat4.x = u_xlat4.x + 1.0;
+212:         u_xlat1.x = u_xlat4.x / RES_NU;
+213:         u_xlat4.xyz = u_xlat8.xxx * u_xlat1.xzw;
+214:         u_xlat1 = textureLod(_Inscatter, u_xlat4.xyz, 0.0);
+215:         u_xlat1 = u_xlat1 + u_xlat2;
+216:         u_xlat4.xyz = u_xlat1.www * u_xlat1.xyz;
+--- Line 214 ---
+212:         u_xlat1.x = u_xlat4.x / RES_NU;
+213:         u_xlat4.xyz = u_xlat8.xxx * u_xlat1.xzw;
+214:         u_xlat1 = textureLod(_Inscatter, u_xlat4.xyz, 0.0);
+215:         u_xlat1 = u_xlat1 + u_xlat2;
+216:         u_xlat4.xyz = u_xlat1.www * u_xlat1.xyz;
+217:         u_xlat13 = max(u_xlat1.x, 9.99999975e-05);
+218:         u_xlat0.yzw = u_xlat4.xyz / vec3(u_xlat13);
+root@localhost:/storage/emulated/0/Download/CASTAWAY_DEPTHS_WORK/GODOT/reports#
