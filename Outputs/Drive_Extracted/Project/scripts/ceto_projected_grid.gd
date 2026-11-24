@@ -37,12 +37,37 @@ func _process(_delta: float) -> void:
 	_update_projection()
 
 
-func _build_grid_arrays(viewport_size: Vector2, step: int, overscan: float = 0.1,
+func _resolution_to_number(resolution: int) -> int:
+	match resolution:
+		1, 2, 4, 8, 16:
+			return resolution
+		_:
+			return 16
+
+
+func _choose_group_size(resolution: int, requested_group: int, width: int, height: int) -> int:
+	if requested_group == -1:
+		return -1
+	var candidates := [128, 196, 256, 512]
+	var candidate_index := candidates.find(requested_group)
+	if candidate_index < 0:
+		candidate_index = 2
+	while candidate_index < candidates.size():
+		var candidate: int = candidates[candidate_index]
+		var vertices_per_group := int(candidate / resolution)
+		if vertices_per_group * vertices_per_group <= 65000:
+			return candidate
+		candidate_index += 1
+	# Ceto's SINGLE fallback uses one full-screen quad group.
+	return -1
+
+
+func _create_screen_quads(viewport_size: Vector2, step: int, overscan: float = 0.1,
 		group_size: int = 256) -> Array:
 	var width := mini(max_screen_width, maxi(2, int(ceil(viewport_size.x))))
 	var height := mini(max_screen_height, maxi(2, int(ceil(viewport_size.y))))
-	var resolution := maxi(step, 1)
-	var selected_group := group_size
+	var resolution := _resolution_to_number(step)
+	var selected_group := _choose_group_size(resolution, group_size, width, height)
 	if selected_group != -1:
 		selected_group = maxi(selected_group, resolution * 2)
 		width = ceili(float(width) / selected_group) * selected_group
@@ -110,7 +135,7 @@ func _create_quad_arrays(verts_x: int, verts_y: int, ux: float, uy: float,
 func _rebuild_screen_grid() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 	_last_viewport_size = Vector2i(viewport_size)
-	var arrays_list := _build_grid_arrays(viewport_size, mesh_resolution, border_uv_fraction, grid_group_size)
+	var arrays_list := _create_screen_quads(viewport_size, mesh_resolution, border_uv_fraction, grid_group_size)
 	var old_material := get_active_material(0)
 	var screen_mesh := ArrayMesh.new()
 	for arrays in arrays_list:
