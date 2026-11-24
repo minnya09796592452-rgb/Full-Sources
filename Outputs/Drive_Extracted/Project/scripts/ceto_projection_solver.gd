@@ -62,7 +62,7 @@ func update_projection(camera: Camera3D, level: float, displacement: float = 0.0
 		position[1] = _precision(minf(position[1], level - margin))
 	else:
 		is_flipped = false
-		position[1] = maxf(position[1], level + margin)
+		position[1] = _precision(maxf(position[1], level + margin))
 
 	var target: Array = [
 		_precision(position[0] + direction.x * 50.0),
