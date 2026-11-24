@@ -1,0 +1,1318 @@
+1. res://scripts/brdf_lut_contract.gd
+
+extends RefCounted
+class_name StrandedBRDFContract
+
+# Source: Atmosphere.cs / Beam Team Atmosphere BRDF GLSL
+const RG: float = 6360000.0
+const RT: float = 6420000.0
+const RL: float = 6421000.0
+
+const RES_R: float = 16.0
+const RES_MU: float = 16.0
+const RES_MU_S: float = 16.0
+const RES_NU: float = 1.0
+
+const MIE_G: float = 0.85
+
+const BRDF_WIDTH: int = 512
+const BRDF_HEIGHT: int = 512
+
+const BRDF_UV_SCALE: float = 2.2
+const CAMERA_ATMOSPHERE_HEIGHT: float = 6360010.0
+
+const POLARISING_DEFAULT: Color = Color(0.0, 0.0, 0.0, 1.0)
+
+
+# Original vertex shader:
+# vs_TEXCOORD0 = (in_TEXCOORD0.xy - vec2(0.5)) * 2.2
+static func source_uv_to_brdf_uv(uv: Vector2) -> Vector2:
+	return (uv - Vector2(0.5, 0.5)) * BRDF_UV_SCALE
+
+
+# Original fragment shader stereographic mapping.
+# Returns the transformed 3D direction.
+static func map_stereographic_uv(uv: Vector2) -> Vector3:
+	var p: Vector2 = source_uv_to_brdf_uv(uv)
+	var r2: float = p.dot(p)
+
+	var mapped: Vector3
+
+	if r2 > 1.0:
+		mapped = Vector3(
+			p.x / r2,
+			1.0 / r2,
+			p.y / r2
+		)
+	else:
+		mapped = Vector3(
+			p.x,
+			r2,
+			p.y
+		)
+
+	var denominator: float = mapped.y + 1.0
+
+	if absf(denominator) < 0.000001:
+		denominator = 0.000001
+
+	var direction := Vector3(
+		mapped.x * 2.0,
+		mapped.y * -1.0 + 1.0,
+		mapped.z * 2.0
+	) / denominator
+
+	return direction.normalized()
+
+
+# The original BRDF shader uses a flattened camera position:
+# (camera.x, 6360010.0, camera.z)
+static func make_atmosphere_camera_position(
+	world_camera_position: Vector3
+) -> Vector3:
+	return Vector3(
+		world_camera_position.x,
+		CAMERA_ATMOSPHERE_HEIGHT,
+		world_camera_position.z
+	)
+
+
+static func get_mu_texel_size() -> float:
+	return 1.0 / RES_MU
+
+
+static func get_mu_s_texel_size() -> float:
+	return 1.0 / RES_MU_S
+
+
+static func get_radius_texel_size() -> float:
+	return 1.0 / RES_R
+
+
+static func get_radius_texel_center() -> float:
+	return 0.5 / RES_R
+
+
+static func get_brdf_dimensions() -> Vector2i:
+	return Vector2i(BRDF_WIDTH, BRDF_HEIGHT)
+
+
+
+
+
+2. res://shaders/stranded_sky.gdshader
+
+
+shader_type spatial;
+
+render_mode unshaded, cull_front, depth_draw_never, fog_disabled;
+
+
+// ------------------------------------------------------------
+// ATMOSPHERE SOURCE CONSTANTS
+// ------------------------------------------------------------
+
+uniform float Rg = 6360000.0;
+uniform float Rt = 6420000.0;
+uniform float RES_R = 16.0;
+uniform float RES_MU = 16.0;
+uniform float RES_MU_S = 16.0;
+uniform float RES_NU = 1.0;
+
+uniform float MieG = 0.85;
+
+
+// ------------------------------------------------------------
+// ORIGINAL SOURCE UNIFORMS
+// ------------------------------------------------------------
+
+uniform vec3 camera_world_position = vec3(0.0, 0.0, 0.0);
+uniform vec3 sun_direction = vec3(0.0, 1.0, 0.0);
+uniform vec3 sun_position = vec3(0.0, 100.0, 0.0);
+
+uniform float StormFade = 0.0;
+uniform vec4 PolarisingColor = vec4(0.0, 0.0, 0.0, 1.0);
+
+uniform sampler3D Inscatter :
+	filter_linear,
+	repeat_disable;
+
+
+// ------------------------------------------------------------
+// GODOT INTEGRATION: SUN / MOON
+// ------------------------------------------------------------
+
+uniform float sun_disk_enabled = 1.0;
+uniform float sun_disk_angular_radius = 0.00465;
+uniform float sun_disk_softness = 0.0008;
+uniform vec4 sun_disk_color : source_color =
+	vec4(1.0, 0.92, 0.72, 1.0);
+uniform float sun_disk_intensity = 20.0;
+
+uniform vec3 moon_direction = vec3(0.0, -1.0, 0.0);
+uniform vec4 moon_color : source_color =
+	vec4(0.65, 0.75, 1.0, 1.0);
+uniform float moon_intensity = 0.0;
+uniform float moon_angular_radius = 0.0045;
+
+
+// ------------------------------------------------------------
+// GODOT INTEGRATION: GRADIENT COLORS
+// ------------------------------------------------------------
+
+uniform vec4 horizon_color : source_color =
+	vec4(0.8, 0.55, 0.35, 1.0);
+
+uniform vec4 zenith_color : source_color =
+	vec4(0.12, 0.24, 0.48, 1.0);
+
+uniform vec4 night_color : source_color =
+	vec4(0.005, 0.008, 0.025, 1.0);
+
+uniform float gradient_strength = 0.0;
+
+
+// ------------------------------------------------------------
+// HELPER FUNCTIONS
+// ------------------------------------------------------------
+
+float safe_sqrt(float value) {
+	return sqrt(max(value, 0.0));
+}
+
+float safe_div(float a, float b) {
+	float denominator = b;
+
+	if (abs(denominator) < 0.000001) {
+		denominator = 0.000001;
+	}
+
+	return a / denominator;
+}
+
+
+// Original vertex shader:
+// (uv - 0.5) * 2.2
+//
+// Original fragment shader:
+// if dot(v,v) > 1:
+//     v = (v.x / dot(v,v), 1 / dot(v,v), v.y / dot(v,v))
+//
+// Then:
+// (v * vec3(2,-1,2) + vec3(0,1,0)) / (v.y + 1)
+vec3 get_original_stereographic_direction(vec2 uv) {
+	vec2 p = (uv - vec2(0.5)) * 2.2;
+
+	float r2 = dot(p, p);
+
+	vec3 mapped;
+
+	if (r2 > 1.0) {
+		mapped = vec3(
+			p.x / r2,
+			1.0 / r2,
+			p.y / r2
+		);
+	} else {
+		mapped = vec3(
+			p.x,
+			r2,
+			p.y
+		);
+	}
+
+	vec3 result =
+		mapped * vec3(2.0, -1.0, 2.0)
+		+ vec3(0.0, 1.0, 0.0);
+
+	result /= max(mapped.y + 1.0, 0.000001);
+
+	return normalize(result);
+}
+
+
+// Original source's approximate acos polynomial.
+float source_fast_acos(float value) {
+	float x = value;
+
+	float ax = abs(x);
+	float inv_ax = 1.0 / max(ax, 0.000001);
+
+	float t = min(ax, 1.0);
+	float t2 = t * t;
+
+	float p =
+		t2 * 0.0208350997
+		- 0.0851330012;
+
+	p = t2 * p + 0.180141002;
+	p = t2 * p - 0.330299497;
+	p = t2 * p + 0.999866009;
+
+	float angle = p * t;
+	bool outside = ax > 1.0;
+
+	float correction = outside
+		? angle * -2.0 + 1.57079637
+		: 0.0;
+
+	angle = angle + correction;
+
+	if (x < 0.0) {
+		angle = -angle;
+	}
+
+	return angle;
+}
+
+
+// ------------------------------------------------------------
+// ORIGINAL ATMOSPHERE BRDF / INSCATTER UV MAPPING
+// ------------------------------------------------------------
+
+vec4 sample_original_inscatter(
+	vec3 atmosphere_position,
+	vec3 view_direction,
+	vec3 sun_dir,
+	float atmosphere_radius,
+	float atmosphere_mu
+) {
+	float radius = atmosphere_radius;
+	float mu = atmosphere_mu;
+
+	float radius_ground_sq = Rg * Rg;
+	float radius_top_sq = Rt * Rt;
+
+	// Original:
+	// u_xlat8.x = sqrt(radius * radius - Rg * Rg)
+	float radius_ground_distance = safe_sqrt(
+		radius * radius - radius_ground_sq
+	);
+
+	// Original:
+	// u_xlat8.y = Rg * Rg + mu * mu - radius * radius
+	float ground_discriminant =
+		radius_ground_sq
+		+ mu * mu
+		- radius * radius;
+
+	bool ground_branch =
+		(mu < 0.0) && (ground_discriminant > 0.0);
+
+	// Original branch vector:
+	// ground branch -> (1,0,0)
+	// otherwise     -> (-1,0,0)
+	float branch_sign = ground_branch ? 1.0 : -1.0;
+
+	float radius_top_distance = safe_sqrt(
+		radius_top_sq - radius_ground_sq
+	);
+
+	float radius_ground_root = radius_ground_distance;
+
+	float mu_s = dot(
+		atmosphere_position,
+		sun_dir
+	) / max(radius, 0.000001);
+
+	// Original radius coordinate.
+	float radius_coordinate =
+		radius_ground_distance
+		/ max(
+			safe_sqrt(radius_top_sq - radius_ground_sq),
+			0.000001
+		);
+
+	float radius_texel_center = 0.5 / RES_R;
+	float radius_texel_scale = 1.0 - 1.0 / RES_R;
+
+	float radius_uv =
+		radius_coordinate * radius_texel_scale
+		+ radius_texel_center;
+
+	// Original mu coordinate.
+	float mu_root = safe_sqrt(
+		ground_discriminant
+	);
+
+	float mu_numerator =
+		mu * branch_sign
+		+ mu_root;
+
+	float mu_denominator =
+		radius_ground_distance;
+
+	float mapped_mu = safe_div(
+		mu_numerator,
+		mu_denominator
+	);
+
+	float mu_scale =
+		0.5 - 1.0 / RES_MU;
+
+	float mu_offset =
+		0.5 / RES_MU;
+
+	float mu_uv =
+		mapped_mu * mu_scale
+		+ mu_offset;
+
+	// Original sun cosine mapping.
+	// u_xlat4.x = max(mu_s, -0.1975) * 5.34962368
+	float scaled_mu_s =
+		max(mu_s, -0.197500005) * 5.34962368;
+
+	float abs_scaled_mu_s = abs(scaled_mu_s);
+
+	float acos_value = min(
+		scaled_mu_s,
+		1.0
+	);
+
+	float acos_approx = source_fast_acos(
+		acos_value
+	);
+
+	float sun_coordinate =
+		acos_approx * 0.909090877
+		+ 0.74000001;
+
+	sun_coordinate *= 0.5;
+
+	float sun_scale =
+		1.0 - 1.0 / RES_MU_S;
+
+	float sun_offset =
+		0.5;
+
+	float mu_s_uv =
+		sun_coordinate * sun_scale
+		+ sun_offset;
+
+	// Original nu interpolation.
+	float nu = dot(view_direction, sun_dir);
+
+	float nu_coordinate =
+		(nu + 1.0) * 0.5;
+
+	float nu_scaled =
+		(RES_NU - 1.0) * nu_coordinate;
+
+	float nu_index = floor(nu_scaled);
+
+	float nu_fraction =
+		nu_scaled - nu_index;
+
+	float nu_a =
+		(nu_index + mu_s_uv) / RES_NU;
+
+	float nu_b =
+		(nu_index + 1.0 + mu_s_uv) / RES_NU;
+
+	vec3 uv_a = vec3(
+		clamp(nu_a, 0.0, 1.0),
+		clamp(mu_uv, 0.0, 1.0),
+		clamp(radius_uv, 0.0, 1.0)
+	);
+
+	vec3 uv_b = vec3(
+		clamp(nu_b, 0.0, 1.0),
+		clamp(mu_uv, 0.0, 1.0),
+		clamp(radius_uv, 0.0, 1.0)
+	);
+
+	vec4 sample_a = textureLod(
+		Inscatter,
+		uv_a,
+		0.0
+	);
+
+	vec4 sample_b = textureLod(
+		Inscatter,
+		uv_b,
+		0.0
+	);
+
+	// Original:
+	// sample_a + sample_b
+	// followed by alpha-weighted interpolation.
+	vec4 combined =
+		sample_a * (1.0 - nu_fraction)
+		+ sample_b * nu_fraction;
+
+	return combined;
+}
+
+
+// ------------------------------------------------------------
+// ORIGINAL RAYLEIGH + MIE PHASE FUNCTION
+// ------------------------------------------------------------
+
+vec3 calculate_original_scattering(
+	vec3 view_direction,
+	vec3 sun_dir,
+	vec3 atmosphere_position,
+	float atmosphere_radius,
+	float atmosphere_mu
+) {
+	vec4 inscatter = sample_original_inscatter(
+		atmosphere_position,
+		view_direction,
+		sun_dir,
+		atmosphere_radius,
+		atmosphere_mu
+	);
+
+	// Original:
+	// u_xlat4.xyz = inscatter.www * inscatter.xyz
+	// inscatter.xyz = u_xlat4.xyz / max(inscatter.x, 1e-4)
+	vec3 weighted_inscatter =
+		inscatter.rgb * inscatter.a;
+
+	float safe_inscatter_red = max(
+		inscatter.r,
+		0.0001
+	);
+
+	vec3 normalized_inscatter =
+		weighted_inscatter / safe_inscatter_red;
+
+	float nu = dot(
+		view_direction,
+		sun_dir
+	);
+
+	// Original Rayleigh phase:
+	// (1 + nu^2) * 0.0596831031
+	float rayleigh_phase =
+		(1.0 + nu * nu) * 0.0596831031;
+
+	// Original Mie phase constants.
+	float mie_g = MieG;
+
+	float mie_g_sq = mie_g * mie_g;
+
+	float mie_factor =
+		(1.0 - mie_g_sq) * 0.119366206;
+
+	float mie_denominator =
+		1.0 + mie_g_sq - 2.0 * mie_g * nu;
+
+	mie_denominator = max(
+		mie_denominator,
+		0.000001
+	);
+
+	float mie_power = pow(
+		mie_denominator,
+		-1.5
+	);
+
+	float mie_phase =
+		mie_power
+		* mie_factor
+		* (1.0 + nu * nu)
+		/ (1.0 + 2.0 * mie_g_sq);
+
+	vec3 rayleigh_contribution =
+		inscatter.rgb * rayleigh_phase;
+
+	vec3 mie_contribution =
+		normalized_inscatter * mie_phase;
+
+	return rayleigh_contribution + mie_contribution;
+}
+
+
+// ------------------------------------------------------------
+// ORIGINAL ATMOSPHERE RAY INTERSECTION
+// ------------------------------------------------------------
+
+vec3 calculate_original_atmosphere(
+	vec3 view_direction,
+	vec3 world_camera_position,
+	vec3 sun_dir
+) {
+	// Original camera flattening:
+	// camera.x * 1 + 6360010.0
+	vec3 atmosphere_camera = vec3(
+		world_camera_position.x,
+		6360010.0,
+		world_camera_position.z
+	);
+
+	float camera_radius_sq = dot(
+		atmosphere_camera,
+		atmosphere_camera
+	);
+
+	float camera_radius = sqrt(
+		camera_radius_sq
+	);
+
+	float camera_mu = dot(
+		atmosphere_camera,
+		view_direction
+	);
+
+	float discriminant =
+		camera_mu * camera_mu
+		- camera_radius_sq
+		+ Rt * Rt;
+
+	float intersection_distance =
+		-sqrt(max(discriminant, 0.0))
+		- camera_mu;
+
+	intersection_distance = max(
+		intersection_distance,
+		0.0
+	);
+
+	bool intersects_atmosphere =
+		intersection_distance > 0.0;
+
+	vec3 atmosphere_position =
+		intersects_atmosphere
+		? atmosphere_camera
+			+ view_direction * intersection_distance
+		: atmosphere_camera;
+
+	float atmosphere_radius =
+		intersects_atmosphere
+		? Rt
+		: camera_radius;
+
+	float atmosphere_mu = dot(
+		atmosphere_position,
+		view_direction
+	);
+
+	if (atmosphere_radius < Rg) {
+		return vec3(0.0);
+	}
+
+	if (atmosphere_radius > Rt) {
+		return vec3(0.0);
+	}
+
+	return calculate_original_scattering(
+		view_direction,
+		sun_dir,
+		atmosphere_position,
+		atmosphere_radius,
+		atmosphere_mu
+	);
+}
+
+
+// ------------------------------------------------------------
+// ORIGINAL POLARISING / STORM FADE COLOR
+// ------------------------------------------------------------
+
+vec3 calculate_original_polarising_color(
+	vec3 scattering
+) {
+	float sun_height_factor = clamp(
+		sun_position.y * -0.0199999996,
+		0.0,
+		1.0
+	);
+
+	vec3 inverse_scattering =
+		vec3(1.0)
+		- scattering * 15.2999992;
+
+	vec3 sun_height_tint =
+		vec3(1.0)
+		- sun_height_factor
+		* vec3(
+			0.0,
+			0.00300000003,
+			0.00449999981
+		);
+
+	vec3 polarised_base =
+		vec3(1.0)
+		- inverse_scattering * sun_height_tint;
+
+	vec3 polarised_color =
+		polarised_base * PolarisingColor.rgb;
+
+	float horizon_factor = clamp(
+		(100.0 - sun_position.y) * 0.0090909088,
+		0.0,
+		1.0
+	);
+
+	float inverse_horizon =
+		1.0 - horizon_factor;
+
+	vec3 storm_color =
+		inverse_horizon
+		* vec3(
+			0.0610000007,
+			0.0689999983,
+			0.0780000016
+		)
+		+ vec3(
+			0.00899999961,
+			0.0109999999,
+			0.0120000001
+		);
+
+	vec3 non_polarised_color =
+		vec3(1.0)
+		- inverse_scattering * PolarisingColor.rgb
+		+ storm_color;
+
+	// Original:
+	// StormFade * non_polarised + polarised
+	return mix(
+		polarised_color,
+		non_polarised_color,
+		clamp(StormFade, 0.0, 1.0)
+	);
+}
+
+
+// ------------------------------------------------------------
+// SUN DISK / MOON DISK
+// These are Godot integration additions, not in the supplied
+// original BRDF fragment shader.
+// ------------------------------------------------------------
+
+float calculate_sun_disk(vec3 view_direction) {
+	float cosine_angle = dot(
+		view_direction,
+		normalize(sun_direction)
+	);
+
+	float edge = cos(
+		sun_disk_angular_radius
+	);
+
+	float soft_edge = cos(
+		sun_disk_angular_radius
+		+ sun_disk_softness
+	);
+
+	return smoothstep(
+		soft_edge,
+		edge,
+		cosine_angle
+	) * sun_disk_enabled;
+}
+
+
+float calculate_moon_disk(vec3 view_direction) {
+	float cosine_angle = dot(
+		view_direction,
+		normalize(moon_direction)
+	);
+
+	return smoothstep(
+		cos(moon_angular_radius + 0.001),
+		cos(moon_angular_radius),
+		cosine_angle
+	);
+}
+
+
+// ------------------------------------------------------------
+// GRADIENT INTEGRATION
+// ------------------------------------------------------------
+
+vec3 calculate_gradient_color(vec3 view_direction) {
+	float height_factor = clamp(
+		view_direction.y * 0.5 + 0.5,
+		0.0,
+		1.0
+	);
+
+	vec3 day_gradient = mix(
+		horizon_color.rgb,
+		zenith_color.rgb,
+		smoothstep(0.0, 1.0, height_factor)
+	);
+
+	vec3 final_gradient = mix(
+		night_color.rgb,
+		day_gradient,
+		clamp(gradient_strength, 0.0, 1.0)
+	);
+
+	return final_gradient;
+}
+
+
+// ------------------------------------------------------------
+// MAIN
+// ------------------------------------------------------------
+
+void fragment() {
+	// This shader expects a UV-mapped sky mesh / quad whose UVs
+	// follow the original BRDF pass convention.
+	vec3 view_direction =
+		get_original_stereographic_direction(UV);
+
+	vec3 sun_dir = normalize(sun_direction);
+
+	vec3 scattering = calculate_original_atmosphere(
+		view_direction,
+		camera_world_position,
+		sun_dir
+	);
+
+	vec3 original_color =
+		calculate_original_polarising_color(scattering);
+
+	vec3 gradient_color =
+		calculate_gradient_color(view_direction);
+
+	vec3 final_color = mix(
+		original_color,
+		gradient_color,
+		clamp(gradient_strength, 0.0, 1.0)
+	);
+
+	float sun_disk = calculate_sun_disk(
+		view_direction
+	);
+
+	final_color +=
+		sun_disk_color.rgb
+		* sun_disk
+		* sun_disk_intensity;
+
+	float moon_disk = calculate_moon_disk(
+		view_direction
+	);
+
+	final_color +=
+		moon_color.rgb
+		* moon_disk
+		* moon_intensity;
+
+	ALBEDO = max(final_color, vec3(0.0));
+	ALPHA = 1.0;
+}
+
+
+
+
+
+3. res://scripts/atmosphere_controller.gd
+
+
+
+extends Node
+class_name StrandedAtmosphereController
+
+# ------------------------------------------------------------
+# SHADER TARGET
+# ------------------------------------------------------------
+
+@export_group("Sky Renderer")
+
+@export var sky_mesh: MeshInstance3D
+@export var sky_shader: Shader
+
+var sky_material: ShaderMaterial
+
+
+# ------------------------------------------------------------
+# CAMERA
+# ------------------------------------------------------------
+
+@export_group("Camera")
+
+@export var camera: Camera3D
+
+
+# ------------------------------------------------------------
+# SUN
+# ------------------------------------------------------------
+
+@export_group("Sun")
+
+@export var sun_light: DirectionalLight3D
+
+@export var sun_gradient: Gradient
+
+@export var sun_disk_enabled: bool = true
+@export_range(0.0, 0.05, 0.0001)
+var sun_disk_angular_radius: float = 0.00465
+
+@export_range(0.0, 0.02, 0.0001)
+var sun_disk_softness: float = 0.0008
+
+@export var sun_disk_intensity: float = 20.0
+
+
+# ------------------------------------------------------------
+# MOON
+# ------------------------------------------------------------
+
+@export_group("Moon")
+
+@export var moon_light: DirectionalLight3D
+
+@export var moon_gradient: Gradient
+
+@export var moon_intensity: float = 0.0
+
+@export_range(0.0, 0.05, 0.0001)
+var moon_angular_radius: float = 0.0045
+
+
+# ------------------------------------------------------------
+# ATMOSPHERE
+# ------------------------------------------------------------
+
+@export_group("Atmosphere")
+
+@export var mie_g: float = 0.85
+
+@export var storm_fade: float = 0.0
+
+@export var polarising_color: Color = Color(
+	0.0,
+	0.0,
+	0.0,
+	1.0
+)
+
+@export var inscatter_texture: Texture3D
+
+
+# ------------------------------------------------------------
+# SKY GRADIENTS
+# ------------------------------------------------------------
+
+@export_group("Sky Gradients")
+
+@export var horizon_gradient: Gradient
+@export var zenith_gradient: Gradient
+@export var night_gradient: Gradient
+
+@export_range(0.0, 1.0, 0.01)
+var gradient_strength: float = 0.0
+
+
+# ------------------------------------------------------------
+# FOG SYNC
+# ------------------------------------------------------------
+
+@export_group("Fog Synchronization")
+
+@export var fog_controller: Node
+
+@export var fog_height: float = 80.0
+@export var fog_start_distance: float = 200.0
+
+@export var sync_fog_sun_position: bool = true
+@export var sync_fog_storm: bool = true
+
+
+# ------------------------------------------------------------
+# INTERNAL STATE
+# ------------------------------------------------------------
+
+var _last_sun_direction: Vector3 = Vector3.UP
+var _last_moon_direction: Vector3 = Vector3.DOWN
+
+
+# ------------------------------------------------------------
+# READY
+# ------------------------------------------------------------
+
+func _ready() -> void:
+	_create_shader_material()
+	_update_all()
+
+
+# ------------------------------------------------------------
+# PROCESS
+# ------------------------------------------------------------
+
+func _process(_delta: float) -> void:
+	if sky_material == null:
+		return
+
+	_update_camera()
+	_update_sun()
+	_update_moon()
+	_update_gradients()
+	_update_atmosphere()
+	_update_fog()
+
+
+# ------------------------------------------------------------
+# MATERIAL CREATION
+# ------------------------------------------------------------
+
+func _create_shader_material() -> void:
+	if sky_shader == null and sky_mesh != null:
+		var existing_material := sky_mesh.material_override
+
+		if existing_material is ShaderMaterial:
+			sky_material = existing_material
+			return
+
+	if sky_shader == null:
+		push_error(
+			"AtmosphereController: sky_shader is not assigned."
+		)
+		return
+
+	sky_material = ShaderMaterial.new()
+	sky_material.shader = sky_shader
+
+	if sky_mesh != null:
+		sky_mesh.material_override = sky_material
+
+
+# ------------------------------------------------------------
+# UPDATE ALL
+# ------------------------------------------------------------
+
+func _update_all() -> void:
+	if sky_material == null:
+		return
+
+	_update_camera()
+	_update_sun()
+	_update_moon()
+	_update_gradients()
+	_update_atmosphere()
+	_update_fog()
+
+
+# ------------------------------------------------------------
+# CAMERA
+# ------------------------------------------------------------
+
+func _update_camera() -> void:
+	if camera == null:
+		return
+
+	sky_material.set_shader_parameter(
+		"camera_world_position",
+		camera.global_position
+	)
+
+
+# ------------------------------------------------------------
+# SUN
+# ------------------------------------------------------------
+
+func _get_sun_direction() -> Vector3:
+	if sun_light == null:
+		return _last_sun_direction
+
+	# Godot DirectionalLight3D shines along local -Z.
+	return -sun_light.global_basis.z.normalized()
+
+
+func _get_sun_position() -> Vector3:
+	if sun_light == null:
+		return Vector3(
+			0.0,
+			100.0,
+			0.0
+		)
+
+	return _get_sun_direction() * 1000.0
+
+
+func _update_sun() -> void:
+	var direction := _get_sun_direction()
+	_last_sun_direction = direction
+
+	sky_material.set_shader_parameter(
+		"sun_direction",
+		direction
+	)
+
+	sky_material.set_shader_parameter(
+		"sun_position",
+		_get_sun_position()
+	)
+
+	sky_material.set_shader_parameter(
+		"sun_disk_enabled",
+		1.0 if sun_disk_enabled else 0.0
+	)
+
+	sky_material.set_shader_parameter(
+		"sun_disk_angular_radius",
+		sun_disk_angular_radius
+	)
+
+	sky_material.set_shader_parameter(
+		"sun_disk_softness",
+		sun_disk_softness
+	)
+
+	sky_material.set_shader_parameter(
+		"sun_disk_intensity",
+		sun_disk_intensity
+	)
+
+	if sun_gradient != null:
+		var sun_height := clampf(
+			direction.y * 0.5 + 0.5,
+			0.0,
+			1.0
+		)
+
+		var sun_color: Color = sun_gradient.sample(
+			sun_height
+		)
+
+		sky_material.set_shader_parameter(
+			"sun_disk_color",
+			sun_color
+		)
+
+
+# ------------------------------------------------------------
+# MOON
+# ------------------------------------------------------------
+
+func _get_moon_direction() -> Vector3:
+	if moon_light == null:
+		return _last_moon_direction
+
+	return -moon_light.global_basis.z.normalized()
+
+
+func _update_moon() -> void:
+	var direction := _get_moon_direction()
+	_last_moon_direction = direction
+
+	sky_material.set_shader_parameter(
+		"moon_direction",
+		direction
+	)
+
+	sky_material.set_shader_parameter(
+		"moon_intensity",
+		moon_intensity
+	)
+
+	sky_material.set_shader_parameter(
+		"moon_angular_radius",
+		moon_angular_radius
+	)
+
+	if moon_gradient != null:
+		var moon_height := clampf(
+			direction.y * 0.5 + 0.5,
+			0.0,
+			1.0
+		)
+
+		var moon_color: Color = moon_gradient.sample(
+			moon_height
+		)
+
+		sky_material.set_shader_parameter(
+			"moon_color",
+			moon_color
+		)
+
+
+# ------------------------------------------------------------
+# SKY GRADIENTS
+# ------------------------------------------------------------
+
+func _sample_gradient(
+	gradient: Gradient,
+	default_color: Color
+) -> Color:
+	if gradient == null:
+		return default_color
+
+	return gradient.sample(0.5)
+
+
+func _update_gradients() -> void:
+	sky_material.set_shader_parameter(
+		"horizon_color",
+		_sample_gradient(
+			horizon_gradient,
+			Color(0.8, 0.55, 0.35, 1.0)
+		)
+	)
+
+	sky_material.set_shader_parameter(
+		"zenith_color",
+		_sample_gradient(
+			zenith_gradient,
+			Color(0.12, 0.24, 0.48, 1.0)
+		)
+	)
+
+	sky_material.set_shader_parameter(
+		"night_color",
+		_sample_gradient(
+			night_gradient,
+			Color(0.005, 0.008, 0.025, 1.0)
+		)
+	)
+
+	sky_material.set_shader_parameter(
+		"gradient_strength",
+		gradient_strength
+	)
+
+
+# ------------------------------------------------------------
+# ATMOSPHERE UNIFORMS
+# ------------------------------------------------------------
+
+func _update_atmosphere() -> void:
+	sky_material.set_shader_parameter(
+		"Rg",
+		StrandedBRDFContract.RG
+	)
+
+	sky_material.set_shader_parameter(
+		"Rt",
+		StrandedBRDFContract.RT
+	)
+
+	sky_material.set_shader_parameter(
+		"RES_R",
+		StrandedBRDFContract.RES_R
+	)
+
+	sky_material.set_shader_parameter(
+		"RES_MU",
+		StrandedBRDFContract.RES_MU
+	)
+
+	sky_material.set_shader_parameter(
+		"RES_MU_S",
+		StrandedBRDFContract.RES_MU_S
+	)
+
+	sky_material.set_shader_parameter(
+		"RES_NU",
+		StrandedBRDFContract.RES_NU
+	)
+
+	sky_material.set_shader_parameter(
+		"MieG",
+		mie_g
+	)
+
+	sky_material.set_shader_parameter(
+		"StormFade",
+		storm_fade
+	)
+
+	sky_material.set_shader_parameter(
+		"PolarisingColor",
+		polarising_color
+	)
+
+	if inscatter_texture != null:
+		sky_material.set_shader_parameter(
+			"Inscatter",
+			inscatter_texture
+		)
+
+
+# ------------------------------------------------------------
+# FOG SYNCHRONIZATION
+# ------------------------------------------------------------
+
+func _set_node_property_if_available(
+	target: Object,
+	property_name: String,
+	value: Variant
+) -> void:
+	if target == null:
+		return
+
+	for property_info in target.get_property_list():
+		if String(property_info.get("name", "")) == property_name:
+			target.set(property_name, value)
+			return
+
+
+func _update_fog() -> void:
+	if fog_controller == null:
+		return
+
+	# Original fog defaults.
+	_set_node_property_if_available(
+		fog_controller,
+		"height",
+		fog_height
+	)
+
+	_set_node_property_if_available(
+		fog_controller,
+		"start_distance",
+		fog_start_distance
+	)
+
+	if sync_fog_sun_position:
+		_set_node_property_if_available(
+			fog_controller,
+			"sun_world_position",
+			_get_sun_position()
+		)
+
+	if sync_fog_storm:
+		_set_node_property_if_available(
+			fog_controller,
+			"sheet_lightning",
+			storm_fade
+		)
+
+
+# ------------------------------------------------------------
+# PUBLIC API
+# ------------------------------------------------------------
+
+func set_storm_fade(value: float) -> void:
+	storm_fade = clampf(value, 0.0, 1.0)
+
+	if sky_material != null:
+		sky_material.set_shader_parameter(
+			"StormFade",
+			storm_fade
+		)
+
+	_update_fog()
+
+
+func set_polarising_color(value: Color) -> void:
+	polarising_color = value
+
+	if sky_material != null:
+		sky_material.set_shader_parameter(
+			"PolarisingColor",
+			polarising_color
+		)
+
+
+func set_inscatter_texture(value: Texture3D) -> void:
+	inscatter_texture = value
+
+	if sky_material != null and inscatter_texture != null:
+		sky_material.set_shader_parameter(
+			"Inscatter",
+			inscatter_texture
+		)
+
+
+func refresh_atmosphere() -> void:
+	_update_all()
+
+
