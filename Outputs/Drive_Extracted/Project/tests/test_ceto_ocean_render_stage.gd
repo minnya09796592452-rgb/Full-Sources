@@ -38,7 +38,13 @@ func _test_ceto_projected_grid_quads_and_border_uv() -> void:
 	var grid = ProjectedGridScript.new()
 	grid.max_screen_width = 2048
 	grid.max_screen_height = 2048
-	var quads: Array = grid._build_grid_arrays(Vector2(320.0, 180.0), 4, 0.1, 256)
+	assert(grid._resolution_to_number(1) == 1)
+	assert(grid._resolution_to_number(2) == 2)
+	assert(grid._resolution_to_number(4) == 4)
+	assert(grid._resolution_to_number(8) == 8)
+	assert(grid._resolution_to_number(16) == 16)
+	assert(grid._choose_group_size(1, 128, 2048, 2048) == 256)
+	var quads: Array = grid._create_screen_quads(Vector2(320.0, 180.0), 4, 0.1, 256)
 	assert(quads.size() == 2)
 	var first: Array = quads[0]
 	var second: Array = quads[1]
