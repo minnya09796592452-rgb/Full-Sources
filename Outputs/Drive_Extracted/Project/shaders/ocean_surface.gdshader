@@ -80,20 +80,28 @@ float jacobian_foam(vec2 world_xz, float cell_size) {
 	return clamp((foam_coverage - jacobian) * foam_amount * 3.0, 0.0, 1.0);
 }
 
-void vertex() {
-	// Ceto_Interpolation stores the four homogeneous world-space horizon hits as rows.
+vec3 ceto_project_world(vec2 screen_uv) {
 	vec4 weights = vec4(
-		(1.0 - UV.x) * (1.0 - UV.y),
-		UV.x * (1.0 - UV.y),
-		UV.x * UV.y,
-		(1.0 - UV.x) * UV.y
+		(1.0 - screen_uv.x) * (1.0 - screen_uv.y),
+		screen_uv.x * (1.0 - screen_uv.y),
+		screen_uv.x * screen_uv.y,
+		(1.0 - screen_uv.x) * screen_uv.y
 	);
 	vec4 world_h = weights * Ceto_Interpolation;
-	vec3 ocean_world = world_h.xyz / max(abs(world_h.w), 0.000001);
+	return world_h.xyz / max(abs(world_h.w), 0.000001);
+}
 
-	// Original ProjectedGrid border UV2 stores squared distance outside each screen edge.
-	vec2 border_direction = sign(UV - vec2(0.5));
-	ocean_world.xz += border_direction * UV2 * Ceto_GridEdgeBorder;
+void vertex() {
+	vec3 ocean_world = ceto_project_world(UV);
+	vec3 world_dx = ceto_project_world(UV + vec2(0.001, 0.0)) - ocean_world;
+	vec3 world_dy = ceto_project_world(UV + vec2(0.0, 0.001)) - ocean_world;
+	vec2 edge_x = normalize(world_dx.xz + vec2(0.000001));
+	vec2 edge_y = normalize(world_dy.xz + vec2(0.000001));
+
+	// UV2 stores Ceto's squared, normalized distance beyond each clamped screen edge.
+	// Expand along the actual projected screen axes, not fixed world X/Z axes.
+	ocean_world.xz += sign(UV.x - 0.5) * UV2.x * Ceto_GridEdgeBorder * edge_x;
+	ocean_world.xz += sign(UV.y - 0.5) * UV2.y * Ceto_GridEdgeBorder * edge_y;
 
 	vec4 projector_clip = vec4(ocean_world, 1.0) * Ceto_ProjectorVP;
 	v_projector_uv = projector_clip.xy / max(abs(projector_clip.w), 0.000001);
@@ -107,7 +115,6 @@ void vertex() {
 	v_underwater = CAMERA_POSITION_WORLD.y < sea_level ? 1.0 : 0.0;
 	POSITION = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ocean_world, 1.0);
 }
-
 void fragment() {
 	// Unity Ceto material values: 1 = Front, 2 = Back.
 	if ((_CullFace == 2 && !FRONT_FACING) || (_CullFace == 1 && FRONT_FACING)) {
