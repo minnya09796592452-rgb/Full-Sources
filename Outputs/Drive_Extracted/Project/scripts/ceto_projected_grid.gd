@@ -8,6 +8,7 @@ extends MeshInstance3D
 @export var sea_level := 0.0
 @export_range(0.0, 1000.0, 1.0) var max_displacement := 0.0
 @export_range(0.0, 1.0, 0.01) var border_uv_fraction := 0.1
+@export_range(0.0, 10000.0, 1.0) var border_length := 200.0
 @export_range(1, 2048, 1) var max_screen_width := 2048
 @export_range(1, 2048, 1) var max_screen_height := 2048
 @export var tight_fit := false
