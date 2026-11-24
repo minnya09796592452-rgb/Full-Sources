@@ -109,10 +109,10 @@ void vertex() {
 }
 
 void fragment() {
-\t// Unity Ceto material values: 1 = Front, 2 = Back.
-\tif ((_CullFace == 2 && !FRONT_FACING) || (_CullFace == 1 && FRONT_FACING)) {
-\t\tdiscard;
-\t}
+	// Unity Ceto material values: 1 = Front, 2 = Back.
+	if ((_CullFace == 2 && !FRONT_FACING) || (_CullFace == 1 && FRONT_FACING)) {
+		discard;
+	}
 	float texel_world = max(grid_size_3 * grid_scale / 64.0, 0.05);
 	vec2 dx = vec2(texel_world, 0.0);
 	vec2 dz = vec2(0.0, texel_world);
