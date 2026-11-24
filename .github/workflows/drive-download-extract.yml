@@ -124,6 +124,20 @@ jobs:
           else:
               raise ValueError("Unsupported archive format. Accepted formats: ZIP and TAR/TAR.GZ/TAR.BZ2/TAR.XZ.")
 
+          # Strip nested Git metadata so extracted repositories become ordinary files,
+          # not submodule gitlinks in the destination repository.
+          for metadata in sorted(dest.rglob(".git"), key=lambda p: len(p.parts), reverse=True):
+              if metadata.is_dir():
+                  shutil.rmtree(metadata)
+              elif metadata.is_file():
+                  metadata.unlink()
+
+          written = [
+              (name, size)
+              for name, size in written
+              if ".git" not in PurePosixPath(name.replace("\\", "/")).parts
+          ]
+
           if not written:
               raise ValueError("Archive extracted no files; refusing to commit an empty output.")
 
