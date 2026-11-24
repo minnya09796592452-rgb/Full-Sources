@@ -101,7 +101,7 @@ void vertex() {
 }
 
 void fragment() {
-	float texel_world = max(grid_size_3 / 64.0, 0.05);
+	float texel_world = max(grid_size_3 * grid_scale / 64.0, 0.05);
 	vec2 dx = vec2(texel_world, 0.0);
 	vec2 dz = vec2(0.0, texel_world);
 	float dhdx = (sample_height(v_ocean_uv + dx) - sample_height(v_ocean_uv - dx)) / (2.0 * texel_world);
