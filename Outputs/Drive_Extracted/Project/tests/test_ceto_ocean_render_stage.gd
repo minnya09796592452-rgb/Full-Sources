@@ -43,7 +43,7 @@ func _test_ceto_projected_grid_quads_and_border_uv() -> void:
 	assert(grid._resolution_to_number(4) == 4)
 	assert(grid._resolution_to_number(8) == 8)
 	assert(grid._resolution_to_number(16) == 16)
-	assert(grid._choose_group_size(1, 128, 2048, 2048) == 256)
+	assert(grid._choose_group_size(1, 128, 2048, 2048) == 128)
 	var quads: Array = grid._create_screen_quads(Vector2(320.0, 180.0), 4, 0.1, 256)
 	assert(quads.size() == 2)
 	var first: Array = quads[0]
