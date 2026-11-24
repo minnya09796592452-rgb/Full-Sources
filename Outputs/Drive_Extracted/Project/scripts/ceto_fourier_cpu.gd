@@ -41,7 +41,7 @@ func _bit_reverse(value: int) -> int:
 		var bit_value := 1 if (value & input_bit) > input_bit - 1 else 0
 		reversed_value += bit_value * output_bit
 		output_bit *= 2
-		input_bit >>= 1
+		input_bit = input_bit >> 1
 
 	return reversed_value
 
