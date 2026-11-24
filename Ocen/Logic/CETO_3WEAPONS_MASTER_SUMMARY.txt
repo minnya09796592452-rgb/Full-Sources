@@ -1,0 +1,516 @@
+=== STRANDED DEEP 4 - 3 TARGET WEAPONS OCEAN SUMMARY ===
+
+================ 1_MASTER_TSV ================
+L8: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-9197667710021192174	Avatar	7872	Seaplane_Enter_CockpitAvatar
+L34: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-9023224207395424648	GameObject	79	Stranded_Deep_Plane_Rig_Final:Seaplane_Button2_Joint
+L79: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-8777657634452178113	Texture2D	216	SeaPlanePanells_NRM
+L192: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-8130045293902132188	Texture2D	216	SeaPlanePanells_DIFF
+L204: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-8036267005708083851	Material	980	SeaPlanePanells
+L234: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-7806699500270056714	Material	980	SeaPlaneInterior
+L250: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-7723219600423882051	MonoScript	100	WaterRefiller
+L298: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-7431741091423871843	Texture2D	216	SeaPlanePedals_AO
+L394: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-6932692676873037809	Texture2D	1398260	Terrain_Sand_Underwater
+L419: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-6793431705009077908	AnimationClip	5412	Seaplane_Close_Cockpit
+L530: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-6103045567973779852	Texture2D	220	SeaPlaneConsole1_DIFF
+L619: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-5542662807216968340	AnimationClip	5424	Seaplane_Enter_Cockpit
+L658: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-5218314111599730858	AnimationClip	4788	Seaplane_Throttle_Cockpit
+L675: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-5063672185694550764	GameObject	79	Stranded_Deep_Plane_Rig_Final:Seaplane_Level_Joint
+L676: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-5053858376637405267	Texture2D	208	Seaplane_NRM
+L769: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-4493107008023807179	Mesh	725648	Stranded_Deep_Plane_Rig_Final:Seaplane.1
+L822: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-4122057473819049288	Texture2D	216	SeaplaneParts_NRM
+L832: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-4020770622873839887	Texture2D	216	SeaPlanePedals_SPEC
+L837: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-4006420488644529012	GameObject	63	Seaplane1
+L909: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-3541187066374074473	GameObject	83	Stranded_Deep_Plane_Rig_Final:Seaplane_StartButton_Joint
+L942: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-3354089541236304833	Material	980	SeaPlaneConsole1
+L1108: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-2329117557895361172	Mesh	510872	Seaplane1
+L1113: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-2280605849387865908	Texture2D	216	SeaPlanePedals_DIFF
+L1166: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-2034653343232357585	Texture2D	216	SeaPlanePedals_NRM
+L1231: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-1681024654884148117	GameObject	79	Stranded_Deep_Plane_Rig_Final:Seaplane_Button4_Joint
+L1254: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-1590908514520164930	Texture2D	212	Seaplane_SPEC
+L1320: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-1253240309831101160	Material	972	Seaplane_Glass
+L1347: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-1106336414973561446	Material	960	SeaPlanePedals
+L1361: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-1027544423714936262	GameObject	59	Seaplane_Collider
+L1377: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-948928127689657767	AnimationClip	5964	Seaplane_Start_Cockpit
+L1380: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-937464960345152934	Texture2D	216	SeaPlaneConsole1_NRM
+L1488: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-318567953980809436	GameObject	79	Stranded_Deep_Plane_Rig_Final:Seaplane_Button3_Joint
+L1498: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-214990024545174689	GameObject	47	StationWaterPosition
+L1526: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	-37267538448008728	GameObject	79	Stranded_Deep_Plane_Rig_Final:Seaplane_Button1_Joint
+L1571: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	268903517522327109	Mesh	40100	Seaplane_Collider
+L1576: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	291121142899544648	GameObject	103	STATION_WATER
+L1589: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	344922377208282558	AnimationClip	4608	Seaplane_Launch_Cockpit
+L1601: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	421869688413389816	Material	980	SeaplaneParts
+L1610: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	495257665475247893	Material	952	Seaplane
+L1631: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	587882832761616542	Mesh	117688	Station_Water
+L1635: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	604692121514315679	AnimationClip	4872	Seaplane_Rail_Cockpit
+L1644: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	640553862027394396	GameObject	43	SeaPlaneExt_low
+L1660: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	722359704807246841	Texture2D	212	SeaplaneParts_AO
+L1800: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	1605129128012469247	GameObject	67	Stranded_Deep_Plane_Rig_Final:Seaplane
+L1801: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	1608731728247612625	AudioMixerSnapshotController	44	Underwater
+L2112: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	3685234334518414669	GameObject	79	Stranded_Deep_Plane_Rig_Final:Seaplane.1
+L2139: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	3809202184341151493	GameObject	75	Seaplane_RudderPedals
+L2149: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	3860512067957393013	Texture2D	220	SeaPlaneInterior_DIFF
+L2166: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	3955262910516695485	GameObject	55	Backseat_OperatingPosition
+L2192: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	4112066202831829735	MonoBehaviour	48	WaterRefiller
+L2263: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	4508177648018941559	Texture2D	220	SeaPlaneInterior_SPEC
+L2292: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	4656502168711297436	Texture2D	216	SeaPlanePanells_SPEC
+L2338: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	4917548524042271329	Sprite	624	Water_Icon
+L2371: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	5038132346210113847	Texture2D	208	Seaplane_AO
+L2464: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	5560100739624384579	GameObject	59	Seaplane_Animation
+L2515: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	5869599403285078831	Texture2D	208	Water_Icon
+L2545: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	6024406148986869737	Texture2D	216	SeaplaneParts_SPEC
+L2558: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	6062389163459480338	GameObject	79	Stranded_Deep_Plane_Rig_Final:Seaplane_Deck_Joint
+L2634: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	6560229103369379474	AnimatorController	2636	Seaplane Animator
+L2735: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	7345404195565715813	GameObject	79	Stranded_Deep_Plane_Rig_Final:Seaplane_Trottle_Joint
+L2742: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	7390222376665661155	Texture2D	220	SeaPlaneConsole1_SPEC
+L2755: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	7460975279440107789	Texture2D	212	Seaplane_DIFF
+L2758: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	7474856469159423129	GameObject	79	Stranded_Deep_Plane_Rig_Final:Seaplane_Root_Joint
+L2762: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	7489092705089088435	GameObject	43	SeaPlaneInt_low
+L2844: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	7975251661624034754	Texture2D	216	SeaplaneParts_DIFF
+L3007: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	9029367073086480658	Texture2D	216	SeaPlaneInterior_NRM
+L3009: CAB-1a52a4f7b11e4cae0fc19d1342b0f583	9036274363127216471	GameObject	43	SeaplaneLowPoly
+L3283: CAB-274bf3f3846c5c146a254ee198cd5955	1608731728247612625	AudioMixerSnapshotController	44	Underwater
+L3564: CAB-72b1dc76f835e51f508afbd70a61a829	-5365175465842637810	Sprite	1580	Sprite_Heatwave
+L3778: CAB-72b1dc76f835e51f508afbd70a61a829	1737175191530799030	Texture2D	212	Sprite_Heatwave
+L3991: CAB-ac412b350193a8eaca3ef4dd28dabf2b	-8709485996425762443	AudioClip	168	boss_land_water
+L4059: CAB-ac412b350193a8eaca3ef4dd28dabf2b	-1716436914057685416	AudioClip	168	boss_jump_water
+L4467: CAB-b713c4afcf1a2c7197e96acf299a9e17	-7076829773314690210	Texture2D	212	WaterSplash_2
+L4750: CAB-b713c4afcf1a2c7197e96acf299a9e17	-5030608709681359006	Material	224	Water_Splash_1
+L4853: CAB-b713c4afcf1a2c7197e96acf299a9e17	-4212762927766926656	Material	208	Water_Splash_2
+L5370: CAB-b713c4afcf1a2c7197e96acf299a9e17	-298545363431020897	GameObject	71	PARTICLE_WATER_WAKE
+L5632: CAB-b713c4afcf1a2c7197e96acf299a9e17	1608731728247612625	AudioMixerSnapshotController	44	Underwater
+L6054: CAB-b713c4afcf1a2c7197e96acf299a9e17	4704556567571877065	GameObject	43	Underwater Props
+L6556: CAB-b713c4afcf1a2c7197e96acf299a9e17	8525793013856614296	Texture2D	212	WaterSplash_1
+L6655: CAB-c9c1a1d56e45b4f40aec8ac42a562959	-8709485996425762443	AudioClip	168	boss_land_water
+L6709: CAB-c9c1a1d56e45b4f40aec8ac42a562959	-1716436914057685416	AudioClip	168	boss_jump_water
+L6974: globalgamemanagers.assets	86	MonoScript	80	ISpectrum
+L7015: globalgamemanagers.assets	127	MonoScript	96	ICustomWaveSpectrum
+L7019: globalgamemanagers.assets	131	MonoScript	116	SessionSearch
+L7032: globalgamemanagers.assets	144	MonoScript	156	LobbySearchSetTargetUserIdOptions
+L7056: globalgamemanagers.assets	168	MonoScript	80	IOceanTime
+L7115: globalgamemanagers.assets	227	MonoScript	84	WaveSpectrum
+L7117: globalgamemanagers.assets	229	MonoScript	136	ConstructionObject_WATERBOTTLE
+L7138: globalgamemanagers.assets	250	MonoScript	104	XblDeviceToken
+L7180: globalgamemanagers.assets	292	MonoScript	172	LobbySearchCopySearchResultByIndexOptions
+L7276: globalgamemanagers.assets	388	MonoScript	124	InitSpectrumDisplacementsTask
+L7287: globalgamemanagers.assets	399	MonoScript	84	AddFoamTrail
+L7368: globalgamemanagers.assets	480	MonoScript	88	XblDeviceToken
+L7375: globalgamemanagers.assets	487	MonoScript	108	WaveSpectrumCondition
+L7450: globalgamemanagers.assets	562	MonoScript	132	PrefabSizeFitsBetweenTerrainAndOcean
+L7462: globalgamemanagers.assets	574	MonoScript	116	CustomWaveSpectrumExample
+L7466: globalgamemanagers.assets	578	MonoScript	92	AddFoamThruster
+L7499: globalgamemanagers.assets	611	MonoScript	84	WaveOverlay
+L7508: globalgamemanagers.assets	620	MonoScript	92	PhillipsSpectrum
+L7515: globalgamemanagers.assets	627	MonoScript	140	LobbySearchSetLobbyIdOptions
+L7569: globalgamemanagers.assets	681	MonoScript	112	UnderwaterSettings
+L7583: globalgamemanagers.assets	695	MonoScript	108	WaveSpectrumBufferGPU
+L7611: globalgamemanagers.assets	723	MonoScript	84	WaveQuery
+L7678: globalgamemanagers.assets	790	MonoScript	84	UnderWater
+L7706: globalgamemanagers.assets	818	MonoScript	140	LobbySearchFindCallbackInfo
+L7798: globalgamemanagers.assets	910	MonoScript	92	WaveOverlayData
+L7800: globalgamemanagers.assets	912	MonoScript	108	ContinuanceToken
+L7810: globalgamemanagers.assets	922	MonoScript	152	XblMultiplayerConnectionAddressDeviceTokenPair
+L7816: globalgamemanagers.assets	928	MonoScript	100	WaterRefiller
+L7867: globalgamemanagers.assets	979	MonoScript	136	PlacementModifier_SnapToWater
+L7971: globalgamemanagers.assets	1083	MonoScript	100	IgnoreOceanEvents
+L7999: globalgamemanagers.assets	1111	MonoScript	100	OceanCameraSettings
+L8001: globalgamemanagers.assets	1113	MonoScript	156	SessionSearchRemoveParameterOptions
+L8027: globalgamemanagers.assets	1139	MonoScript	92	WaterStillAudio
+L8034: globalgamemanagers.assets	1146	MonoScript	148	SessionSearchSetParameterOptions
+L8086: globalgamemanagers.assets	1198	MonoScript	92	ProjectedGrid
+L8106: globalgamemanagers.assets	1218	MonoScript	164	SessionSearchGetSearchResultCountOptions
+L8151: globalgamemanagers.assets	1263	MonoScript	116	UnifiedSpectrumConditionKey
+L8285: globalgamemanagers.assets	1397	MonoScript	108	OceanWeatherEventEffect
+L8316: globalgamemanagers.assets	1428	MonoScript	108	CoroutineWaveQueryTask
+L8319: globalgamemanagers.assets	1431	MonoScript	108	WaveSpectrumConditionKey
+L8322: globalgamemanagers.assets	1434	MonoScript	112	SessionSearchOnFindCallback
+L8345: globalgamemanagers.assets	1457	MonoScript	156	LobbySearchRemoveParameterOptions
+L8351: globalgamemanagers.assets	1463	MonoScript	136	BeamTeamWaterDistortAndDroplets
+L8390: globalgamemanagers.assets	1502	MonoScript	116	CustomWaveSpectrumCondition
+L8464: globalgamemanagers.assets	1576	MonoScript	112	LobbySearchOnFindCallback
+L8563: globalgamemanagers.assets	1675	MonoScript	132	SessionSearchFindOptions
+L8572: globalgamemanagers.assets	1684	MonoScript	84	FourierTask
+L8574: globalgamemanagers.assets	1686	MonoScript	108	WaveSpectrumBufferCPU
+L8615: globalgamemanagers.assets	1727	MonoScript	156	SessionSearchSetMaxResultsOptions
+L8667: globalgamemanagers.assets	1779	MonoScript	80	OceanData
+L8670: globalgamemanagers.assets	1782	MonoScript	112	XblMultiplayerSearchHandle
+L8685: globalgamemanagers.assets	1797	MonoScript	116	PhillipsSpectrumConditionKey
+L8739: globalgamemanagers.assets	1851	MonoScript	100	WaveSpectrumBuffer
+L8756: globalgamemanagers.assets	1868	MonoScript	128	XblMultiplayerSearchHandle
+L8817: globalgamemanagers.assets	1929	MonoScript	172	SessionSearchCopySearchResultByIndexOptions
+L8836: globalgamemanagers.assets	1948	MonoScript	148	SessionSearchSetSessionIdOptions
+L8845: globalgamemanagers.assets	1957	MonoScript	140	CreateSessionSearchOptions
+L8870: globalgamemanagers.assets	1982	MonoScript	92	AddWaveOverlay
+L8922: globalgamemanagers.assets	2034	MonoScript	132	CreateLobbySearchOptions
+L8925: globalgamemanagers.assets	2037	MonoScript	92	UnifiedSpectrum
+L8931: globalgamemanagers.assets	2043	MonoScript	148	LobbySearchSetMaxResultsOptions
+L8988: globalgamemanagers.assets	2100	MonoScript	84	CetoSettings
+L8991: globalgamemanagers.assets	2103	MonoScript	92	WaveQueryTask
+L9014: globalgamemanagers.assets	2126	MonoScript	148	SessionSearchFindCallbackInfo
+L9030: globalgamemanagers.assets	2142	MonoScript	84	SpectrumTask
+L9049: globalgamemanagers.assets	2161	MonoScript	128	UnderwaterEffectController
+L9088: globalgamemanagers.assets	2200	MonoScript	84	FoamOverlay
+L9165: globalgamemanagers.assets	2277	MonoScript	128	ConnectorCheck_Underwater
+L9233: globalgamemanagers.assets	2345	MonoScript	96	BEAMSeaFortGenerator
+L9279: globalgamemanagers.assets	2391	MonoScript	108	Interactive_SEA_ANCHOR
+L9381: globalgamemanagers.assets	2493	MonoScript	100	AddWaveOverlayBase
+L9400: globalgamemanagers.assets	2512	MonoScript	108	ThreadedWaveQueryTask
+L9492: globalgamemanagers.assets	2604	MonoScript	124	UnifiedPhillipsSpectrumCondition
+L9543: globalgamemanagers.assets	2655	MonoScript	92	OceanComponent
+L9567: globalgamemanagers.assets	2679	MonoScript	88	BaseActionEvent
+L9616: globalgamemanagers.assets	2728	MonoScript	136	WaveformMonitor
+L9655: globalgamemanagers.assets	2767	MonoScript	84	OceanTime
+L9685: globalgamemanagers.assets	2797	MonoScript	148	LobbySearchSetParameterOptions
+L9724: globalgamemanagers.assets	2836	MonoScript	168	XblMultiplayerConnectionAddressDeviceTokenPair
+L9779: globalgamemanagers.assets	2891	MonoScript	108	UnifiedSpectrumCondition
+L9793: globalgamemanagers.assets	2905	MonoScript	132	LobbySearchFindOptions
+L9814: globalgamemanagers.assets	2926	MonoScript	84	FourierCPU
+L9836: globalgamemanagers.assets	2948	MonoScript	84	OceanUtility
+L9895: globalgamemanagers.assets	3007	MonoScript	164	LobbySearchGetSearchResultCountOptions
+L9919: globalgamemanagers.assets	3031	MonoScript	116	PhillipsSpectrumCondition
+L9923: globalgamemanagers.assets	3035	MonoScript	156	SessionSearchSetTargetUserIdOptions
+L9974: globalgamemanagers.assets	3086	MonoScript	108	LobbySearch
+L10049: globalgamemanagers.assets	3161	MonoScript	80	SeaUrchins
+L10067: globalgamemanagers.assets	3179	MonoScript	76	Ocean
+L10137: globalgamemanagers.assets	3249	MonoScript	84	FourierGPU
+L10227: level0	29	GameObject	107	_Ceto
+L10657: level1	105	GameObject	131	Control - Caustics
+L10661: level1	109	GameObject	71	Group - Search Bar
+L10691: level1	139	GameObject	55	Category - Water
+L10740: level1	188	GameObject	103	Input - Search
+L11570: level1	1018	GameObject	135	Control - Ocean Rotation
+L16459: level2	8	GameObject	67	Deep Ocean Audio
+L16460: level2	9	GameObject	63	Ocean Audio
+L16475: level2	24	GameObject	119	_Ceto
+L16760: level3	5	GameObject	67	Deep Ocean Audio
+L16762: level3	7	GameObject	63	Ocean Audio
+L16894: level3	139	GameObject	119	_Ceto
+L18153: level4	5	GameObject	119	_Ceto
+L18191: level4	43	GameObject	67	Deep Ocean Audio
+L18192: level4	44	GameObject	63	Ocean Audio
+L18314: level4	166	GameObject	75	SeaFort_Bridge_Broken_L2
+L18339: level4	191	GameObject	71	SeaFort_Bridge_L2
+L18361: level4	213	GameObject	87	SeaFort_Bridge_Broken
+L18382: level4	234	GameObject	67	Seafort_Poles_L0
+L18402: level4	254	GameObject	67	Seafort_01_L1
+L18465: level4	317	GameObject	39	Seafort_01
+L18535: level4	387	GameObject	87	WATER BOTTLE
+L18578: level4	430	GameObject	79	SeaFort_Bridge
+L18646: level4	498	GameObject	67	Seafort_02_L2
+L18660: level4	512	GameObject	39	Seafort_02
+L18663: level4	515	GameObject	75	SEALADDER
+L18685: level4	537	GameObject	67	Seafort_01_L0
+L18709: level4	561	GameObject	75	SeaFort_2
+L18719: level4	571	GameObject	67	Seafort_Poles_L0
+L18748: level4	600	GameObject	51	Seafort_01_Colliders_Box
+L18761: level4	613	GameObject	87	WATER SKIN
+L18777: level4	629	GameObject	75	SeaFort_1
+L18915: level4	767	GameObject	51	Seafort_02_Colliders_Box
+L18970: level4	822	GameObject	67	Seafort_01_L2
+L18983: level4	835	GameObject	75	SeaLadder
+L19005: level4	857	GameObject	67	Seafort_02_L0
+L19025: level4	877	GameObject	71	SeaFort_Bridge_L1
+L19059: level4	911	GameObject	71	Seafort_01_Pipes_L0
+L19130: level4	982	GameObject	71	SeaFort_Bridge_L0
+L19138: level4	990	GameObject	75	SeaFort_Bridge_Broken_L0
+L19147: level4	999	GameObject	67	Seafort_02_L1
+L19166: level4	1018	GameObject	75	SeaFort_Bridge_Broken_L1
+L19238: level4	1090	GameObject	51	Toggle_Ocean
+L24235: resources.assets	68	Material	936	SeaAnchor_MAT
+L24276: resources.assets	109	Material	944	WaterPot_MAT
+L24277: resources.assets	110	Material	948	Waterskin_MAT
+L24282: resources.assets	115	Material	960	SeaPlanePedals
+L24335: resources.assets	168	Material	936	SeafortWallLeaks
+L24336: resources.assets	169	Material	1028	Seafort_Atlas2_MAT
+L24337: resources.assets	170	Material	1012	Seafort_Atlas_MAT
+L24338: resources.assets	171	Material	1012	Seafort_Concrete_MAT
+L24339: resources.assets	172	Material	1048	Seafort_Decals_MAT
+L24384: resources.assets	217	Material	1004	decal2_UnderwaterVegetation
+L24385: resources.assets	218	Material	1808	decal_UnderwaterVegetation
+L24388: resources.assets	221	Material	948	tile_UnderwaterVegetation1
+L24389: resources.assets	222	Material	948	tile_UnderwaterVegetation2
+L24436: resources.assets	269	Material	1288	seagull
+L24462: resources.assets	295	Material	224	Water_Splash_1
+L24463: resources.assets	296	Material	208	Water_Splash_2
+L24579: resources.assets	412	Material	636	SeaFort_1_Impostor
+L24605: resources.assets	438	Material	636	SeaFort_2_Impostor
+L24668: resources.assets	501	Texture2D	164	decal2_UnderwaterVegetation_SPEC
+L24790: resources.assets	623	Texture2D	156	SeafortWallLeaks_SPEC
+L24808: resources.assets	641	Texture2D	172	SeaFort_2_Impostor_SpecularSmoothness
+L24839: resources.assets	672	Texture2D	152	SeaPlanePedals_NRM
+L24842: resources.assets	675	Texture2D	144	SeaFort_3
+L24851: resources.assets	684	Texture2D	144	WATER SKIN
+L24854: resources.assets	687	Texture2D	148	FOOD_WATER_SKIN
+L24860: resources.assets	693	Texture2D	152	Seafort_Decals_DIFF
+L24874: resources.assets	707	Texture2D	164	SeaFort_2_Impostor_NormalDepth
+L24882: resources.assets	715	Texture2D	148	ANIMALS_SEAGULL
+L24884: resources.assets	717	Texture2D	164	SeaFort_1_Impostor_AlbedoAlpha
+L24891: resources.assets	724	Texture2D	164	decal_UnderwaterVegetation_NRM
+L24898: resources.assets	731	Texture2D	148	Waterskin_DIFF
+L24902: resources.assets	735	Texture2D	164	SeaFort_1_Impostor_NormalDepth
+L24905: resources.assets	738	Texture2D	164	tile_UnderwaterVegetation1_NRM
+L24927: resources.assets	760	Texture2D	148	WaterSplash_1
+L24928: resources.assets	761	Texture2D	152	FOOD_WATER_BOTTLE
+L24953: resources.assets	786	Texture2D	144	WaterPot_NRM
+L24990: resources.assets	823	Texture2D	148	SeaFort_Brige
+L25021: resources.assets	854	Texture2D	164	tile_UnderwaterVegetation2_SPEC
+L25039: resources.assets	872	Texture2D	164	SeaFort_2_Impostor_AlbedoAlpha
+L25092: resources.assets	925	Texture2D	164	decal2_UnderwaterVegetation_DIFF
+L25105: resources.assets	938	Texture2D	160	BUILDING_VEHICLE_GYRO_SEAT
+L25169: resources.assets	1002	Texture2D	144	SeaFort_1
+L25215: resources.assets	1048	Texture2D	152	SeaPlanePedals_AO
+L25249: resources.assets	1082	Texture2D	148	WaterSplash_2
+L25274: resources.assets	1107	Texture2D	144	SeaFort_2
+L25303: resources.assets	1136	Texture2D	148	Waterskin_NRM
+L25350: resources.assets	1183	Texture2D	152	FOOD_WATER_BOTTLE
+L25353: resources.assets	1186	Texture2D	148	Waterskin_SPEC
+L25354: resources.assets	1187	Texture2D	164	decal_UnderwaterVegetation_DIFF
+L25426: resources.assets	1259	Texture2D	164	tile_UnderwaterVegetation2_NRM
+L25427: resources.assets	1260	Texture2D	152	Seafort_Support_DIFF
+L25448: resources.assets	1281	Texture2D	144	Water_Icon
+L25454: resources.assets	1287	Texture2D	148	ANIMALS_SEAGULL
+L25456: resources.assets	1289	Texture2D	148	FOOD_WATER_SKIN
+L25482: resources.assets	1315	Texture2D	152	Seafort_Support_NRM
+L25487: resources.assets	1320	Texture2D	144	Seafort_DIFF
+L25493: resources.assets	1326	Texture2D	144	WATER BOTTLE
+L25497: resources.assets	1330	Texture2D	152	SeaPlanePedals_SPEC
+L25547: resources.assets	1380	Texture2D	164	tile_UnderwaterVegetation1_SPEC
+L25548: resources.assets	1381	Texture2D	148	WaterPot_SPEC
+L25599: resources.assets	1432	Texture2D	148	Seafort2_DIFF
+L25603: resources.assets	1436	Texture2D	140	seagull
+L25619: resources.assets	1452	Texture2D	164	tile_UnderwaterVegetation1_DIFF
+L25638: resources.assets	1471	Texture2D	789628	DeepSeaBase
+L25663: resources.assets	1496	Texture2D	148	SeaAnchor_NRM
+L25702: resources.assets	1535	Texture2D	156	SeaFort_Bridge_Broken
+L25710: resources.assets	1543	Texture2D	164	tile_UnderwaterVegetation2_DIFF
+L25745: resources.assets	1578	Texture2D	148	SeaAnchor_SPEC
+L25771: resources.assets	1604	Texture2D	148	WaterPot_DIFF
+L25776: resources.assets	1609	Texture2D	144	Seafort_SPEC
+L25811: resources.assets	1644	Texture2D	152	SeaPlanePedals_DIFF
+L25825: resources.assets	1658	Texture2D	152	Seafort_Support_SPEC
+L25942: resources.assets	1775	Texture2D	164	decal_UnderwaterVegetation_SPEC
+L25956: resources.assets	1789	Texture2D	148	water_splash_v3
+L25960: resources.assets	1793	Texture2D	144	Seafort_NRM
+L25966: resources.assets	1799	Texture2D	152	SeafortWallLeaks_NRM
+L25972: resources.assets	1805	Texture2D	172	SeaFort_1_Impostor_SpecularSmoothness
+L25987: resources.assets	1820	Texture2D	164	decal2_UnderwaterVegetation_NRM
+L25996: resources.assets	1829	Texture2D	148	SeaAnchor_DIFF
+L26051: resources.assets	1884	Texture2D	144	SeaFort_1
+L26055: resources.assets	1888	Texture2D	156	SeafortWallLeaks_DIFF
+L26072: resources.assets	1905	Texture2D	148	SeaFort_Bridge
+L26093: resources.assets	1926	Texture2D	152	CRAFTING_WATER_STILL
+L26144: resources.assets	1977	Mesh	9872	Water_Still_L2
+L26193: resources.assets	2026	Mesh	60552	Sea_Anchor_Rock_Packed
+L26239: resources.assets	2072	Mesh	22856	Sea_Anchor_Static
+L26252: resources.assets	2085	Mesh	39844	Sea_Anchor_L1
+L26311: resources.assets	2144	Mesh	77900	SeaFort_Bridge_Broken_L0
+L26321: resources.assets	2154	Mesh	88324	Helicopter_Stage_2_Seat
+L26410: resources.assets	2243	Mesh	93984	SeaFort_Bridge_L0
+L26417: resources.assets	2250	Mesh	70072	Water_Still_L1
+L26448: resources.assets	2281	Mesh	17348	WaterSkin_L1
+L26461: resources.assets	2294	Mesh	10372	Sea_Anchor_Rock_Deployed_Stick
+L26508: resources.assets	2341	Mesh	20844	WaterPot_L1
+L26631: resources.assets	2464	Mesh	62896	WaterSkin
+L26651: resources.assets	2484	Mesh	66888	Sea_Anchor
+L26721: resources.assets	2554	Mesh	37688	Sea_Anchor_Rock_Deployed
+L26745: resources.assets	2578	Mesh	50536	Sea_Anchor_Rock_Packed_L1
+L26818: resources.assets	2651	Mesh	48868	Sea_Anchor_Static_Deploy
+L26831: resources.assets	2664	Mesh	20164	SeaFort_Bridge_Broken_L1
+L26857: resources.assets	2690	Mesh	28016	SeaFort_Bridge_L1
+L26922: resources.assets	2755	Mesh	35352	WaterPot
+L26957: resources.assets	2790	Mesh	4244	SeaFort_Bridge_Broken_L2
+L26979: resources.assets	2812	Mesh	3992	SeaFort_Bridge_L2
+L27064: resources.assets	2897	Mesh	91872	Water_Still
+L27143: resources.assets	2976	Mesh	14620	Seafort_Poles_L0
+L27151: resources.assets	2984	Mesh	776592	Seafort_01_Pipes_L0
+L27152: resources.assets	2985	Mesh	1181608	Seafort_01_L0
+L27153: resources.assets	2986	Mesh	304080	Seafort_01_L1
+L27154: resources.assets	2987	Mesh	143596	Seafort_01_L2
+L27155: resources.assets	2988	Mesh	46792	Seafort_01_L3
+L27156: resources.assets	2989	Mesh	979104	Seafort_02_L0
+L27157: resources.assets	2990	Mesh	385000	Seafort_02_L1
+L27158: resources.assets	2991	Mesh	212280	Seafort_02_L2
+L27159: resources.assets	2992	Mesh	71540	Seafort_02_L3
+L27173: resources.assets	3006	Mesh	708	SeaFort_1_Impostor
+L27174: resources.assets	3007	Mesh	708	SeaFort_2_Impostor
+L27244: resources.assets	3077	Shader	9356	Beam Team/Post Effects/Underwater
+L27311: resources.assets	3144	Shader	5224	Beam Team/Post Effects/Water Distort and Droplets
+L27647: resources.assets	3480	AudioClip	96	footstep_water_6
+L27657: resources.assets	3490	AudioClip	108	solarstill_collect_water_2
+L27660: resources.assets	3493	AudioClip	96	footstep_water_5
+L27662: resources.assets	3495	AudioClip	108	footstep_metal_seafort_R2
+L27671: resources.assets	3504	AudioClip	108	footstep_metal_seafort_L3
+L27690: resources.assets	3523	AudioClip	108	footstep_metal_seafort_L2
+L27692: resources.assets	3525	AudioClip	100	paddle_water_loop
+L27700: resources.assets	3533	AudioClip	96	SeaFort_Ambience
+L27707: resources.assets	3540	AudioClip	100	swim_abovewater_3
+L27716: resources.assets	3549	AudioClip	96	footstep_water_4
+L27720: resources.assets	3553	AudioClip	96	boss_jump_water
+L27726: resources.assets	3559	AudioClip	104	rock_seaAnchor_deploy
+L27734: resources.assets	3567	AudioClip	96	drink_water_1
+L27739: resources.assets	3572	AudioClip	96	footstep_water_2
+L27745: resources.assets	3578	AudioClip	96	footstep_water_3
+L27751: resources.assets	3584	AudioClip	108	footstep_metal_seafort_R1
+L27767: resources.assets	3600	AudioClip	108	solarstill_collect_water_3
+L27772: resources.assets	3605	AudioClip	112	Player_Damage_Underwater_1 tk1
+L27784: resources.assets	3617	AudioClip	96	footstep_water_1
+L27785: resources.assets	3618	AudioClip	108	solarstill_collecting_water
+L27786: resources.assets	3619	AudioClip	108	footstep_metal_seafort_L1
+L27804: resources.assets	3637	AudioClip	104	rock_seaAnchor_retrieve
+L27821: resources.assets	3654	AudioClip	100	swim_underwater_1
+L27826: resources.assets	3659	AudioClip	92	plot_water
+L27836: resources.assets	3669	AudioClip	108	solarstill_collect_water_1
+L27854: resources.assets	3687	AudioClip	108	liferaft_seaAnchor_retrieve
+L27857: resources.assets	3690	AudioClip	108	footstep_metal_seafort_L4
+L27897: resources.assets	3730	AudioClip	100	swim_abovewater_4
+L27913: resources.assets	3746	AudioClip	100	swim_underwater_3
+L27935: resources.assets	3768	AudioClip	108	Player_Damage_Underwater_2
+L27946: resources.assets	3779	AudioClip	100	swim_abovewater_1
+L27961: resources.assets	3794	AudioClip	96	boss_land_water
+L27963: resources.assets	3796	AudioClip	108	footstep_metal_seafort_R3
+L27966: resources.assets	3799	AudioClip	112	Player_Damage_Underwater_2 tk1
+L28008: resources.assets	3841	AudioClip	100	swim_abovewater_2
+L28016: resources.assets	3849	AudioClip	108	Player_Damage_Underwater_1
+L28029: resources.assets	3862	AudioClip	108	liferaft_seaAnchor_deploy
+L28033: resources.assets	3866	AudioClip	100	swim_underwater_4
+L28042: resources.assets	3875	AudioClip	108	footstep_metal_seafort_R4
+L28047: resources.assets	3880	AudioClip	100	swim_underwater_2
+L28247: resources.assets	4080	Sprite	1240	FOOD_WATER_SKIN
+L28257: resources.assets	4090	Sprite	1600	ANIMALS_SEAGULL
+L28268: resources.assets	4101	Sprite	1548	FOOD_WATER_BOTTLE
+L28314: resources.assets	4147	Sprite	880	BUILDING_VEHICLE_GYRO_SEAT
+L28377: resources.assets	4210	Sprite	756	FOOD_WATER_BOTTLE
+L28413: resources.assets	4246	Sprite	624	Water_Icon
+L28417: resources.assets	4250	Sprite	792	ANIMALS_SEAGULL
+L28418: resources.assets	4251	Sprite	772	FOOD_WATER_SKIN
+L28572: resources.assets	4405	Sprite	1152	CRAFTING_WATER_STILL
+L28662: resources.assets	4495	GameObject	147	WATER_BOTTLE
+L28766: resources.assets	4599	GameObject	71	PARTICLE_WATER_WAKE
+L28796: resources.assets	4629	GameObject	71	Flash_Shockwave_v1
+L28819: resources.assets	4652	GameObject	71	PARTICLE_WATER_WAKE
+L28829: resources.assets	4662	GameObject	71	PARTICLE_WATER_WAKE
+L28852: resources.assets	4685	GameObject	71	PARTICLE_WATER_WAKE
+L29012: resources.assets	4845	GameObject	75	SeaFort_2
+L29153: resources.assets	4986	GameObject	75	SeaFort_1
+L29179: resources.assets	5012	GameObject	75	SEALADDER
+L29228: resources.assets	5061	GameObject	79	PARTICLE_WATER_SPLASH_SML
+L29229: resources.assets	5062	GameObject	75	PARTICLE_WATER_SPLASH
+L29241: resources.assets	5074	GameObject	79	PARTICLE_WATER_SPLASH_WHALE
+L29431: resources.assets	5264	GameObject	155	SEAGULL
+L29445: resources.assets	5278	GameObject	79	SeaFort_Brige
+L29457: resources.assets	5290	GameObject	83	SeaFort_Brige_Broken
+L30190: resources.assets	6023	GameObject	195	WATER_STILL
+L30419: resources.assets	6252	GameObject	59	SEAFORT GENERATOR
+L30544: resources.assets	6377	GameObject	67	Seafort_02_L1
+L30826: resources.assets	6659	GameObject	71	Seafort_01_Pipes_L0
+L30832: resources.assets	6665	GameObject	51	Seafort_02_Colliders_Box
+L30956: resources.assets	6789	GameObject	75	SeaFort_Bridge_Broken_L0
+L30966: resources.assets	6799	GameObject	71	SeaFort_Bridge_L1
+L31009: resources.assets	6842	GameObject	75	SeaFort_Bridge_Broken_L2
+L31071: resources.assets	6904	GameObject	67	Seafort_02_L2
+L31163: resources.assets	6996	GameObject	67	Seafort_Poles_L0
+L31182: resources.assets	7015	GameObject	67	Seafort_02_L3
+L31225: resources.assets	7058	GameObject	135	WATER_SKIN
+L31233: resources.assets	7066	GameObject	67	Seafort_01_L2
+L31241: resources.assets	7074	GameObject	51	Seafort_01_Colliders_Box
+L31289: resources.assets	7122	GameObject	39	Seafort_01
+L31292: resources.assets	7125	GameObject	75	SeaLadder
+L31310: resources.assets	7143	GameObject	71	SeaFort_Bridge_L0
+L31389: resources.assets	7222	GameObject	67	Seafort_01_L1
+L31394: resources.assets	7227	GameObject	67	Seafort_Poles_L0
+L31435: resources.assets	7268	GameObject	67	Seafort_01_L0
+L31446: resources.assets	7279	GameObject	67	Seafort_02_L0
+L31480: resources.assets	7313	GameObject	75	SeaFort_Bridge_Broken_L1
+L31502: resources.assets	7335	GameObject	39	Seafort_02
+L31565: resources.assets	7398	GameObject	71	SeaFort_Bridge_L2
+L31580: resources.assets	7413	GameObject	67	Seafort_01_L3
+L31998: resources.assets	7831	GameObject	67	Connector_Seat
+L32019: resources.assets	7852	GameObject	75	PARTICLE_WATER_SPLASH
+L32174: resources.assets	8007	GameObject	83	SeaFort_2_Impostor
+L33417: resources.assets	9250	GameObject	71	PARTICLE_WATER_WAKE
+L34084: resources.assets	9917	GameObject	111	SEA_ANCHOR
+L34326: resources.assets	10159	GameObject	111	GYRO_SEAT_2
+L34457: resources.assets	10290	GameObject	71	PARTICLE_WATER_WAKE
+L34606: resources.assets	10439	GameObject	83	SeaFort_1_Impostor
+L34703: resources.assets	10536	GameObject	75	PARTICLE_WATER_SPLASH
+L34850: resources.assets	10683	GameObject	63	Water_Wake
+L51820: sharedassets0.assets	2	Material	144	OceanTopSide_Transparent
+L51821: sharedassets0.assets	3	Material	108	OceanUnderSide_Transparent
+L51866: sharedassets0.assets	48	Texture2D	152	CausticsNormal
+L51932: sharedassets0.assets	114	Texture2D	148	SearchTex
+L51957: sharedassets0.assets	139	Shader	4072	Ceto/OceanBottom
+L51960: sharedassets0.assets	142	Shader	14464	Ceto/OceanMaskFlipped
+L51961: sharedassets0.assets	143	Shader	580088	Ceto/OceanUnderSide_Transparent
+L51963: sharedassets0.assets	145	Shader	4948	Hidden/PostProcessing/Debug/Waveform
+L51965: sharedassets0.assets	147	Shader	4092	Ceto/SlopeCopy
+L51968: sharedassets0.assets	150	Shader	13188	Ceto/FoamCopy
+L51972: sharedassets0.assets	154	Shader	16284	Ceto/InitDisplacement
+L51973: sharedassets0.assets	155	Shader	4160	Ceto/CopyDepth
+L51977: sharedassets0.assets	159	Shader	16164	Ceto/InitJacobians
+L51978: sharedassets0.assets	160	Shader	7140	Ceto/NormalFade
+L51979: sharedassets0.assets	161	Shader	18956	Ceto/WaveOverlay
+L51984: sharedassets0.assets	166	Shader	4756	Ceto/BlurEffectConeTap
+L51986: sharedassets0.assets	168	Shader	14456	Ceto/OceanMask
+L51993: sharedassets0.assets	175	Shader	338788	Ceto/OceanTopSide_Transparent
+L51994: sharedassets0.assets	176	Shader	15124	Ceto/InitSlope
+L51996: sharedassets0.assets	178	Shader	22804	Ceto/Fourier
+L51997: sharedassets0.assets	179	Shader	31772	Ceto/OceanDepth
+L51999: sharedassets0.assets	181	Shader	13964	Ceto/DisplacementCopy
+L52014: sharedassets0.assets	196	ComputeShader	7076	Waveform
+L52046: sharedassets0.assets	228	AudioMixerSnapshotController	44	Underwater
+L52339: sharedassets1.assets	20	Texture2D	156	Cartographer_Search
+L52425: sharedassets1.assets	106	Sprite	936	Cartographer_Search
+L53121: sharedassets2.assets	20	AudioClip	108	ENVIRONMENT_Ocean_Calm
+L53130: sharedassets2.assets	29	AudioClip	108	ENVIRONMENT_Ocean_Waves
+L53231: sharedassets3.assets	16	Material	968	SeaSnake_Fish_Group_MAT
+L53250: sharedassets3.assets	35	Material	1464	Sea_Urchins_MAT
+L53251: sharedassets3.assets	36	Material	1912	Seaweed_MAT
+L53252: sharedassets3.assets	37	Material	1816	Shoreline_Seaweed_MAT
+L53262: sharedassets3.assets	47	Texture2D	152	Sea_Snake_NRM
+L53271: sharedassets3.assets	56	Texture2D	152	Sea_Snake_DIFF
+L53281: sharedassets3.assets	66	Texture2D	1398260	Terrain_Sand_Underwater
+L53285: sharedassets3.assets	70	Texture2D	144	Seaweed
+L53311: sharedassets3.assets	96	Texture2D	160	Shoreline_Seaweed_PACK
+L53313: sharedassets3.assets	98	Texture2D	156	Shoreline_Seaweed
+L53315: sharedassets3.assets	100	Texture2D	152	WaveNormalMap
+L53319: sharedassets3.assets	104	Texture2D	148	Seaweed_PACK
+L53333: sharedassets3.assets	118	Mesh	12244	SeaWeed05_medium
+L53340: sharedassets3.assets	125	Mesh	12956	Sea_Snake_L1
+L53342: sharedassets3.assets	127	Mesh	29788	SeaWeed06_medium
+L53351: sharedassets3.assets	136	Mesh	7976	Shoreline_Seaweed
+L53352: sharedassets3.assets	137	Mesh	7484	Seaweed
+L53361: sharedassets3.assets	146	Mesh	3240	Sea_Urchin
+L53364: sharedassets3.assets	149	Mesh	7272	Sea_Cucumber
+L53397: sharedassets3.assets	182	AudioClip	100	seagull_flock
+L53425: sharedassets3.assets	210	GameObject	63	GEN_DEEPSEA_SHIPWRECK
+L53442: sharedassets3.assets	227	GameObject	75	SEA_URCHIN
+L53535: sharedassets3.assets	320	GameObject	59	Seaweed
+L53585: sharedassets3.assets	370	GameObject	63	Sea_Cucumber
+L53594: sharedassets3.assets	379	GameObject	83	SeaSnake Fish Group
+L53608: sharedassets3.assets	393	GameObject	71	Shoreline_Seaweed
+L54477: unity default resources	10400	Texture2D	29824	UnityWatermark-small
+L54482: unity default resources	10406	Texture2D	96388	UnityWatermark-trial-big
+L54483: unity default resources	10407	Texture2D	2256	UnityWatermark-trial
+L54484: unity default resources	10408	Texture2D	4448	UnityWatermark-beta
+L54485: unity default resources	10409	Texture2D	5160	UnityWatermark-edu
+L54486: unity default resources	10410	Texture2D	4040	UnityWatermark-dev
+L54488: unity default resources	10413	Texture2D	2392	UnityWatermark-proto
+L54489: unity default resources	10414	Texture2D	2380	UnityWatermarkPlugin-beta
+-> Subtotal: 494 lines
+
+================ 2_GOLD_IDS ================
+L39: [Shader       ] sharedassets0.assets   | pid=   143 |    580,088 B | Ceto/OceanUnderSide_Transparent
+L45: [Shader       ] sharedassets0.assets   | pid=   175 |    338,788 B | Ceto/OceanTopSide_Transparent
+-> Subtotal: 2 lines
+
+================ 3_BUCKET_MEMORY ================
+L183: NAME: UnityWatermark-beta
+L184: NAME: UnityWatermark-dev
+L185: NAME: UnityWatermark-edu
+L186: NAME: UnityWatermark-proto
+L187: NAME: UnityWatermark-small
+L188: NAME: UnityWatermark-trial
+L189: NAME: UnityWatermark-trial-big
+L190: NAME: UnityWatermarkPlugin-beta
+L275: NAME: ANIMALS_SEAGULL
+-> Subtotal: 9 lines
+

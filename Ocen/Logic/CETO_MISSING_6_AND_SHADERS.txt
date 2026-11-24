@@ -1,0 +1,1121 @@
+// STRANDED DEEP 4 - MISSING 6 CETO FILES + UNDERWATER + OCEAN SHADERS
+
+==================== Ceto_ISpectrum.cs ====================
+namespace Ceto;
+
+public interface ISpectrum
+{
+	float Spectrum(float kx, float ky);
+}
+
+
+==================== Ceto_WaveSpectrumConditionCPU.cs ====================
+
+
+==================== Ceto_WaveSpectrumConditionGPU.cs ====================
+
+
+==================== Ceto_SlopeBuffer.cs ====================
+
+
+==================== Ceto_JacobianBuffer.cs ====================
+
+
+==================== Ceto_UnderWater.cs ====================
+using System;
+using Ceto.Common.Unity.Utility;
+using UnityEngine;
+using UnityEngine.Rendering;
+
+namespace Ceto;
+
+[AddComponentMenu("Ceto/Components/UnderWater")]
+[DisallowMultipleComponent]
+[RequireComponent(typeof(Ocean))]
+public class UnderWater : OceanComponent
+{
+	public const float MAX_REFRACTION_INTENSITY = 2f;
+
+	public const float MAX_REFRACTION_DISORTION = 4f;
+
+	private readonly float MAX_DEPTH_DIST = 500f;
+
+	public UNDERWATER_MODE underwaterMode;
+
+	public DEPTH_MODE depthMode;
+
+	public LayerMask oceanDepthsMask = 1;
+
+	public float bottomDepth = 500f;
+
+	[Range(0f, 1f)]
+	private float depthBlend = 0.2f;
+
+	[Range(0f, 1f)]
+	public float edgeFade = 0.2f;
+
+	[Range(0f, 2f)]
+	public float aboveRefractionIntensity = 0.5f;
+
+	[Range(0f, 2f)]
+	public float belowRefractionIntensity = 0.5f;
+
+	[Range(0f, 4f)]
+	public float refractionDistortion = 0.5f;
+
+	[Range(0f, 1f)]
+	public float absorptionR = 0.45f;
+
+	[Range(0f, 1f)]
+	public float absorptionG = 0.029f;
+
+	[Range(0f, 1f)]
+	public float absorptionB = 0.018f;
+
+	public AbsorptionModifier aboveAbsorptionModifier = new AbsorptionModifier(2f, 1f, Color.white);
+
+	public AbsorptionModifier belowAbsorptionModifier = new AbsorptionModifier(0.1f, 1f, Color.white);
+
+	public AbsorptionModifier subSurfaceScatterModifier = new AbsorptionModifier(10f, 1.5f, new Color32(220, 250, 180, byte.MaxValue));
+
+	public InscatterModifier aboveInscatterModifier = new InscatterModifier(50f, 1f, new Color32(2, 25, 43, byte.MaxValue), INSCATTER_MODE.EXP);
+
+	public InscatterModifier belowInscatterModifier = new InscatterModifier(60f, 1f, new Color32(7, 51, 77, byte.MaxValue), INSCATTER_MODE.EXP);
+
+	private GameObject m_bottomMask;
+
+	public int NumMeshSegmentsX = 32;
+
+	public int NumMeshSegmentsY = 512;
+
+	public Shader oceanBottomSdr;
+
+	public Shader oceanDepthSdr;
+
+	public Shader copyDepthSdr;
+
+	public Shader oceanMaskSdr;
+
+	public Shader oceanMaskFlippedSdr;
+
+	public Shader normalFadeSdr;
+
+	public bool DisableCopyDepthCmd { get; set; }
+
+	public bool DisableNormalFadeCmd { get; set; }
+
+	private void Start()
+	{
+		try
+		{
+			Mesh mesh = CreateBottomMesh(NumMeshSegmentsX, NumMeshSegmentsY);
+			m_bottomMask = new GameObject("Ceto Bottom Mask Gameobject");
+			MeshFilter meshFilter = m_bottomMask.AddComponent<MeshFilter>();
+			MeshRenderer meshRenderer = m_bottomMask.AddComponent<MeshRenderer>();
+			NotifyOnWillRender notifyOnWillRender = m_bottomMask.AddComponent<NotifyOnWillRender>();
+			meshFilter.sharedMesh = mesh;
+			meshRenderer.receiveShadows = false;
+			meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+			meshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+			meshRenderer.material = new Material(oceanBottomSdr);
+			notifyOnWillRender.AddAction(m_ocean.RenderWaveOverlays);
+			notifyOnWillRender.AddAction(m_ocean.RenderOceanMask);
+			notifyOnWillRender.AddAction(m_ocean.RenderOceanDepth);
+			m_bottomMask.layer = LayerMask.NameToLayer(Ocean.OCEAN_LAYER);
+			m_bottomMask.hideFlags = HideFlags.HideAndDontSave;
+			UpdateBottomBounds();
+			UnityEngine.Object.Destroy(mesh);
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	protected override void OnEnable()
+	{
+		base.OnEnable();
+		try
+		{
+			Shader.EnableKeyword("CETO_UNDERWATER_ON");
+			SetBottomActive(m_bottomMask, active: true);
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	protected override void OnDisable()
+	{
+		base.OnDisable();
+		try
+		{
+			Shader.DisableKeyword("CETO_UNDERWATER_ON");
+			SetBottomActive(m_bottomMask, active: false);
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+		try
+		{
+			if (m_bottomMask != null)
+			{
+				Mesh mesh = m_bottomMask.GetComponent<MeshFilter>().mesh;
+				UnityEngine.Object.Destroy(m_bottomMask);
+				UnityEngine.Object.Destroy(mesh);
+			}
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	private void Update()
+	{
+		try
+		{
+			Vector4 vector = new Vector4(absorptionR, absorptionG, absorptionB, 1f);
+			Vector4 value = vector;
+			Vector4 value2 = vector;
+			vector.w = Mathf.Max(0f, aboveAbsorptionModifier.scale);
+			value.w = Mathf.Max(0f, subSurfaceScatterModifier.scale);
+			value2.w = Mathf.Max(0f, belowAbsorptionModifier.scale);
+			Color value3 = aboveAbsorptionModifier.tint * Mathf.Max(0f, aboveAbsorptionModifier.intensity);
+			Color value4 = subSurfaceScatterModifier.tint * Mathf.Max(0f, subSurfaceScatterModifier.intensity);
+			Color value5 = belowAbsorptionModifier.tint * Mathf.Max(0f, belowAbsorptionModifier.intensity);
+			Shader.SetGlobalVector("Ceto_AbsCof", vector);
+			Shader.SetGlobalColor("Ceto_AbsTint", value3);
+			Shader.SetGlobalVector("Ceto_SSSCof", value);
+			Shader.SetGlobalColor("Ceto_SSSTint", value4);
+			Shader.SetGlobalVector("Ceto_BelowCof", value2);
+			Shader.SetGlobalColor("Ceto_BelowTint", value5);
+			Color color = aboveInscatterModifier.color;
+			color.a = Mathf.Clamp01(aboveInscatterModifier.intensity);
+			Shader.SetGlobalFloat("Ceto_AboveInscatterScale", Mathf.Max(0.1f, aboveInscatterModifier.scale));
+			Shader.SetGlobalVector("Ceto_AboveInscatterMode", InscatterModeToMask(aboveInscatterModifier.mode));
+			Shader.SetGlobalColor("Ceto_AboveInscatterColor", color);
+			Color color2 = belowInscatterModifier.color;
+			color2.a = Mathf.Clamp01(belowInscatterModifier.intensity);
+			Shader.SetGlobalFloat("Ceto_BelowInscatterScale", Mathf.Max(0.1f, belowInscatterModifier.scale));
+			Shader.SetGlobalVector("Ceto_BelowInscatterMode", InscatterModeToMask(belowInscatterModifier.mode));
+			Shader.SetGlobalColor("Ceto_BelowInscatterColor", color2);
+			Shader.SetGlobalFloat("Ceto_AboveRefractionIntensity", Mathf.Max(0f, aboveRefractionIntensity));
+			Shader.SetGlobalFloat("Ceto_BelowRefractionIntensity", Mathf.Max(0f, belowRefractionIntensity));
+			Shader.SetGlobalFloat("Ceto_RefractionDistortion", refractionDistortion * 0.05f);
+			Shader.SetGlobalFloat("Ceto_MaxDepthDist", Mathf.Max(0f, MAX_DEPTH_DIST));
+			Shader.SetGlobalFloat("Ceto_DepthBlend", Mathf.Clamp01(depthBlend));
+			Shader.SetGlobalFloat("Ceto_EdgeFade", Mathf.Lerp(20f, 2f, Mathf.Clamp01(edgeFade)));
+			float num = Ocean.Instance.FindMaxDisplacement(inculdeOverlays: false);
+			float value6 = Ocean.Instance.level - num;
+			Shader.SetGlobalFloat("Ceto_MaxWaveDisplacement", num);
+			Shader.SetGlobalFloat("Ceto_MinWaveHeight", value6);
+			if (depthMode == DEPTH_MODE.USE_OCEAN_DEPTH_PASS)
+			{
+				Shader.EnableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+				if (underwaterMode == UNDERWATER_MODE.ABOVE_ONLY)
+				{
+					SetBottomActive(m_bottomMask, active: false);
+					return;
+				}
+				SetBottomActive(m_bottomMask, active: true);
+				UpdateBottomBounds();
+			}
+			else
+			{
+				Shader.DisableKeyword("CETO_USE_OCEAN_DEPTHS_BUFFER");
+				if (underwaterMode == UNDERWATER_MODE.ABOVE_ONLY)
+				{
+					SetBottomActive(m_bottomMask, active: false);
+					return;
+				}
+				SetBottomActive(m_bottomMask, active: true);
+				UpdateBottomBounds();
+			}
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	private void SetBottomActive(GameObject bottom, bool active)
+	{
+		if (bottom != null)
+		{
+			bottom.SetActive(active);
+		}
+	}
+
+	private Vector3 InscatterModeToMask(INSCATTER_MODE mode)
+	{
+		return mode switch
+		{
+			INSCATTER_MODE.LINEAR => new Vector3(1f, 0f, 0f), 
+			INSCATTER_MODE.EXP => new Vector3(0f, 1f, 0f), 
+			INSCATTER_MODE.EXP2 => new Vector3(0f, 0f, 1f), 
+			_ => new Vector3(0f, 0f, 1f), 
+		};
+	}
+
+	private void FitBottomToCamera()
+	{
+		if (enabled && !(m_bottomMask == null))
+		{
+			Camera current = Camera.current;
+			Vector3 position = current.transform.position;
+			float num = current.farClipPlane * 0.85f;
+			m_bottomMask.transform.localScale = new Vector3(num, bottomDepth, num);
+			float num2 = 0f;
+			m_bottomMask.transform.localPosition = new Vector3(position.x, 0f - bottomDepth + m_ocean.level - num2, position.z);
+		}
+	}
+
+	private void UpdateBottomBounds()
+	{
+		float num = 100000000f;
+		float level = m_ocean.level;
+		if (m_bottomMask != null && m_bottomMask.activeSelf)
+		{
+			Bounds bounds = new Bounds(new Vector3(0f, level, 0f), new Vector3(num, bottomDepth, num));
+			m_bottomMask.GetComponent<MeshFilter>().mesh.bounds = bounds;
+		}
+	}
+
+	private LayerMask GetOceanDepthsLayermask(OceanCameraSettings settings)
+	{
+		if (!(settings != null))
+		{
+			return oceanDepthsMask;
+		}
+		return settings.oceanDepthsMask;
+	}
+
+	private bool GetDisableUnderwater(OceanCameraSettings settings)
+	{
+		if (!(settings != null))
+		{
+			return false;
+		}
+		return settings.disableUnderwater;
+	}
+
+	public void RenderOceanMask(GameObject go)
+	{
+		try
+		{
+			if (!enabled || oceanMaskSdr == null)
+			{
+				return;
+			}
+			Camera current = Camera.current;
+			if (current == null)
+			{
+				return;
+			}
+			CameraData cameraData = m_ocean.FindCameraData(current);
+			if (cameraData.mask == null)
+			{
+				cameraData.mask = new MaskData();
+			}
+			if (cameraData.mask.IsViewUpdated(current))
+			{
+				return;
+			}
+			if (current.name == "SceneCamera" || SystemInfo.graphicsShaderLevel < 30 || GetDisableUnderwater(cameraData.settings))
+			{
+				Shader.SetGlobalTexture(Ocean.OCEAN_MASK_TEXTURE_NAME0, Texture2D.blackTexture);
+				Shader.SetGlobalTexture(Ocean.OCEAN_MASK_TEXTURE_NAME1, Texture2D.blackTexture);
+				cameraData.mask.SetViewAsUpdated(current);
+				return;
+			}
+			CreateMaskCameraFor(current, cameraData.mask);
+			FitBottomToCamera();
+			Shader sdr = (m_ocean.Projection.IsFlipped ? oceanMaskFlippedSdr : oceanMaskSdr);
+			if (current.stereoEnabled)
+			{
+				RenderSteroOceanMask(cameraData.mask, current, sdr);
+			}
+			else
+			{
+				Shader.DisableKeyword("CETO_STERO_CAMERA");
+				RenderOceanMask(cameraData.mask, cameraData.mask.target0, current.transform.position, current.transform.rotation, current.projectionMatrix, sdr);
+				Shader.SetGlobalTexture(Ocean.OCEAN_MASK_TEXTURE_NAME0, cameraData.mask.target0);
+			}
+			cameraData.mask.SetViewAsUpdated(current);
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	private void RenderSteroOceanMask(MaskData data, Camera cam, Shader sdr)
+	{
+		Shader.DisableKeyword("CETO_STERO_CAMERA");
+		RenderOceanMask(data, data.target0, cam.transform.position, cam.transform.rotation, cam.projectionMatrix, sdr);
+		Shader.SetGlobalTexture(Ocean.OCEAN_MASK_TEXTURE_NAME0, data.target0);
+	}
+
+	private void RenderOceanMask(MaskData data, RenderTexture target, Vector3 position, Quaternion rotation, Matrix4x4 projection, Shader sdr)
+	{
+		NotifyOnEvent.Disable = true;
+		data.cam.ResetWorldToCameraMatrix();
+		data.cam.transform.position = position;
+		data.cam.transform.rotation = rotation;
+		data.cam.projectionMatrix = projection;
+		data.cam.targetTexture = target;
+		data.cam.RenderWithShader(sdr, "OceanMask");
+		data.cam.targetTexture = null;
+		NotifyOnEvent.Disable = false;
+	}
+
+	public void RenderOceanDepth(GameObject go)
+	{
+		try
+		{
+			if (!enabled)
+			{
+				return;
+			}
+			Camera current = Camera.current;
+			if (current == null)
+			{
+				return;
+			}
+			CameraData cameraData = m_ocean.FindCameraData(current);
+			if (cameraData.depth == null)
+			{
+				cameraData.depth = new DepthData();
+			}
+			if (cameraData.depth.IsViewUpdated(current))
+			{
+				return;
+			}
+			if (GetDisableUnderwater(cameraData.settings))
+			{
+				Shader.DisableKeyword("CETO_UNDERWATER_ON");
+				cameraData.depth.SetViewAsUpdated(current);
+				return;
+			}
+			Shader.EnableKeyword("CETO_UNDERWATER_ON");
+			if (SystemInfo.graphicsShaderLevel < 30)
+			{
+				Shader.SetGlobalTexture(Ocean.OCEAN_DEPTH_TEXTURE_NAME0, Texture2D.whiteTexture);
+				Shader.SetGlobalTexture(Ocean.OCEAN_DEPTH_TEXTURE_NAME1, Texture2D.whiteTexture);
+				Shader.SetGlobalTexture(Ocean.DEPTH_GRAB_TEXTURE_NAME, Texture2D.whiteTexture);
+				Shader.SetGlobalTexture(Ocean.NORMAL_FADE_TEXTURE_NAME, Texture2D.blackTexture);
+				BindIVPMatrix(current.projectionMatrix, current.worldToCameraMatrix);
+				cameraData.depth.SetViewAsUpdated(current);
+			}
+			else if (depthMode == DEPTH_MODE.USE_DEPTH_BUFFER)
+			{
+				Shader.SetGlobalTexture(Ocean.OCEAN_DEPTH_TEXTURE_NAME0, Texture2D.whiteTexture);
+				Shader.SetGlobalTexture(Ocean.OCEAN_DEPTH_TEXTURE_NAME1, Texture2D.whiteTexture);
+				current.depthTextureMode |= DepthTextureMode.Depth;
+				current.depthTextureMode |= DepthTextureMode.DepthNormals;
+				CreateRefractionCommand(current, cameraData.depth);
+				BindIVPMatrix(current.projectionMatrix, current.worldToCameraMatrix);
+				cameraData.depth.SetViewAsUpdated(current);
+			}
+			else if (depthMode == DEPTH_MODE.USE_OCEAN_DEPTH_PASS)
+			{
+				Shader.SetGlobalTexture(Ocean.DEPTH_GRAB_TEXTURE_NAME, Texture2D.whiteTexture);
+				Shader.SetGlobalTexture(Ocean.NORMAL_FADE_TEXTURE_NAME, Texture2D.blackTexture);
+				CreateDepthCameraFor(current, cameraData.depth);
+				CreateRefractionCommand(current, cameraData.depth);
+				cameraData.depth.cam.cullingMask = GetOceanDepthsLayermask(cameraData.settings);
+				cameraData.depth.cam.cullingMask = OceanUtility.HideLayer(cameraData.depth.cam.cullingMask, Ocean.OCEAN_LAYER);
+				if (current.stereoEnabled)
+				{
+					RenderSteroOceanDepth(cameraData.depth, current);
+				}
+				else
+				{
+					Shader.DisableKeyword("CETO_STERO_CAMERA");
+					RenderOceanDepth(cameraData.depth, cameraData.depth.target0, current.transform.position, current.transform.rotation, current.projectionMatrix);
+					Shader.SetGlobalTexture(Ocean.OCEAN_DEPTH_TEXTURE_NAME0, cameraData.depth.target0);
+				}
+				cameraData.depth.SetViewAsUpdated(current);
+			}
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	private void BindIVPMatrix(Matrix4x4 projection, Matrix4x4 view)
+	{
+		Shader.SetGlobalMatrix("Ceto_Camera_IVP0", (projection * view).inverse);
+	}
+
+	private void RenderSteroOceanDepth(DepthData data, Camera cam)
+	{
+		Shader.DisableKeyword("CETO_STERO_CAMERA");
+		RenderOceanDepth(data, data.target0, cam.transform.position, cam.transform.rotation, cam.projectionMatrix);
+		Shader.SetGlobalTexture(Ocean.OCEAN_DEPTH_TEXTURE_NAME0, data.target0);
+	}
+
+	private void RenderOceanDepth(DepthData data, RenderTexture target, Vector3 position, Quaternion rotation, Matrix4x4 projection)
+	{
+		NotifyOnEvent.Disable = true;
+		data.cam.ResetWorldToCameraMatrix();
+		data.cam.transform.position = position;
+		data.cam.transform.rotation = rotation;
+		data.cam.projectionMatrix = projection;
+		data.cam.targetTexture = target;
+		data.cam.RenderWithShader(oceanDepthSdr, "RenderType");
+		data.cam.targetTexture = null;
+		NotifyOnEvent.Disable = false;
+	}
+
+	private void CreateMaskCameraFor(Camera cam, MaskData data)
+	{
+		if (data.cam == null)
+		{
+			GameObject gameObject = new GameObject("Ceto Mask Camera: " + cam.name);
+			gameObject.hideFlags = HideFlags.HideAndDontSave;
+			gameObject.AddComponent<IgnoreOceanEvents>();
+			gameObject.AddComponent<DisableFog>();
+			gameObject.AddComponent<DisableShadows>();
+			data.cam = gameObject.AddComponent<Camera>();
+			data.cam.clearFlags = CameraClearFlags.Color;
+			data.cam.backgroundColor = new Color(0f, 1f, 0f, 0f);
+			data.cam.cullingMask = 1 << LayerMask.NameToLayer(Ocean.OCEAN_LAYER);
+			data.cam.enabled = false;
+			data.cam.renderingPath = RenderingPath.Forward;
+			data.cam.targetTexture = null;
+			data.cam.useOcclusionCulling = false;
+			data.cam.RemoveAllCommandBuffers();
+			data.cam.targetTexture = null;
+		}
+		data.cam.fieldOfView = cam.fieldOfView;
+		data.cam.nearClipPlane = cam.nearClipPlane;
+		data.cam.farClipPlane = cam.farClipPlane;
+		data.cam.orthographic = cam.orthographic;
+		data.cam.aspect = cam.aspect;
+		data.cam.orthographicSize = cam.orthographicSize;
+		data.cam.rect = new Rect(0f, 0f, 1f, 1f);
+		if (data.target0 == null || data.target0.width != cam.pixelWidth || data.target0.height != cam.pixelHeight)
+		{
+			data.DestroyTargets();
+			int pixelWidth = cam.pixelWidth;
+			int pixelHeight = cam.pixelHeight;
+			int depth = 32;
+			RenderTextureFormat format = RenderTextureFormat.RGHalf;
+			if (!SystemInfo.SupportsRenderTextureFormat(format))
+			{
+				format = RenderTextureFormat.ARGBHalf;
+			}
+			data.target0 = new RenderTexture(pixelWidth, pixelHeight, depth, format, RenderTextureReadWrite.Linear);
+			data.target0.filterMode = FilterMode.Point;
+			data.target0.hideFlags = HideFlags.DontSave;
+			data.target0.name = "Ceto Mask Render Target0: " + cam.name;
+			if (cam.stereoEnabled)
+			{
+				data.target1 = new RenderTexture(pixelWidth, pixelHeight, depth, format, RenderTextureReadWrite.Linear);
+				data.target1.filterMode = FilterMode.Point;
+				data.target1.hideFlags = HideFlags.DontSave;
+				data.target1.name = "Ceto Mask Render Target1: " + cam.name;
+			}
+		}
+	}
+
+	private void CreateDepthCameraFor(Camera cam, DepthData data)
+	{
+		if (data.cam == null)
+		{
+			GameObject gameObject = new GameObject("Ceto Depth Camera: " + cam.name);
+			gameObject.hideFlags = HideFlags.HideAndDontSave;
+			gameObject.AddComponent<IgnoreOceanEvents>();
+			gameObject.AddComponent<DisableFog>();
+			gameObject.AddComponent<DisableShadows>();
+			data.cam = gameObject.AddComponent<Camera>();
+			data.cam.clearFlags = CameraClearFlags.Color;
+			data.cam.backgroundColor = Color.white;
+			data.cam.enabled = false;
+			data.cam.renderingPath = RenderingPath.Forward;
+			data.cam.targetTexture = null;
+			data.cam.useOcclusionCulling = false;
+			data.cam.RemoveAllCommandBuffers();
+			data.cam.targetTexture = null;
+		}
+		data.cam.fieldOfView = cam.fieldOfView;
+		data.cam.nearClipPlane = cam.nearClipPlane;
+		data.cam.farClipPlane = cam.farClipPlane;
+		data.cam.orthographic = cam.orthographic;
+		data.cam.aspect = cam.aspect;
+		data.cam.orthographicSize = cam.orthographicSize;
+		data.cam.rect = new Rect(0f, 0f, 1f, 1f);
+		data.cam.layerCullDistances = cam.layerCullDistances;
+		data.cam.layerCullSpherical = cam.layerCullSpherical;
+		if (data.target0 == null || data.target0.width != cam.pixelWidth || data.target0.height != cam.pixelHeight)
+		{
+			data.DestroyTargets();
+			int pixelWidth = cam.pixelWidth;
+			int pixelHeight = cam.pixelHeight;
+			int depth = 24;
+			RenderTextureFormat format = RenderTextureFormat.RGFloat;
+			if (!SystemInfo.SupportsRenderTextureFormat(format))
+			{
+				format = RenderTextureFormat.RGHalf;
+			}
+			if (!SystemInfo.SupportsRenderTextureFormat(format))
+			{
+				format = RenderTextureFormat.ARGBHalf;
+			}
+			data.target0 = new RenderTexture(pixelWidth, pixelHeight, depth, format, RenderTextureReadWrite.Linear);
+			data.target0.filterMode = FilterMode.Point;
+			data.target0.hideFlags = HideFlags.DontSave;
+			data.target0.name = "Ceto Ocean Depths Render Target0: " + cam.name;
+			if (cam.stereoEnabled)
+			{
+				data.target1 = new RenderTexture(pixelWidth, pixelHeight, depth, format, RenderTextureReadWrite.Linear);
+				data.target1.filterMode = FilterMode.Point;
+				data.target1.hideFlags = HideFlags.DontSave;
+				data.target1.name = "Ceto Ocean Depths Render Target1: " + cam.name;
+			}
+		}
+	}
+
+	private void CreateRefractionCommand(Camera cam, DepthData data)
+	{
+		if (depthMode == DEPTH_MODE.USE_DEPTH_BUFFER)
+		{
+			if (data.refractionCommand == null)
+			{
+				data.refractionCommand = new RefractionCommand(cam, copyDepthSdr, normalFadeSdr);
+			}
+			if (!data.refractionCommand.DisableCopyDepthCmd && DisableCopyDepthCmd)
+			{
+				Shader.SetGlobalTexture(Ocean.DEPTH_GRAB_TEXTURE_NAME, Texture2D.whiteTexture);
+			}
+			if (!data.refractionCommand.DisableNormalFadeCmd && DisableNormalFadeCmd)
+			{
+				Shader.SetGlobalTexture(Ocean.NORMAL_FADE_TEXTURE_NAME, Texture2D.blackTexture);
+			}
+			data.refractionCommand.DisableCopyDepthCmd = DisableCopyDepthCmd;
+			data.refractionCommand.DisableNormalFadeCmd = DisableNormalFadeCmd;
+			data.refractionCommand.UpdateCommands();
+		}
+		else if (data.refractionCommand != null)
+		{
+			data.refractionCommand.ClearCommands();
+			data.refractionCommand = null;
+		}
+	}
+
+	private Mesh CreateBottomMesh(int segementsX, int segementsY)
+	{
+		Vector3[] array = new Vector3[segementsX * segementsY];
+		Vector2[] uv = new Vector2[segementsX * segementsY];
+		float num = MathF.PI * 2f;
+		for (int i = 0; i < segementsX; i++)
+		{
+			for (int j = 0; j < segementsY; j++)
+			{
+				float num2 = (float)i / (float)(segementsX - 1);
+				array[i + j * segementsX].x = num2 * Mathf.Cos(num * (float)j / (float)(segementsY - 1));
+				array[i + j * segementsX].y = 0f;
+				array[i + j * segementsX].z = num2 * Mathf.Sin(num * (float)j / (float)(segementsY - 1));
+				if (i == segementsX - 1)
+				{
+					array[i + j * segementsX].y = 1f;
+				}
+			}
+		}
+		int[] array2 = new int[segementsX * segementsY * 6];
+		int num3 = 0;
+		for (int k = 0; k < segementsX - 1; k++)
+		{
+			for (int l = 0; l < segementsY - 1; l++)
+			{
+				array2[num3++] = k + l * segementsX;
+				array2[num3++] = k + (l + 1) * segementsX;
+				array2[num3++] = k + 1 + l * segementsX;
+				array2[num3++] = k + (l + 1) * segementsX;
+				array2[num3++] = k + 1 + (l + 1) * segementsX;
+				array2[num3++] = k + 1 + l * segementsX;
+			}
+		}
+		Mesh mesh = new Mesh();
+		mesh.vertices = array;
+		mesh.uv = uv;
+		mesh.triangles = array2;
+		mesh.name = "Ceto Bottom Mesh";
+		mesh.hideFlags = HideFlags.HideAndDontSave;
+		mesh.RecalculateNormals();
+		return mesh;
+	}
+}
+
+
+==================== ORIGINAL CETO OCEAN SHADERS ====================
+
+--- SHADER: Ceto/OceanBottom (sharedassets0.assets PID=139) ---
+
+--- SHADER: Ceto/OceanMaskFlipped (sharedassets0.assets PID=142) ---
+
+--- SHADER: Ceto/OceanUnderSide_Transparent (sharedassets0.assets PID=143) ---
+  Prop _CullFace (__cf) = (1.0, 0.0, 0.0, 0.0)
+
+--- SHADER: Ceto/SlopeCopy (sharedassets0.assets PID=147) ---
+
+--- SHADER: Ceto/FoamCopy (sharedassets0.assets PID=150) ---
+
+--- SHADER: Ceto/InitDisplacement (sharedassets0.assets PID=154) ---
+
+--- SHADER: Ceto/CopyDepth (sharedassets0.assets PID=155) ---
+
+--- SHADER: Ceto/InitJacobians (sharedassets0.assets PID=159) ---
+
+--- SHADER: Ceto/NormalFade (sharedassets0.assets PID=160) ---
+
+--- SHADER: Ceto/WaveOverlay (sharedassets0.assets PID=161) ---
+
+--- SHADER: Ceto/BlurEffectConeTap (sharedassets0.assets PID=166) ---
+  Prop _MainTex () = (0.0, 0.0, 0.0, 0.0)
+
+--- SHADER: Ceto/OceanMask (sharedassets0.assets PID=168) ---
+
+--- SHADER: Ceto/OceanTopSide_Transparent (sharedassets0.assets PID=175) ---
+  Prop _CullFace (__cf) = (2.0, 0.0, 0.0, 0.0)
+
+--- SHADER: Ceto/InitSlope (sharedassets0.assets PID=176) ---
+
+--- SHADER: Ceto/Fourier (sharedassets0.assets PID=178) ---
+
+--- SHADER: Ceto/OceanDepth (sharedassets0.assets PID=179) ---
+
+--- SHADER: Ceto/DisplacementCopy (sharedassets0.assets PID=181) ---
+
+==================== Ceto_CustomWaveSpectrumCondition.cs ====================
+using System;
+
+namespace Ceto;
+
+public class CustomWaveSpectrumCondition : WaveSpectrumCondition
+{
+	private ICustomWaveSpectrum m_custom;
+
+	public CustomWaveSpectrumCondition(ICustomWaveSpectrum custom, int size, float windDir, int numGrids)
+		: base(size, numGrids)
+	{
+		if (numGrids < 1 || numGrids > 4)
+		{
+			throw new ArgumentException("UCustomSpectrumCondition must have 1 to 4 grids not " + numGrids);
+		}
+		m_custom = custom;
+		Key = m_custom.CreateKey(size, windDir, SPECTRUM_TYPE.CUSTOM, numGrids);
+		GridSizes = m_custom.GetGridSizes(numGrids);
+		Choppyness = m_custom.GetChoppyness(numGrids);
+		WaveAmps = m_custom.GetWaveAmps(numGrids);
+	}
+
+	public override SpectrumTask GetCreateSpectrumConditionTask()
+	{
+		ISpectrum spectrum = m_custom.CreateSpectrum(Key);
+		bool multiThreadTask = m_custom.MultiThreadTask;
+		return new SpectrumTask(this, multiThreadTask, new ISpectrum[4] { spectrum, spectrum, spectrum, spectrum });
+	}
+}
+
+
+==================== Ceto_DisplacementBufferCPU.cs ====================
+using System.Collections.Generic;
+using Ceto.Common.Containers.Interpolation;
+using Ceto.Common.Threading.Scheduling;
+using UnityEngine;
+
+namespace Ceto;
+
+public class DisplacementBufferCPU : WaveSpectrumBufferCPU, IDisplacementBuffer
+{
+	private const int NUM_BUFFERS = 3;
+
+	private IList<InterpolatedArray2f[]> m_displacements;
+
+	public DisplacementBufferCPU(int size, Scheduler scheduler)
+		: base(size, 3, scheduler)
+	{
+		int gRIDS = QueryDisplacements.GRIDS;
+		int cHANNELS = QueryDisplacements.CHANNELS;
+		m_displacements = new List<InterpolatedArray2f[]>(2);
+		m_displacements.Add(new InterpolatedArray2f[gRIDS]);
+		m_displacements.Add(new InterpolatedArray2f[gRIDS]);
+		for (int i = 0; i < gRIDS; i++)
+		{
+			m_displacements[0][i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+			m_displacements[1][i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+		}
+	}
+
+	protected override void Initilize(WaveSpectrumCondition condition, float time)
+	{
+		InterpolatedArray2f[] writeDisplacements = GetWriteDisplacements();
+		writeDisplacements[0].Clear();
+		writeDisplacements[1].Clear();
+		writeDisplacements[2].Clear();
+		writeDisplacements[3].Clear();
+		if (m_initTask == null)
+		{
+			m_initTask = condition.GetInitSpectrumDisplacementsTask(this, time);
+		}
+		else if (m_initTask.SpectrumType != condition.Key.SpectrumType || m_initTask.NumGrids != condition.Key.NumGrids)
+		{
+			m_initTask = condition.GetInitSpectrumDisplacementsTask(this, time);
+		}
+		else
+		{
+			m_initTask.Reset(condition, time);
+		}
+	}
+
+	public InterpolatedArray2f[] GetWriteDisplacements()
+	{
+		return m_displacements[0];
+	}
+
+	public InterpolatedArray2f[] GetReadDisplacements()
+	{
+		return m_displacements[1];
+	}
+
+	public override void Run(WaveSpectrumCondition condition, float time)
+	{
+		SwapDisplacements();
+		base.Run(condition, time);
+	}
+
+	public void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements)
+	{
+		QueryDisplacements.CopyAndCreateDisplacements(GetReadDisplacements(), out displacements);
+	}
+
+	public void CopyDisplacements(IList<InterpolatedArray2f> displacements)
+	{
+		QueryDisplacements.CopyDisplacements(GetReadDisplacements(), displacements);
+	}
+
+	private void SwapDisplacements()
+	{
+		InterpolatedArray2f[] value = m_displacements[0];
+		m_displacements[0] = m_displacements[1];
+		m_displacements[1] = value;
+	}
+
+	public Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale)
+	{
+		return QueryDisplacements.MaxRange(GetReadDisplacements(), choppyness, gridScale, null);
+	}
+
+	public void QueryWaves(WaveQuery query, QueryGridScaling scaling)
+	{
+		int num = EnabledBuffers();
+		if (num != 0)
+		{
+			InterpolatedArray2f[] readDisplacements = GetReadDisplacements();
+			QueryDisplacements.QueryWaves(query, num, readDisplacements, scaling);
+		}
+	}
+}
+
+
+==================== Ceto_DisplacementBufferGPU.cs ====================
+using System.Collections.Generic;
+using Ceto.Common.Containers.Interpolation;
+using UnityEngine;
+
+namespace Ceto;
+
+public class DisplacementBufferGPU : WaveSpectrumBufferGPU, IDisplacementBuffer
+{
+	private static readonly int NUM_BUFFERS = 3;
+
+	private InterpolatedArray2f[] m_displacements;
+
+	public DisplacementBufferGPU(int size, Shader fourierSdr)
+		: base(size, fourierSdr, NUM_BUFFERS)
+	{
+		int gRIDS = QueryDisplacements.GRIDS;
+		int cHANNELS = QueryDisplacements.CHANNELS;
+		m_displacements = new InterpolatedArray2f[gRIDS];
+		for (int i = 0; i < gRIDS; i++)
+		{
+			m_displacements[i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+		}
+	}
+
+	public InterpolatedArray2f[] GetReadDisplacements()
+	{
+		return m_displacements;
+	}
+
+	public void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements)
+	{
+		QueryDisplacements.CopyAndCreateDisplacements(m_displacements, out displacements);
+	}
+
+	public void CopyDisplacements(IList<InterpolatedArray2f> displacements)
+	{
+		QueryDisplacements.CopyDisplacements(m_displacements, displacements);
+	}
+
+	public Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale)
+	{
+		return QueryDisplacements.MaxRange(m_displacements, choppyness, gridScale, null);
+	}
+
+	public void QueryWaves(WaveQuery query, QueryGridScaling scaling)
+	{
+		int num = EnabledBuffers();
+		if (num != 0)
+		{
+			QueryDisplacements.QueryWaves(query, num, m_displacements, scaling);
+		}
+	}
+}
+
+
+==================== Ceto_WaveSpectrumCondition.cs ====================
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+public abstract class WaveSpectrumCondition
+{
+	public bool Done { get; set; }
+
+	public Vector4 GridSizes { get; protected set; }
+
+	public Vector4 Choppyness { get; protected set; }
+
+	public Vector4 WaveAmps { get; protected set; }
+
+	public WaveSpectrumConditionKey Key { get; protected set; }
+
+	public Texture2D Spectrum01 { get; private set; }
+
+	public Color[] SpectrumData01 { get; private set; }
+
+	public Texture2D Spectrum23 { get; private set; }
+
+	public Color[] SpectrumData23 { get; private set; }
+
+	public Texture2D WTable { get; private set; }
+
+	public Color[] WTableData { get; private set; }
+
+	public int LastUpdated { get; set; }
+
+	public bool SupportsJacobians { get; protected set; }
+
+	public WaveSpectrumCondition(int size, int numGrids)
+	{
+		GridSizes = Vector4.one;
+		Choppyness = Vector4.one;
+		WaveAmps = Vector4.one;
+		SpectrumData01 = new Color[size * size];
+		if (numGrids > 2)
+		{
+			SpectrumData23 = new Color[size * size];
+		}
+		WTableData = new Color[size * size];
+		LastUpdated = -1;
+		SupportsJacobians = true;
+	}
+
+	public abstract SpectrumTask GetCreateSpectrumConditionTask();
+
+	public InitSpectrumDisplacementsTask GetInitSpectrumDisplacementsTask(DisplacementBufferCPU buffer, float time)
+	{
+		return new InitSpectrumDisplacementsTask(buffer, this, time);
+	}
+
+	public Vector4 InverseGridSizes()
+	{
+		float num = MathF.PI * 2f * (float)Key.Size;
+		return new Vector4(num / GridSizes.x, num / GridSizes.y, num / GridSizes.z, num / GridSizes.w);
+	}
+
+	public void Release()
+	{
+		if (Spectrum01 != null)
+		{
+			UnityEngine.Object.Destroy(Spectrum01);
+			Spectrum01 = null;
+		}
+		if (Spectrum23 != null)
+		{
+			UnityEngine.Object.Destroy(Spectrum23);
+			Spectrum23 = null;
+		}
+		if (WTable != null)
+		{
+			UnityEngine.Object.Destroy(WTable);
+			WTable = null;
+		}
+	}
+
+	public void CreateTextures()
+	{
+		if (Spectrum01 == null)
+		{
+			Spectrum01 = new Texture2D(Key.Size, Key.Size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+			Spectrum01.filterMode = FilterMode.Point;
+			Spectrum01.wrapMode = TextureWrapMode.Repeat;
+			Spectrum01.hideFlags = HideFlags.HideAndDontSave;
+			Spectrum01.name = "Ceto Spectrum01 Condition";
+		}
+		if (Spectrum23 == null && Key.NumGrids > 2)
+		{
+			Spectrum23 = new Texture2D(Key.Size, Key.Size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+			Spectrum23.filterMode = FilterMode.Point;
+			Spectrum23.wrapMode = TextureWrapMode.Repeat;
+			Spectrum23.hideFlags = HideFlags.HideAndDontSave;
+			Spectrum23.name = "Ceto Spectrum23 Condition";
+		}
+		if (WTable == null)
+		{
+			WTable = new Texture2D(Key.Size, Key.Size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+			WTable.filterMode = FilterMode.Point;
+			WTable.wrapMode = TextureWrapMode.Clamp;
+			WTable.hideFlags = HideFlags.HideAndDontSave;
+			WTable.name = "Ceto Wave Spectrum GPU WTable";
+		}
+	}
+
+	public void Apply(Color[] spectrum01, Color[] spectrum23, Color[] wtable)
+	{
+		if (Spectrum01 != null && spectrum01 != null)
+		{
+			Spectrum01.SetPixels(spectrum01);
+			Spectrum01.Apply();
+			Array.Copy(spectrum01, SpectrumData01, spectrum01.Length);
+		}
+		if (Spectrum23 != null && spectrum23 != null)
+		{
+			Spectrum23.SetPixels(spectrum23);
+			Spectrum23.Apply();
+			Array.Copy(spectrum23, SpectrumData23, spectrum23.Length);
+		}
+		if (WTable != null && wtable != null)
+		{
+			WTable.SetPixels(wtable);
+			WTable.Apply();
+			Array.Copy(wtable, WTableData, wtable.Length);
+		}
+	}
+}
+
+
+==================== Ceto_WaveSpectrumConditionKey.cs ====================
+using System;
+
+namespace Ceto;
+
+public abstract class WaveSpectrumConditionKey : IEquatable<WaveSpectrumConditionKey>
+{
+	public int Size { get; private set; }
+
+	public int NumGrids { get; private set; }
+
+	public float WindDir { get; private set; }
+
+	public SPECTRUM_TYPE SpectrumType { get; private set; }
+
+	public WaveSpectrumConditionKey(int size, float windDir, SPECTRUM_TYPE spectrumType, int numGrids)
+	{
+		Size = size;
+		NumGrids = numGrids;
+		WindDir = windDir;
+		SpectrumType = spectrumType;
+	}
+
+	protected abstract bool Matches(WaveSpectrumConditionKey k);
+
+	protected abstract int AddToHashCode(int hashcode);
+
+	public static bool operator ==(WaveSpectrumConditionKey k1, WaveSpectrumConditionKey k2)
+	{
+		if ((object)k1 == k2)
+		{
+			return true;
+		}
+		if ((object)k1 == null || (object)k2 == null)
+		{
+			return false;
+		}
+		if (k1.Size != k2.Size)
+		{
+			return false;
+		}
+		if (k1.NumGrids != k2.NumGrids)
+		{
+			return false;
+		}
+		if (k1.WindDir != k2.WindDir)
+		{
+			return false;
+		}
+		if (k1.SpectrumType != k2.SpectrumType)
+		{
+			return false;
+		}
+		return k1.Matches(k2);
+	}
+
+	public static bool operator !=(WaveSpectrumConditionKey k1, WaveSpectrumConditionKey k2)
+	{
+		return !(k1 == k2);
+	}
+
+	public override bool Equals(object o)
+	{
+		WaveSpectrumConditionKey waveSpectrumConditionKey = o as WaveSpectrumConditionKey;
+		if (waveSpectrumConditionKey == null)
+		{
+			return false;
+		}
+		return waveSpectrumConditionKey == this;
+	}
+
+	public bool Equals(WaveSpectrumConditionKey k)
+	{
+		return k == this;
+	}
+
+	public override int GetHashCode()
+	{
+		int num = 23;
+		num = num * 37 + Size.GetHashCode();
+		num = num * 37 + NumGrids.GetHashCode();
+		num = num * 37 + WindDir.GetHashCode();
+		num = num * 37 + SpectrumType.GetHashCode();
+		return AddToHashCode(num);
+	}
+}
+
