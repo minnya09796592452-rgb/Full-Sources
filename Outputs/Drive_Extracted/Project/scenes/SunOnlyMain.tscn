@@ -1,0 +1,93 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/sun_only_controller.gd" id="1_ctrl"]
+[ext_resource type="Shader" path="res://shaders/sun_only_sky.gdshader" id="2_sdr"]
+[ext_resource type="Texture2D" path="res://assets/sun/Halo_ID103.png" id="3_halo"]
+[ext_resource type="Texture2D" path="res://assets/sky/inscatter_ID98.png" id="4_ins"]
+[ext_resource type="Texture2D" path="res://assets/sky/transmittance_ID77.png" id="5_tra"]
+[ext_resource type="Texture2D" path="res://assets/sky/irradiance_ID69.png" id="6_irr"]
+[ext_resource type="Texture2D" path="res://assets/moon/moon_albedo.png" id="7_moon"]
+[ext_resource type="Shader" path="res://shaders/ocean_surface.gdshader" id="8_ocn_sdr"]
+[ext_resource type="Texture2D" path="res://assets/ocean/wave_normal_orig.png" id="9_wnrm"]
+[ext_resource type="Texture2D" path="res://assets/ocean/deep_sea_base_orig.png" id="10_dsea"]
+[ext_resource type="Script" path="res://scripts/ceto_projected_grid.gd" id="11_pgrid"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sun"]
+shader = ExtResource("2_sdr")
+shader_parameter/halo_tex = ExtResource("3_halo")
+shader_parameter/inscatter_lut = ExtResource("4_ins")
+shader_parameter/transmittance_lut = ExtResource("5_tra")
+shader_parameter/irradiance_lut = ExtResource("6_irr")
+shader_parameter/moon_tex = ExtResource("7_moon")
+shader_parameter/sun_color = Color(1, 0.99222, 0.98529, 1)
+shader_parameter/sun_intensity = 18.0
+shader_parameter/sun_disc_radius = 0.024
+shader_parameter/halo_radius = 0.18
+shader_parameter/halo_larger_radius = 0.45
+shader_parameter/halo_intensity = 1.25
+shader_parameter/moon_dir = Vector3(0, -0.866025, 0.5)
+shader_parameter/moon_color = Color(0.78, 0.86, 1, 1)
+shader_parameter/moon_radius = 0.036
+shader_parameter/moon_intensity = 2.6
+shader_parameter/star_intensity = 1.35
+shader_parameter/beta_r = Vector3(0.0058, 0.0135, 0.0331)
+shader_parameter/beta_m = 0.0045
+shader_parameter/mie_g = 0.85
+shader_parameter/atmosphere_exposure = 1.35
+shader_parameter/cloud_coverage = 0.42
+shader_parameter/cloud_density = 1.05
+shader_parameter/cloud_scale = 1.15
+shader_parameter/wind_speed = Vector2(0.035, 0.018)
+shader_parameter/storm_intensity = 0.0
+
+[sub_resource type="Sky" id="Sky_sun"]
+sky_material = SubResource("ShaderMaterial_sun")
+
+[sub_resource type="Environment" id="Environment_sun"]
+background_mode = 2
+sky = SubResource("Sky_sun")
+tonemap_mode = 3
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ocean"]
+shader = ExtResource("8_ocn_sdr")
+shader_parameter/wave_normal_tex = ExtResource("9_wnrm")
+shader_parameter/deep_sea_tex = ExtResource("10_dsea")
+shader_parameter/shallow_color = Color(0.03, 0.34, 0.42, 1)
+shader_parameter/deep_color = Color(0.006, 0.065, 0.145, 1)
+shader_parameter/horizon_fog_color = Color(0.58, 0.78, 0.95, 1)
+shader_parameter/wave_height = 0.28
+shader_parameter/wave_speed = 0.85
+shader_parameter/normal_scale = 0.065
+shader_parameter/normal_strength = 0.85
+shader_parameter/blur_start_dist = 80.0
+shader_parameter/cutoff_dist = 450.0
+shader_parameter/horizon_fade_dist = 1400.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ocean"]
+material = SubResource("ShaderMaterial_ocean")
+size = Vector2(3200, 3200)
+subdivide_width = 128
+subdivide_depth = 128
+
+[node name="SunOnlyMain" type="Node3D"]
+script = ExtResource("1_ctrl")
+time_of_day = 10.0
+auto_cycle = false
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_sun")
+
+[node name="SunDirectionalLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 15, 25)
+light_color = Color(1, 0.99222, 0.98529, 1)
+light_energy = 1.65
+shadow_enabled = true
+
+[node name="OceanSurface" type="MeshInstance3D" parent="."]
+script = ExtResource("11_pgrid")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_ocean")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 3.2, 0)
+current = true
