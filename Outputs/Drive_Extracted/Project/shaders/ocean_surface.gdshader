@@ -14,6 +14,8 @@ uniform float grid_size_0 = 1372.0;
 uniform float grid_size_1 = 392.0;
 uniform float grid_size_2 = 28.0;
 uniform float grid_size_3 = 4.0;
+uniform vec4 grid_choppyness = vec4(2.3, 2.1, 1.6, 0.9);
+uniform float grid_scale = 0.5;
 uniform float sea_level = 0.0;
 uniform float max_horizon_dist = 2800.0;
 uniform float choppyness = 0.8;
@@ -40,11 +42,16 @@ varying float v_view_distance;
 varying float v_underwater;
 
 vec4 sample_displacement(vec2 world_xz) {
-	vec4 d0 = texture(displacement_map_0, world_xz / max(grid_size_0, 0.001));
-	vec4 d1 = texture(displacement_map_1, world_xz / max(grid_size_1, 0.001));
-	vec4 d2 = texture(displacement_map_2, world_xz / max(grid_size_2, 0.001));
-	vec4 d3 = texture(displacement_map_3, world_xz / max(grid_size_3, 0.001));
-	return d0 + d1 + d2 + d3;
+	vec4 d0 = texture(displacement_map_0, world_xz / max(grid_size_0 * grid_scale, 0.001));
+	vec4 d1 = texture(displacement_map_1, world_xz / max(grid_size_1 * grid_scale, 0.001));
+	vec4 d2 = texture(displacement_map_2, world_xz / max(grid_size_2 * grid_scale, 0.001));
+	vec4 d3 = texture(displacement_map_3, world_xz / max(grid_size_3 * grid_scale, 0.001));
+	return vec4(
+		d0.r * grid_choppyness.x + d1.r * grid_choppyness.y + d2.r * grid_choppyness.z + d3.r * grid_choppyness.w,
+		(d0.g + d1.g + d2.g + d3.g) * grid_scale,
+		d0.b * grid_choppyness.x + d1.b * grid_choppyness.y + d2.b * grid_choppyness.z + d3.b * grid_choppyness.w,
+		1.0
+	);
 }
 
 float sample_height(vec2 world_xz) {
@@ -77,6 +84,9 @@ void vertex() {
 	vec3 ray_dir = normalize(far_world - near_world);
 	float denom = ray_dir.y;
 	float hit_distance = abs(denom) > 0.00001 ? (sea_level - near_world.y) / denom : max_horizon_dist;
+	if (hit_distance < 0.0) {
+		hit_distance = max_horizon_dist;
+	}
 	hit_distance = clamp(hit_distance, 0.0, max_horizon_dist);
 	vec3 ocean_world = near_world + ray_dir * hit_distance;
 	vec4 displacement = sample_displacement(ocean_world.xz);
