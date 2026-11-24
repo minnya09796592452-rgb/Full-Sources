@@ -12,6 +12,7 @@ extends MeshInstance3D
 @export_range(1, 2048, 1) var max_screen_height := 2048
 @export var tight_fit := false
 @export var disable_projection_flipping := true
+@export var use_double_precision := true
 
 var _projection_solver: CetoProjectionSolver
 var _last_viewport_size := Vector2i.ZERO
@@ -22,7 +23,7 @@ var _last_projection := Projection()
 
 func _ready() -> void:
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_projection_solver = CetoProjectionSolver.new()
+	_projection_solver = CetoProjection3d.new() if use_double_precision else CetoProjection3f.new()
 	_projection_solver.tight_fit = tight_fit
 	_projection_solver.disable_projection_flipping = disable_projection_flipping
 	_rebuild_screen_grid()
@@ -110,10 +111,14 @@ func _rebuild_screen_grid() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 	_last_viewport_size = Vector2i(viewport_size)
 	var arrays_list := _build_grid_arrays(viewport_size, mesh_resolution, border_uv_fraction, grid_group_size)
+	var old_material := get_active_material(0)
 	var screen_mesh := ArrayMesh.new()
 	for arrays in arrays_list:
 		screen_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	mesh = screen_mesh
+	if old_material != null:
+		for surface_index in range(screen_mesh.get_surface_count()):
+			set_surface_override_material(surface_index, old_material)
 	_update_projection()
 
 
