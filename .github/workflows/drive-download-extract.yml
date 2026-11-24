@@ -37,7 +37,7 @@ jobs:
           DRIVE_FILE_ID: 1pVtCrJFmfkX-lJswUeDhPgMg62wdZETZ
         run: |
           set -euo pipefail
-          "$RUNNER_TEMP/drive-venv/bin/gdown" --fuzzy "https://drive.google.com/file/d/${DRIVE_FILE_ID}/view?usp=drivesdk" -O "$RUNNER_TEMP/drive_archive"
+          "$RUNNER_TEMP/drive-venv/bin/gdown" "https://drive.google.com/uc?id=${DRIVE_FILE_ID}" -O "$RUNNER_TEMP/drive_archive"
           test -s "$RUNNER_TEMP/drive_archive"
           echo "Downloaded bytes: $(wc -c < "$RUNNER_TEMP/drive_archive")"
 
