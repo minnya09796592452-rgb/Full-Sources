@@ -50,6 +50,8 @@ func _ready() -> void:
 	_material.set_shader_parameter("grid_size_1", grid_sizes.y)
 	_material.set_shader_parameter("grid_size_2", grid_sizes.z)
 	_material.set_shader_parameter("grid_size_3", grid_sizes.w)
+	_material.set_shader_parameter("grid_choppyness", condition.choppyness)
+	_material.set_shader_parameter("grid_scale", 0.5)
 	_material.set_shader_parameter("sea_level", sea_level)
 	_ready_for_render = true
 
