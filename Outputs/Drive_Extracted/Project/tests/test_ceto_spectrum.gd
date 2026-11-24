@@ -7,6 +7,7 @@ const MixedCondition = preload("res://scripts/ceto_unified_phillips_spectrum_con
 const SpectrumTask = preload("res://scripts/ceto_spectrum_task.gd")
 const UnifiedSpectrum = preload("res://scripts/ceto_unified_spectrum.gd")
 const PhillipsSpectrum = preload("res://scripts/ceto_phillips_spectrum.gd")
+const UnifiedSpectrumModel = preload("res://scripts/ceto_unified_spectrum.gd")
 
 
 func _initialize() -> void:
@@ -15,6 +16,7 @@ func _initialize() -> void:
 
 func _run_tests() -> void:
 	_test_dotnet_random_seed_zero_sequence()
+	_test_spectrum_formula_reference_values()
 	_test_grid_presets()
 	_test_mixed_grid_spectrum_selection()
 	_test_spectrum_task_is_deterministic()
@@ -83,6 +85,9 @@ func _test_spectrum_and_wtable_shapes() -> void:
 	assert(result.wtable[0].g == 0.0)
 	assert(result.wtable[0].b == 0.0)
 	assert(result.wtable[0].a == 0.0)
+	var expected_grid_3 := Vector4(0.41442147, -0.27774803, -0.02893791, 0.01100171)
+	assert(result.spectrum23[1].is_equal_approx(Color(expected_grid_3.x, expected_grid_3.y, expected_grid_3.z, expected_grid_3.w)),
+		"Seeded SpectrumTask sample differs from the C# reference calculation.")
 
 
 func _test_cancellation() -> void:
@@ -91,3 +96,12 @@ func _test_cancellation() -> void:
 	var cancel_now := func() -> bool: return true
 	var result: Dictionary = task.run(cancel_now)
 	assert(result.cancelled)
+
+
+func _test_spectrum_formula_reference_values() -> void:
+	var phillips = PhillipsSpectrum.new(8.0, 0.0)
+	var unified = UnifiedSpectrumModel.new(8.0, 0.0, 0.64)
+	assert(absf(phillips.spectrum(0.5, 0.25) - 0.0972493643) < 1.0e-6,
+		"Phillips spectrum formula differs from the C# reference value.")
+	assert(absf(unified.spectrum(0.5, 0.25) - 0.0228057660) < 1.0e-6,
+		"Unified spectrum formula differs from the C# reference value.")
