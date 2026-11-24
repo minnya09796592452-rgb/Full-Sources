@@ -1,0 +1,6026 @@
+// STRANDED DEEP 4 - FULL ORIGINAL CETO OCEAN ENGINE ARCHIVE
+// Target: Godot 4.7.2 (GDScript + Compute/Fragment Shader)
+
+==================== Ceto_PhillipsSpectrum.cs ====================
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+public class PhillipsSpectrum : ISpectrum
+{
+	private readonly float GRAVITY = 9.818286f;
+
+	private readonly float AMP = 0.02f;
+
+	private readonly float WindSpeed;
+
+	private readonly Vector2 WindDir;
+
+	private readonly float length2;
+
+	private readonly float dampedLength2;
+
+	public PhillipsSpectrum(float windSpeed, float windDir)
+	{
+		WindSpeed = windSpeed;
+		float f = windDir * MathF.PI / 180f;
+		WindDir = new Vector2(Mathf.Cos(f), Mathf.Sin(f));
+		float num = WindSpeed * WindSpeed / GRAVITY;
+		length2 = num * num;
+		float num2 = 0.001f;
+		dampedLength2 = length2 * num2 * num2;
+	}
+
+	public float Spectrum(float kx, float kz)
+	{
+		float num = kx * WindDir.x - kz * WindDir.y;
+		float num2 = kx * WindDir.y + kz * WindDir.x;
+		kx = num;
+		kz = num2;
+		float num3 = Mathf.Sqrt(kx * kx + kz * kz);
+		if (num3 < 1E-06f)
+		{
+			return 0f;
+		}
+		float num4 = num3 * num3;
+		float num5 = num4 * num4;
+		kx /= num3;
+		kz /= num3;
+		float num6 = kx * 1f + kz * 0f;
+		float num7 = num6 * num6 * num6 * num6 * num6 * num6;
+		return AMP * Mathf.Exp(-1f / (num4 * length2)) / num5 * num7 * Mathf.Exp((0f - num4) * dampedLength2);
+	}
+}
+
+
+==================== Ceto_UnifiedSpectrum.cs ====================
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+public class UnifiedSpectrum : ISpectrum
+{
+	private readonly float GRAVITY = 9.818286f;
+
+	private readonly float WAVE_CM = 0.23f;
+
+	private readonly float WAVE_KM = 370f;
+
+	private readonly float U10;
+
+	private readonly float PI_2;
+
+	private readonly float SQRT_10;
+
+	private readonly float G_SQ_OMEGA_U10;
+
+	private readonly float Z_SQ_U10_G;
+
+	private readonly float LOG_OMEGA_6;
+
+	private readonly float SIGMA;
+
+	private readonly float SQ_SIGMA_2;
+
+	private readonly float ALPHA_P;
+
+	private readonly float LOG_2_4;
+
+	private readonly float kp;
+
+	private readonly float cp;
+
+	private readonly float z0;
+
+	private readonly float u_star;
+
+	private readonly float gamma;
+
+	private readonly float HALF_ALPHA_P_CP;
+
+	private readonly float alpham;
+
+	private readonly float HALF_ALPHAM_WAVE_CM;
+
+	private readonly float am;
+
+	private readonly float WindSpeed;
+
+	private readonly float WaveAge;
+
+	private readonly Vector2 WindDir;
+
+	public UnifiedSpectrum(float windSpeed, float windDir, float waveAge)
+	{
+		WindSpeed = windSpeed;
+		WaveAge = waveAge;
+		float f = windDir * MathF.PI / 180f;
+		WindDir = new Vector2(Mathf.Cos(f), Mathf.Sin(f));
+		U10 = WindSpeed;
+		PI_2 = MathF.PI * 2f;
+		SQRT_10 = Mathf.Sqrt(10f);
+		G_SQ_OMEGA_U10 = GRAVITY * sqr(WaveAge / U10);
+		Z_SQ_U10_G = 3.7E-05f * sqr(U10) / 9.81f;
+		LOG_OMEGA_6 = Mathf.Log(WaveAge) * 6f;
+		SIGMA = 0.08f * (1f + 4f / Mathf.Pow(WaveAge, 3f));
+		SQ_SIGMA_2 = sqr(SIGMA) * 2f;
+		ALPHA_P = 0.006f * Mathf.Sqrt(WaveAge);
+		LOG_2_4 = Mathf.Log(2f) / 4f;
+		kp = G_SQ_OMEGA_U10;
+		cp = omega(kp) / kp;
+		z0 = Z_SQ_U10_G * Mathf.Pow(U10 / cp, 0.9f);
+		u_star = 0.41f * U10 / Mathf.Log(10f / z0);
+		gamma = ((WaveAge < 1f) ? 1.7f : (1.7f + LOG_OMEGA_6));
+		HALF_ALPHA_P_CP = 0.5f * ALPHA_P * cp;
+		alpham = 0.01f * ((u_star < WAVE_CM) ? (1f + Mathf.Log(u_star / WAVE_CM)) : (1f + 3f * Mathf.Log(u_star / WAVE_CM)));
+		HALF_ALPHAM_WAVE_CM = 0.5f * alpham * WAVE_CM;
+		am = 0.13f * u_star / WAVE_CM;
+	}
+
+	private float sqr(float x)
+	{
+		return x * x;
+	}
+
+	private float omega(float k)
+	{
+		return Mathf.Sqrt(GRAVITY * k * (1f + sqr(k / WAVE_KM)));
+	}
+
+	public float Spectrum(float kx, float ky)
+	{
+		float num = kx * WindDir.x - ky * WindDir.y;
+		float num2 = kx * WindDir.y + ky * WindDir.x;
+		kx = num;
+		ky = num2;
+		float num3 = Mathf.Sqrt(kx * kx + ky * ky);
+		float num4 = omega(num3) / num3;
+		float num5 = Mathf.Exp(-1.25f * sqr(kp / num3));
+		float p = Mathf.Exp(-1f / SQ_SIGMA_2 * sqr(Mathf.Sqrt(num3 / kp) - 1f));
+		float num6 = Mathf.Pow(gamma, p);
+		float num7 = num5 * num6 * Mathf.Exp((0f - WaveAge) / SQRT_10 * (Mathf.Sqrt(num3 / kp) - 1f));
+		float num8 = HALF_ALPHA_P_CP / num4 * num7;
+		float num9 = Mathf.Exp(-0.25f * sqr(num3 / WAVE_KM - 1f));
+		float num10 = HALF_ALPHAM_WAVE_CM / num4 * num9 * num5;
+		float num11 = (float)Math.Tanh(LOG_2_4 + 4f * Mathf.Pow(num4 / cp, 2.5f) + am * Mathf.Pow(WAVE_CM / num4, 2.5f));
+		float num12 = Mathf.Atan2(ky, kx);
+		if (kx < 0f)
+		{
+			return 0f;
+		}
+		num8 *= 2f;
+		num10 *= 2f;
+		float num13 = Mathf.Sqrt(Mathf.Max(kx / num3, 0f));
+		return (num8 + num10) * (1f + num11 * Mathf.Cos(2f * num12)) / (PI_2 * num3 * num3 * num3 * num3) * num13;
+	}
+}
+
+
+==================== Ceto_PhillipsSpectrumCondition.cs ====================
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+public class PhillipsSpectrumCondition : WaveSpectrumCondition
+{
+	public PhillipsSpectrumCondition(int size, float windSpeed, float windDir, float waveAge, int numGrids)
+		: base(size, numGrids)
+	{
+		if (numGrids < 1 || numGrids > 4)
+		{
+			throw new ArgumentException("PhillipsSpectrumCondition must have 1 to 4 grids not " + numGrids);
+		}
+		Key = new PhillipsSpectrumConditionKey(windSpeed, size, windDir, SPECTRUM_TYPE.PHILLIPS, numGrids);
+		switch (numGrids)
+		{
+		case 1:
+			GridSizes = new Vector4(217f, 1f, 1f, 1f);
+			Choppyness = new Vector4(1.5f, 1f, 1f, 1f);
+			WaveAmps = new Vector4(0.5f, 1f, 1f, 1f);
+			break;
+		case 2:
+			GridSizes = new Vector4(217f, 97f, 1f, 1f);
+			Choppyness = new Vector4(1.5f, 1.2f, 1f, 1f);
+			WaveAmps = new Vector4(0.5f, 1f, 1f, 1f);
+			break;
+		case 3:
+			GridSizes = new Vector4(217f, 97f, 31f, 1f);
+			Choppyness = new Vector4(1.5f, 1.2f, 1f, 1f);
+			WaveAmps = new Vector4(0.5f, 1f, 1f, 1f);
+			break;
+		case 4:
+			GridSizes = new Vector4(1372f, 217f, 97f, 31f);
+			Choppyness = new Vector4(1.5f, 1.2f, 1f, 1f);
+			WaveAmps = new Vector4(0.25f, 0.5f, 1f, 1f);
+			break;
+		}
+	}
+
+	public override SpectrumTask GetCreateSpectrumConditionTask()
+	{
+		PhillipsSpectrumConditionKey phillipsSpectrumConditionKey = Key as PhillipsSpectrumConditionKey;
+		PhillipsSpectrum phillipsSpectrum = new PhillipsSpectrum(phillipsSpectrumConditionKey.WindSpeed, phillipsSpectrumConditionKey.WindDir);
+		return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { phillipsSpectrum, phillipsSpectrum, phillipsSpectrum, phillipsSpectrum });
+	}
+}
+
+
+==================== Ceto_UnifiedSpectrumCondition.cs ====================
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+public class UnifiedSpectrumCondition : WaveSpectrumCondition
+{
+	public UnifiedSpectrumCondition(int size, float windSpeed, float windDir, float waveAge, int numGrids)
+		: base(size, numGrids)
+	{
+		if (numGrids < 1 || numGrids > 4)
+		{
+			throw new ArgumentException("UnifiedSpectrumCondition must have 1 to 4 grids not " + numGrids);
+		}
+		Key = new UnifiedSpectrumConditionKey(windSpeed, waveAge, size, windDir, SPECTRUM_TYPE.UNIFIED, numGrids);
+		switch (numGrids)
+		{
+		case 1:
+			GridSizes = new Vector4(772f, 1f, 1f, 1f);
+			Choppyness = new Vector4(2.3f, 1f, 1f, 1f);
+			WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+			break;
+		case 2:
+			GridSizes = new Vector4(772f, 57f, 1f, 1f);
+			Choppyness = new Vector4(2.3f, 2.1f, 1f, 1f);
+			WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+			break;
+		case 3:
+			GridSizes = new Vector4(1372f, 392f, 28f, 1f);
+			Choppyness = new Vector4(2.3f, 2.1f, 1.6f, 1f);
+			WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+			break;
+		case 4:
+			GridSizes = new Vector4(1372f, 392f, 28f, 4f);
+			Choppyness = new Vector4(2.3f, 2.1f, 1.6f, 0.9f);
+			WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+			break;
+		}
+	}
+
+	public override SpectrumTask GetCreateSpectrumConditionTask()
+	{
+		UnifiedSpectrumConditionKey unifiedSpectrumConditionKey = Key as UnifiedSpectrumConditionKey;
+		UnifiedSpectrum unifiedSpectrum = new UnifiedSpectrum(unifiedSpectrumConditionKey.WindSpeed, unifiedSpectrumConditionKey.WindDir, unifiedSpectrumConditionKey.WaveAge);
+		return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, unifiedSpectrum, unifiedSpectrum, unifiedSpectrum });
+	}
+}
+
+
+==================== Ceto_UnifiedPhillipsSpectrumCondition.cs ====================
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+public class UnifiedPhillipsSpectrumCondition : WaveSpectrumCondition
+{
+	public UnifiedPhillipsSpectrumCondition(int size, float windSpeed, float windDir, float waveAge, int numGrids)
+		: base(size, numGrids)
+	{
+		if (numGrids < 1 || numGrids > 4)
+		{
+			throw new ArgumentException("UnifiedPhillipsSpectrumCondition must have 1 to 4 grids not " + numGrids);
+		}
+		Key = new UnifiedSpectrumConditionKey(windSpeed, waveAge, size, windDir, SPECTRUM_TYPE.UNIFIED_PHILLIPS, numGrids);
+		switch (numGrids)
+		{
+		case 1:
+			GridSizes = new Vector4(772f, 1f, 1f, 1f);
+			Choppyness = new Vector4(2.3f, 1f, 1f, 1f);
+			WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+			break;
+		case 2:
+			GridSizes = new Vector4(772f, 97f, 1f, 1f);
+			Choppyness = new Vector4(2.3f, 1.2f, 1f, 1f);
+			WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+			break;
+		case 3:
+			GridSizes = new Vector4(1372f, 392f, 31f, 1f);
+			Choppyness = new Vector4(2.3f, 2.1f, 1f, 1f);
+			WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+			break;
+		case 4:
+			GridSizes = new Vector4(1372f, 392f, 31f, 4f);
+			Choppyness = new Vector4(2.3f, 2.1f, 1f, 0.9f);
+			WaveAmps = new Vector4(1f, 1f, 1f, 1f);
+			break;
+		}
+	}
+
+	public override SpectrumTask GetCreateSpectrumConditionTask()
+	{
+		UnifiedSpectrumConditionKey unifiedSpectrumConditionKey = Key as UnifiedSpectrumConditionKey;
+		UnifiedSpectrum unifiedSpectrum = new UnifiedSpectrum(unifiedSpectrumConditionKey.WindSpeed, unifiedSpectrumConditionKey.WindDir, unifiedSpectrumConditionKey.WaveAge);
+		PhillipsSpectrum phillipsSpectrum = new PhillipsSpectrum(unifiedSpectrumConditionKey.WindSpeed, unifiedSpectrumConditionKey.WindDir);
+		if (Key.NumGrids == 1)
+		{
+			return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, null, null, null });
+		}
+		if (Key.NumGrids == 2)
+		{
+			return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, phillipsSpectrum, null, null });
+		}
+		if (Key.NumGrids == 3)
+		{
+			return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, unifiedSpectrum, phillipsSpectrum, null });
+		}
+		return new SpectrumTask(this, multiThreadTask: true, new ISpectrum[4] { unifiedSpectrum, unifiedSpectrum, phillipsSpectrum, unifiedSpectrum });
+	}
+}
+
+
+==================== Ceto_WaveSpectrumCondition.cs ====================
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+public abstract class WaveSpectrumCondition
+{
+	public bool Done { get; set; }
+
+	public Vector4 GridSizes { get; protected set; }
+
+	public Vector4 Choppyness { get; protected set; }
+
+	public Vector4 WaveAmps { get; protected set; }
+
+	public WaveSpectrumConditionKey Key { get; protected set; }
+
+	public Texture2D Spectrum01 { get; private set; }
+
+	public Color[] SpectrumData01 { get; private set; }
+
+	public Texture2D Spectrum23 { get; private set; }
+
+	public Color[] SpectrumData23 { get; private set; }
+
+	public Texture2D WTable { get; private set; }
+
+	public Color[] WTableData { get; private set; }
+
+	public int LastUpdated { get; set; }
+
+	public bool SupportsJacobians { get; protected set; }
+
+	public WaveSpectrumCondition(int size, int numGrids)
+	{
+		GridSizes = Vector4.one;
+		Choppyness = Vector4.one;
+		WaveAmps = Vector4.one;
+		SpectrumData01 = new Color[size * size];
+		if (numGrids > 2)
+		{
+			SpectrumData23 = new Color[size * size];
+		}
+		WTableData = new Color[size * size];
+		LastUpdated = -1;
+		SupportsJacobians = true;
+	}
+
+	public abstract SpectrumTask GetCreateSpectrumConditionTask();
+
+	public InitSpectrumDisplacementsTask GetInitSpectrumDisplacementsTask(DisplacementBufferCPU buffer, float time)
+	{
+		return new InitSpectrumDisplacementsTask(buffer, this, time);
+	}
+
+	public Vector4 InverseGridSizes()
+	{
+		float num = MathF.PI * 2f * (float)Key.Size;
+		return new Vector4(num / GridSizes.x, num / GridSizes.y, num / GridSizes.z, num / GridSizes.w);
+	}
+
+	public void Release()
+	{
+		if (Spectrum01 != null)
+		{
+			UnityEngine.Object.Destroy(Spectrum01);
+			Spectrum01 = null;
+		}
+		if (Spectrum23 != null)
+		{
+			UnityEngine.Object.Destroy(Spectrum23);
+			Spectrum23 = null;
+		}
+		if (WTable != null)
+		{
+			UnityEngine.Object.Destroy(WTable);
+			WTable = null;
+		}
+	}
+
+	public void CreateTextures()
+	{
+		if (Spectrum01 == null)
+		{
+			Spectrum01 = new Texture2D(Key.Size, Key.Size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+			Spectrum01.filterMode = FilterMode.Point;
+			Spectrum01.wrapMode = TextureWrapMode.Repeat;
+			Spectrum01.hideFlags = HideFlags.HideAndDontSave;
+			Spectrum01.name = "Ceto Spectrum01 Condition";
+		}
+		if (Spectrum23 == null && Key.NumGrids > 2)
+		{
+			Spectrum23 = new Texture2D(Key.Size, Key.Size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+			Spectrum23.filterMode = FilterMode.Point;
+			Spectrum23.wrapMode = TextureWrapMode.Repeat;
+			Spectrum23.hideFlags = HideFlags.HideAndDontSave;
+			Spectrum23.name = "Ceto Spectrum23 Condition";
+		}
+		if (WTable == null)
+		{
+			WTable = new Texture2D(Key.Size, Key.Size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+			WTable.filterMode = FilterMode.Point;
+			WTable.wrapMode = TextureWrapMode.Clamp;
+			WTable.hideFlags = HideFlags.HideAndDontSave;
+			WTable.name = "Ceto Wave Spectrum GPU WTable";
+		}
+	}
+
+	public void Apply(Color[] spectrum01, Color[] spectrum23, Color[] wtable)
+	{
+		if (Spectrum01 != null && spectrum01 != null)
+		{
+			Spectrum01.SetPixels(spectrum01);
+			Spectrum01.Apply();
+			Array.Copy(spectrum01, SpectrumData01, spectrum01.Length);
+		}
+		if (Spectrum23 != null && spectrum23 != null)
+		{
+			Spectrum23.SetPixels(spectrum23);
+			Spectrum23.Apply();
+			Array.Copy(spectrum23, SpectrumData23, spectrum23.Length);
+		}
+		if (WTable != null && wtable != null)
+		{
+			WTable.SetPixels(wtable);
+			WTable.Apply();
+			Array.Copy(wtable, WTableData, wtable.Length);
+		}
+	}
+}
+
+
+==================== Ceto_SpectrumTask.cs ====================
+using System;
+using System.Collections;
+using Ceto.Common.Threading.Tasks;
+using UnityEngine;
+
+namespace Ceto;
+
+public class SpectrumTask : ThreadedTask
+{
+	public const float GRAVITY = 9.818286f;
+
+	public const float WAVE_CM = 0.23f;
+
+	public const float WAVE_KM = 370f;
+
+	private Color[] m_spectrum01;
+
+	private Color[] m_spectrum23;
+
+	private Color[] m_wtable;
+
+	private ISpectrum[] m_spectrums;
+
+	private System.Random m_rnd;
+
+	private SPECTRUM_DISTRIBUTION m_distibution;
+
+	public int Size { get; private set; }
+
+	public int NumGrids { get; private set; }
+
+	public Vector4 GridSizes { get; private set; }
+
+	public Vector4 InverseGridSizes { get; private set; }
+
+	public Vector4 WaveAmps { get; private set; }
+
+	protected WaveSpectrumCondition Condition { get; private set; }
+
+	public SpectrumTask(WaveSpectrumCondition condition, bool multiThreadTask, ISpectrum[] spectrums)
+		: base(multiThreadTask)
+	{
+		if (spectrums == null || spectrums.Length != 4)
+		{
+			throw new ArgumentException("Spectrums array must have a length of 4");
+		}
+		m_spectrums = spectrums;
+		Condition = condition;
+		Size = condition.Key.Size;
+		GridSizes = condition.GridSizes;
+		WaveAmps = condition.WaveAmps;
+		NumGrids = condition.Key.NumGrids;
+		m_rnd = new System.Random(0);
+		m_distibution = SPECTRUM_DISTRIBUTION.LINEAR;
+		float num = MathF.PI * 2f * (float)Size;
+		InverseGridSizes = new Vector4(num / GridSizes.x, num / GridSizes.y, num / GridSizes.z, num / GridSizes.w);
+		m_spectrum01 = new Color[Size * Size];
+		if (NumGrids > 2)
+		{
+			m_spectrum23 = new Color[Size * Size];
+		}
+		m_wtable = new Color[Size * Size];
+	}
+
+	protected float RandomNumber()
+	{
+		return m_distibution switch
+		{
+			SPECTRUM_DISTRIBUTION.LINEAR => (float)m_rnd.NextDouble(), 
+			SPECTRUM_DISTRIBUTION.GAUSSIAN => GaussianRandomNumber(), 
+			_ => (float)m_rnd.NextDouble(), 
+		};
+	}
+
+	private float GaussianRandomNumber()
+	{
+		float num;
+		float num3;
+		do
+		{
+			num = 2f * (float)m_rnd.NextDouble() - 1f;
+			float num2 = 2f * (float)m_rnd.NextDouble() - 1f;
+			num3 = num * num + num2 * num2;
+		}
+		while (num3 >= 1f);
+		num3 = Mathf.Sqrt(-2f * Mathf.Log(num3) / num3);
+		return num * num3;
+	}
+
+	public override void Start()
+	{
+		base.Start();
+		Condition.CreateTextures();
+		Condition.Done = false;
+	}
+
+	public override IEnumerator Run()
+	{
+		CreateWTable();
+		GenerateWavesSpectrum();
+		FinishedRunning();
+		return null;
+	}
+
+	public override void End()
+	{
+		base.End();
+		Condition.Apply(m_spectrum01, m_spectrum23, m_wtable);
+		Condition.LastUpdated = Time.frameCount;
+		Condition.Done = true;
+	}
+
+	private float GetSpectrumSample(float i, float j, float dk, float kMin, float amp, ISpectrum spectrum)
+	{
+		if (spectrum == null)
+		{
+			return 0f;
+		}
+		float num = i * dk;
+		float num2 = j * dk;
+		float num3 = 0f;
+		if (Math.Abs(num) >= kMin || Math.Abs(num2) >= kMin)
+		{
+			num3 = Mathf.Sqrt(spectrum.Spectrum(num, num2) * amp * 0.5f) * dk;
+			if (float.IsNaN(num3) || float.IsInfinity(num3))
+			{
+				num3 = 0f;
+			}
+		}
+		return num3;
+	}
+
+	private void GenerateWavesSpectrum()
+	{
+		int size = Size;
+		int num = size / 2;
+		float num2 = size;
+		int numGrids = NumGrids;
+		float num3 = MathF.PI * 2f;
+		float kMin = MathF.PI / GridSizes.x;
+		float kMin2 = MathF.PI * num2 / GridSizes.x;
+		float kMin3 = MathF.PI * num2 / GridSizes.y;
+		float kMin4 = MathF.PI * num2 / GridSizes.z;
+		float dk = num3 / GridSizes.x;
+		float dk2 = num3 / GridSizes.y;
+		float dk3 = num3 / GridSizes.z;
+		float dk4 = num3 / GridSizes.w;
+		float x = WaveAmps.x;
+		float y = WaveAmps.y;
+		float z = WaveAmps.z;
+		float w = WaveAmps.w;
+		Vector4 vector = default;
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				if (Cancelled)
+				{
+					return;
+				}
+				int num4 = j + i * size;
+				float i2 = ((j >= num) ? ((float)j - num2) : ((float)j));
+				float j2 = ((i >= num) ? ((float)i - num2) : ((float)i));
+				if (numGrids > 0)
+				{
+					float f = RandomNumber() * num3;
+					vector.x = GetSpectrumSample(i2, j2, dk, kMin, x, m_spectrums[0]);
+					m_spectrum01[num4].r = vector.x * Mathf.Cos(f) * 1.4142135f;
+					m_spectrum01[num4].g = vector.x * Mathf.Sin(f) * 1.4142135f;
+				}
+				if (numGrids > 1)
+				{
+					float f = RandomNumber() * num3;
+					vector.y = GetSpectrumSample(i2, j2, dk2, kMin2, y, m_spectrums[1]);
+					m_spectrum01[num4].b = vector.y * Mathf.Cos(f) * 1.4142135f;
+					m_spectrum01[num4].a = vector.y * Mathf.Sin(f) * 1.4142135f;
+				}
+				if (numGrids > 2)
+				{
+					float f = RandomNumber() * num3;
+					vector.z = GetSpectrumSample(i2, j2, dk3, kMin3, z, m_spectrums[2]);
+					m_spectrum23[num4].r = vector.z * Mathf.Cos(f) * 1.4142135f;
+					m_spectrum23[num4].g = vector.z * Mathf.Sin(f) * 1.4142135f;
+				}
+				if (numGrids > 3)
+				{
+					float f = RandomNumber() * num3;
+					vector.w = GetSpectrumSample(i2, j2, dk4, kMin4, w, m_spectrums[3]);
+					m_spectrum23[num4].b = vector.w * Mathf.Cos(f) * 1.4142135f;
+					m_spectrum23[num4].a = vector.w * Mathf.Sin(f) * 1.4142135f;
+				}
+			}
+		}
+	}
+
+	private void CreateWTable()
+	{
+		int size = Size;
+		float num = size;
+		float num2 = 1f / num;
+		int numGrids = NumGrids;
+		Vector4 vector = default;
+		vector.x = InverseGridSizes.x * InverseGridSizes.x;
+		vector.y = InverseGridSizes.y * InverseGridSizes.y;
+		vector.z = InverseGridSizes.z * InverseGridSizes.z;
+		vector.w = InverseGridSizes.w * InverseGridSizes.w;
+		float num3 = 136900f;
+		Vector2 vector2 = default;
+		Vector2 vector3 = default;
+		Vector2 vector4 = default;
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				if (Cancelled)
+				{
+					return;
+				}
+				int num4 = j + i * size;
+				vector2.x = (float)j * num2;
+				vector2.y = (float)i * num2;
+				vector3.x = ((vector2.x > 0.5f) ? (vector2.x - 1f) : vector2.x);
+				vector3.y = ((vector2.y > 0.5f) ? (vector2.y - 1f) : vector2.y);
+				vector4.x = vector3.x * vector3.x;
+				vector4.y = vector3.y * vector3.y;
+				if (numGrids > 0)
+				{
+					float num5 = Mathf.Sqrt(vector4.x * vector.x + vector4.y * vector.x);
+					float r = Mathf.Sqrt(9.818286f * num5 * (1f + num5 * num5 / num3));
+					m_wtable[num4].r = r;
+				}
+				if (numGrids > 1)
+				{
+					float num6 = Mathf.Sqrt(vector4.x * vector.y + vector4.y * vector.y);
+					float g = Mathf.Sqrt(9.818286f * num6 * (1f + num6 * num6 / num3));
+					m_wtable[num4].g = g;
+				}
+				if (numGrids > 2)
+				{
+					float num7 = Mathf.Sqrt(vector4.x * vector.z + vector4.y * vector.z);
+					float b = Mathf.Sqrt(9.818286f * num7 * (1f + num7 * num7 / num3));
+					m_wtable[num4].b = b;
+				}
+				if (numGrids > 3)
+				{
+					float num8 = Mathf.Sqrt(vector4.x * vector.w + vector4.y * vector.w);
+					float a = Mathf.Sqrt(9.818286f * num8 * (1f + num8 * num8 / num3));
+					m_wtable[num4].a = a;
+				}
+			}
+		}
+	}
+}
+
+
+==================== Ceto_InitSpectrumDisplacementsTask.cs ====================
+using System;
+using System.Collections;
+using Ceto.Common.Threading.Tasks;
+using UnityEngine;
+
+namespace Ceto;
+
+public class InitSpectrumDisplacementsTask : ThreadedTask
+{
+	private Color[] m_spectrum01;
+
+	private Color[] m_spectrum23;
+
+	private Color[] m_wtable;
+
+	private Vector3[] m_ktable1;
+
+	private Vector3[] m_ktable2;
+
+	private Vector3[] m_ktable3;
+
+	private Vector3[] m_ktable4;
+
+	public int NumGrids { get; private set; }
+
+	public int Size { get; private set; }
+
+	public int LastUpdated { get; protected set; }
+
+	public float TimeValue { get; protected set; }
+
+	public SPECTRUM_TYPE SpectrumType { get; private set; }
+
+	protected DisplacementBufferCPU Buffer { get; private set; }
+
+	protected Vector4[] Data0 { get; set; }
+
+	protected Vector4[] Data1 { get; set; }
+
+	protected Vector4[] Data2 { get; set; }
+
+	public InitSpectrumDisplacementsTask(DisplacementBufferCPU buffer, WaveSpectrumCondition condition, float time)
+		: base(isThreaded: true)
+	{
+		Buffer = buffer;
+		NumGrids = condition.Key.NumGrids;
+		Size = condition.Key.Size;
+		SpectrumType = condition.Key.SpectrumType;
+		TimeValue = time;
+		Reset(condition, time);
+		CreateKTables(condition.InverseGridSizes());
+	}
+
+	public void Reset(WaveSpectrumCondition condition, float time)
+	{
+		if (condition.Key.SpectrumType != SpectrumType)
+		{
+			throw new InvalidOperationException("Trying to reset a Unified InitSpectrum task with wrong condition type = " + condition.Key.SpectrumType);
+		}
+		if (condition.Key.Size != Size)
+		{
+			throw new InvalidOperationException("Trying to reset a Unified InitSpectrum task with wrong condition size = " + condition.Key.Size);
+		}
+		base.Reset();
+		int num = Size * Size;
+		if (m_spectrum01 == null)
+		{
+			m_spectrum01 = new Color[num];
+		}
+		if (m_spectrum23 == null && NumGrids > 2)
+		{
+			m_spectrum23 = new Color[num];
+		}
+		if (m_wtable == null)
+		{
+			m_wtable = new Color[num];
+		}
+		TimeValue = time;
+		Data0 = Buffer.GetReadBuffer(0);
+		Data1 = Buffer.GetReadBuffer(1);
+		Data2 = Buffer.GetReadBuffer(2);
+		WaveSpectrumBufferCPU.Buffer buffer = Buffer.GetBuffer(0);
+		WaveSpectrumBufferCPU.Buffer buffer2 = Buffer.GetBuffer(1);
+		WaveSpectrumBufferCPU.Buffer buffer3 = Buffer.GetBuffer(2);
+		if (buffer != null)
+		{
+			if (NumGrids > 2)
+			{
+				buffer.doublePacked = true;
+			}
+			else
+			{
+				buffer.doublePacked = false;
+			}
+		}
+		if (buffer2 != null)
+		{
+			if (NumGrids > 1)
+			{
+				buffer2.doublePacked = true;
+			}
+			else
+			{
+				buffer2.doublePacked = false;
+			}
+		}
+		if (buffer3 != null)
+		{
+			if (NumGrids > 3)
+			{
+				buffer3.doublePacked = true;
+			}
+			else
+			{
+				buffer3.doublePacked = false;
+			}
+		}
+		if (LastUpdated != condition.LastUpdated)
+		{
+			LastUpdated = condition.LastUpdated;
+			if (m_spectrum01 != null && condition.SpectrumData01 != null)
+			{
+				Array.Copy(condition.SpectrumData01, m_spectrum01, num);
+			}
+			if (m_spectrum23 != null && condition.SpectrumData23 != null)
+			{
+				Array.Copy(condition.SpectrumData23, m_spectrum23, num);
+			}
+			if (m_wtable != null && condition.WTableData != null)
+			{
+				Array.Copy(condition.WTableData, m_wtable, num);
+			}
+		}
+	}
+
+	public override IEnumerator Run()
+	{
+		if (NumGrids == 1)
+		{
+			InitilizeGrids1();
+		}
+		else if (NumGrids == 2)
+		{
+			InitilizeGrids2();
+		}
+		else if (NumGrids == 3)
+		{
+			InitilizeGrids3();
+		}
+		else if (NumGrids == 4)
+		{
+			InitilizeGrids4();
+		}
+		FinishedRunning();
+		return null;
+	}
+
+	private void InitilizeGrids1()
+	{
+		int size = Size;
+		float num = 1f / (float)size;
+		Vector2 vector = default;
+		Vector2 vector2 = default;
+		Vector2 vector3 = default;
+		Vector2 vector5 = default;
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				if (Cancelled)
+				{
+					return;
+				}
+				vector.x = (float)j * num;
+				vector.y = (float)i * num;
+				vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+				vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+				int num2 = j + i * size;
+				int num3 = (size - j) % size + (size - i) % size * size;
+				Color color = m_spectrum01[num2];
+				Color color2 = m_spectrum01[num3];
+				float f = m_wtable[num2].r * TimeValue;
+				float num4 = Mathf.Cos(f);
+				float num5 = Mathf.Sin(f);
+				vector3.x = (color.r + color2.r) * num4 - (color.g + color2.g) * num5;
+				vector3.y = (color.r - color2.r) * num5 + (color.g - color2.g) * num4;
+				if (Data0 != null)
+				{
+					Data0[num2].x = vector3.x;
+					Data0[num2].y = vector3.y;
+					Data0[num2].z = 0f;
+					Data0[num2].w = 0f;
+				}
+				if (Data1 != null)
+				{
+					Vector3 vector4 = m_ktable1[num2];
+					vector5.x = 0f - vector4.x * vector3.y - vector4.y * vector3.x;
+					vector5.y = vector4.x * vector3.x - vector4.y * vector3.y;
+					Data1[num2].x = vector5.x * vector4.z;
+					Data1[num2].y = vector5.y * vector4.z;
+					Data1[num2].z = 0f;
+					Data1[num2].w = 0f;
+				}
+			}
+		}
+	}
+
+	private void InitilizeGrids2()
+	{
+		int size = Size;
+		float num = 1f / (float)size;
+		Vector2 vector = default;
+		Vector2 vector2 = default;
+		Vector2 vector3 = default;
+		Vector2 vector4 = default;
+		Vector2 vector7 = default;
+		Vector2 vector8 = default;
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				if (Cancelled)
+				{
+					return;
+				}
+				vector.x = (float)j * num;
+				vector.y = (float)i * num;
+				vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+				vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+				int num2 = j + i * size;
+				int num3 = (size - j) % size + (size - i) % size * size;
+				Color color = m_spectrum01[num2];
+				Color color2 = m_spectrum01[num3];
+				Color color3 = m_wtable[num2];
+				color3.r *= TimeValue;
+				color3.g *= TimeValue;
+				float num4 = Mathf.Cos(color3.r);
+				float num5 = Mathf.Sin(color3.r);
+				vector3.x = (color.r + color2.r) * num4 - (color.g + color2.g) * num5;
+				vector3.y = (color.r - color2.r) * num5 + (color.g - color2.g) * num4;
+				num4 = Mathf.Cos(color3.g);
+				num5 = Mathf.Sin(color3.g);
+				vector4.x = (color.b + color2.b) * num4 - (color.a + color2.a) * num5;
+				vector4.y = (color.b - color2.b) * num5 + (color.a - color2.a) * num4;
+				if (Data0 != null)
+				{
+					Data0[num2].x = vector3.x + (0f - vector4.y);
+					Data0[num2].y = vector3.y + vector4.x;
+					Data0[num2].z = 0f;
+					Data0[num2].w = 0f;
+				}
+				if (Data1 != null)
+				{
+					Vector3 vector5 = m_ktable1[num2];
+					Vector3 vector6 = m_ktable2[num2];
+					vector7.x = 0f - vector5.x * vector3.y - vector5.y * vector3.x;
+					vector7.y = vector5.x * vector3.x - vector5.y * vector3.y;
+					vector8.x = 0f - vector6.x * vector4.y - vector6.y * vector4.x;
+					vector8.y = vector6.x * vector4.x - vector6.y * vector4.y;
+					Data1[num2].x = vector7.x * vector5.z;
+					Data1[num2].y = vector7.y * vector5.z;
+					Data1[num2].z = vector8.x * vector6.z;
+					Data1[num2].w = vector8.y * vector6.z;
+				}
+			}
+		}
+	}
+
+	private void InitilizeGrids3()
+	{
+		int size = Size;
+		float num = 1f / (float)size;
+		Vector2 vector = default;
+		Vector2 vector2 = default;
+		Vector2 vector3 = default;
+		Vector2 vector4 = default;
+		Vector2 vector5 = default;
+		Vector2 vector8 = default;
+		Vector2 vector9 = default;
+		Vector2 vector11 = default;
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				if (Cancelled)
+				{
+					return;
+				}
+				vector.x = (float)j * num;
+				vector.y = (float)i * num;
+				vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+				vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+				int num2 = j + i * size;
+				int num3 = (size - j) % size + (size - i) % size * size;
+				Color color = m_spectrum01[num2];
+				Color color2 = m_spectrum23[num2];
+				Color color3 = m_spectrum01[num3];
+				Color color4 = m_spectrum23[num3];
+				Color color5 = m_wtable[num2];
+				color5.r *= TimeValue;
+				color5.g *= TimeValue;
+				color5.b *= TimeValue;
+				color5.a *= TimeValue;
+				float num4 = Mathf.Cos(color5.r);
+				float num5 = Mathf.Sin(color5.r);
+				vector3.x = (color.r + color3.r) * num4 - (color.g + color3.g) * num5;
+				vector3.y = (color.r - color3.r) * num5 + (color.g - color3.g) * num4;
+				num4 = Mathf.Cos(color5.g);
+				num5 = Mathf.Sin(color5.g);
+				vector4.x = (color.b + color3.b) * num4 - (color.a + color3.a) * num5;
+				vector4.y = (color.b - color3.b) * num5 + (color.a - color3.a) * num4;
+				num4 = Mathf.Cos(color5.b);
+				num5 = Mathf.Sin(color5.b);
+				vector5.x = (color2.r + color4.r) * num4 - (color2.g + color4.g) * num5;
+				vector5.y = (color2.r - color4.r) * num5 + (color2.g - color4.g) * num4;
+				if (Data0 != null)
+				{
+					Data0[num2].x = vector3.x + (0f - vector4.y);
+					Data0[num2].y = vector3.y + vector4.x;
+					Data0[num2].z = vector5.x;
+					Data0[num2].w = vector5.y;
+				}
+				if (Data1 != null)
+				{
+					Vector3 vector6 = m_ktable1[num2];
+					Vector3 vector7 = m_ktable2[num2];
+					vector8.x = 0f - vector6.x * vector3.y - vector6.y * vector3.x;
+					vector8.y = vector6.x * vector3.x - vector6.y * vector3.y;
+					vector9.x = 0f - vector7.x * vector4.y - vector7.y * vector4.x;
+					vector9.y = vector7.x * vector4.x - vector7.y * vector4.y;
+					Data1[num2].x = vector8.x * vector6.z;
+					Data1[num2].y = vector8.y * vector6.z;
+					Data1[num2].z = vector9.x * vector7.z;
+					Data1[num2].w = vector9.y * vector7.z;
+				}
+				if (Data2 != null)
+				{
+					Vector3 vector10 = m_ktable3[num2];
+					vector11.x = 0f - vector10.x * vector5.y - vector10.y * vector5.x;
+					vector11.y = vector10.x * vector5.x - vector10.y * vector5.y;
+					Data2[num2].x = vector11.x * vector10.z;
+					Data2[num2].y = vector11.y * vector10.z;
+					Data2[num2].z = 0f;
+					Data2[num2].w = 0f;
+				}
+			}
+		}
+	}
+
+	private void InitilizeGrids4()
+	{
+		int size = Size;
+		float num = 1f / (float)size;
+		Vector2 vector = default;
+		Vector2 vector2 = default;
+		Vector2 vector3 = default;
+		Vector2 vector4 = default;
+		Vector2 vector5 = default;
+		Vector2 vector6 = default;
+		Vector2 vector9 = default;
+		Vector2 vector10 = default;
+		Vector2 vector13 = default;
+		Vector2 vector14 = default;
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				if (Cancelled)
+				{
+					return;
+				}
+				vector.x = (float)j * num;
+				vector.y = (float)i * num;
+				vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+				vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+				int num2 = j + i * size;
+				int num3 = (size - j) % size + (size - i) % size * size;
+				Color color = m_spectrum01[num2];
+				Color color2 = m_spectrum23[num2];
+				Color color3 = m_spectrum01[num3];
+				Color color4 = m_spectrum23[num3];
+				Color color5 = m_wtable[num2];
+				color5.r *= TimeValue;
+				color5.g *= TimeValue;
+				color5.b *= TimeValue;
+				color5.a *= TimeValue;
+				float num4 = Mathf.Cos(color5.r);
+				float num5 = Mathf.Sin(color5.r);
+				vector3.x = (color.r + color3.r) * num4 - (color.g + color3.g) * num5;
+				vector3.y = (color.r - color3.r) * num5 + (color.g - color3.g) * num4;
+				num4 = Mathf.Cos(color5.g);
+				num5 = Mathf.Sin(color5.g);
+				vector4.x = (color.b + color3.b) * num4 - (color.a + color3.a) * num5;
+				vector4.y = (color.b - color3.b) * num5 + (color.a - color3.a) * num4;
+				num4 = Mathf.Cos(color5.b);
+				num5 = Mathf.Sin(color5.b);
+				vector5.x = (color2.r + color4.r) * num4 - (color2.g + color4.g) * num5;
+				vector5.y = (color2.r - color4.r) * num5 + (color2.g - color4.g) * num4;
+				num4 = Mathf.Cos(color5.a);
+				num5 = Mathf.Sin(color5.a);
+				vector6.x = (color2.b + color4.b) * num4 - (color2.a + color4.a) * num5;
+				vector6.y = (color2.b - color4.b) * num5 + (color2.a - color4.a) * num4;
+				if (Data0 != null)
+				{
+					Data0[num2].x = vector3.x + (0f - vector4.y);
+					Data0[num2].y = vector3.y + vector4.x;
+					Data0[num2].z = vector5.x + (0f - vector6.y);
+					Data0[num2].w = vector5.y + vector6.x;
+				}
+				if (Data1 != null)
+				{
+					Vector3 vector7 = m_ktable1[num2];
+					Vector3 vector8 = m_ktable2[num2];
+					vector9.x = 0f - vector7.x * vector3.y - vector7.y * vector3.x;
+					vector9.y = vector7.x * vector3.x - vector7.y * vector3.y;
+					vector10.x = 0f - vector8.x * vector4.y - vector8.y * vector4.x;
+					vector10.y = vector8.x * vector4.x - vector8.y * vector4.y;
+					Data1[num2].x = vector9.x * vector7.z;
+					Data1[num2].y = vector9.y * vector7.z;
+					Data1[num2].z = vector10.x * vector8.z;
+					Data1[num2].w = vector10.y * vector8.z;
+				}
+				if (Data2 != null)
+				{
+					Vector3 vector11 = m_ktable3[num2];
+					Vector3 vector12 = m_ktable4[num2];
+					vector13.x = 0f - vector11.x * vector5.y - vector11.y * vector5.x;
+					vector13.y = vector11.x * vector5.x - vector11.y * vector5.y;
+					vector14.x = 0f - vector12.x * vector6.y - vector12.y * vector6.x;
+					vector14.y = vector12.x * vector6.x - vector12.y * vector6.y;
+					Data2[num2].x = vector13.x * vector11.z;
+					Data2[num2].y = vector13.y * vector11.z;
+					Data2[num2].z = vector14.x * vector12.z;
+					Data2[num2].w = vector14.y * vector12.z;
+				}
+			}
+		}
+	}
+
+	private void CreateKTables(Vector4 inverseGridSizes)
+	{
+		int size = Size;
+		float num = 1f / (float)size;
+		int numGrids = NumGrids;
+		if (numGrids > 0)
+		{
+			m_ktable1 = new Vector3[size * size];
+		}
+		if (numGrids > 1)
+		{
+			m_ktable2 = new Vector3[size * size];
+		}
+		if (numGrids > 2)
+		{
+			m_ktable3 = new Vector3[size * size];
+		}
+		if (numGrids > 3)
+		{
+			m_ktable4 = new Vector3[size * size];
+		}
+		Vector2 vector = default;
+		Vector2 vector2 = default;
+		Vector2 vector3 = default;
+		Vector2 vector4 = default;
+		Vector2 vector5 = default;
+		Vector2 vector6 = default;
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				vector.x = (float)j * num;
+				vector.y = (float)i * num;
+				vector2.x = ((vector.x > 0.5f) ? (vector.x - 1f) : vector.x);
+				vector2.y = ((vector.y > 0.5f) ? (vector.y - 1f) : vector.y);
+				int num2 = j + i * size;
+				if (numGrids > 0)
+				{
+					vector3.x = vector2.x * inverseGridSizes.x;
+					vector3.y = vector2.y * inverseGridSizes.x;
+					float num3 = Mathf.Sqrt(vector3.x * vector3.x + vector3.y * vector3.y);
+					float z = ((num3 == 0f) ? 0f : (1f / num3));
+					m_ktable1[num2].x = vector3.x;
+					m_ktable1[num2].y = vector3.y;
+					m_ktable1[num2].z = z;
+				}
+				if (numGrids > 1)
+				{
+					vector4.x = vector2.x * inverseGridSizes.y;
+					vector4.y = vector2.y * inverseGridSizes.y;
+					float num4 = Mathf.Sqrt(vector4.x * vector4.x + vector4.y * vector4.y);
+					float z2 = ((num4 == 0f) ? 0f : (1f / num4));
+					m_ktable2[num2].x = vector4.x;
+					m_ktable2[num2].y = vector4.y;
+					m_ktable2[num2].z = z2;
+				}
+				if (numGrids > 2)
+				{
+					vector5.x = vector2.x * inverseGridSizes.z;
+					vector5.y = vector2.y * inverseGridSizes.z;
+					float num5 = Mathf.Sqrt(vector5.x * vector5.x + vector5.y * vector5.y);
+					float z3 = ((num5 == 0f) ? 0f : (1f / num5));
+					m_ktable3[num2].x = vector5.x;
+					m_ktable3[num2].y = vector5.y;
+					m_ktable3[num2].z = z3;
+				}
+				if (numGrids > 3)
+				{
+					vector6.x = vector2.x * inverseGridSizes.w;
+					vector6.y = vector2.y * inverseGridSizes.w;
+					float num6 = Mathf.Sqrt(vector6.x * vector6.x + vector6.y * vector6.y);
+					float z4 = ((num6 == 0f) ? 0f : (1f / num6));
+					m_ktable4[num2].x = vector6.x;
+					m_ktable4[num2].y = vector6.y;
+					m_ktable4[num2].z = z4;
+				}
+			}
+		}
+	}
+}
+
+
+==================== Ceto_FourierCPU.cs ====================
+using System;
+using System.Collections.Generic;
+using Ceto.Common.Threading.Tasks;
+using UnityEngine;
+
+namespace Ceto;
+
+public class FourierCPU
+{
+	private struct LookUp
+	{
+		public int j1;
+
+		public int j2;
+
+		public float wr;
+
+		public float wi;
+	}
+
+	private int m_size;
+
+	private float m_fsize;
+
+	private int m_passes;
+
+	private LookUp[] m_butterflyLookupTable;
+
+	public int size => m_size;
+
+	public int passes => m_passes;
+
+	public FourierCPU(int size)
+	{
+		if (!Mathf.IsPowerOfTwo(size))
+		{
+			throw new ArgumentException("Fourier grid size must be pow2 number");
+		}
+		m_size = size;
+		m_fsize = m_size;
+		m_passes = (int)(Mathf.Log(m_fsize) / Mathf.Log(2f));
+		ComputeButterflyLookupTable();
+	}
+
+	private int BitReverse(int i)
+	{
+		int num = i;
+		int num2 = 0;
+		int num3 = 1;
+		for (int num4 = m_size / 2; num4 != 0; num4 /= 2)
+		{
+			num = (((i & num4) > num4 - 1) ? 1 : 0);
+			num2 += num * num3;
+			num3 *= 2;
+		}
+		return num2;
+	}
+
+	private void ComputeButterflyLookupTable()
+	{
+		m_butterflyLookupTable = new LookUp[m_size * m_passes];
+		for (int i = 0; i < m_passes; i++)
+		{
+			int num = (int)Mathf.Pow(2f, m_passes - 1 - i);
+			int num2 = (int)Mathf.Pow(2f, i);
+			for (int j = 0; j < num; j++)
+			{
+				for (int k = 0; k < num2; k++)
+				{
+					int num3;
+					int num4;
+					int j2;
+					int j3;
+					if (i == 0)
+					{
+						num3 = j * num2 * 2 + k;
+						num4 = j * num2 * 2 + num2 + k;
+						j2 = BitReverse(num3);
+						j3 = BitReverse(num4);
+					}
+					else
+					{
+						num3 = j * num2 * 2 + k;
+						num4 = j * num2 * 2 + num2 + k;
+						j2 = num3;
+						j3 = num4;
+					}
+					float num5 = Mathf.Cos(MathF.PI * 2f * (float)(k * num) / m_fsize);
+					float num6 = Mathf.Sin(MathF.PI * 2f * (float)(k * num) / m_fsize);
+					int num7 = num3 + i * m_size;
+					m_butterflyLookupTable[num7].j1 = j2;
+					m_butterflyLookupTable[num7].j2 = j3;
+					m_butterflyLookupTable[num7].wr = num5;
+					m_butterflyLookupTable[num7].wi = num6;
+					int num8 = num4 + i * m_size;
+					m_butterflyLookupTable[num8].j1 = j2;
+					m_butterflyLookupTable[num8].j2 = j3;
+					m_butterflyLookupTable[num8].wr = 0f - num5;
+					m_butterflyLookupTable[num8].wi = 0f - num6;
+				}
+			}
+		}
+	}
+
+	private Vector4 FFT(Vector2 w, Vector4 input1, Vector4 input2)
+	{
+		input1.x += w.x * input2.x - w.y * input2.y;
+		input1.y += w.y * input2.x + w.x * input2.y;
+		input1.z += w.x * input2.z - w.y * input2.w;
+		input1.w += w.y * input2.z + w.x * input2.w;
+		return input1;
+	}
+
+	private Vector2 FFT(Vector2 w, Vector2 input1, Vector2 input2)
+	{
+		input1.x += w.x * input2.x - w.y * input2.y;
+		input1.y += w.y * input2.x + w.x * input2.y;
+		return input1;
+	}
+
+	public int PeformFFT_SinglePacked(int startIdx, IList<Vector4[]> data0, ICancelToken token)
+	{
+		int num = 0;
+		int num2 = startIdx;
+		int num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int index = (num2 + 1) % 2;
+			Vector4[] array = data0[num];
+			Vector4[] array2 = data0[index];
+			int num4 = num3 * m_size;
+			for (int i = 0; i < m_size; i++)
+			{
+				int num5 = i + num4;
+				int j = m_butterflyLookupTable[num5].j1;
+				int j2 = m_butterflyLookupTable[num5].j2;
+				float wr = m_butterflyLookupTable[num5].wr;
+				float wi = m_butterflyLookupTable[num5].wi;
+				for (int k = 0; k < m_size; k++)
+				{
+					if (token.Cancelled)
+					{
+						return -1;
+					}
+					int num6 = k * m_size;
+					int num7 = i + num6;
+					int num8 = j + num6;
+					int num9 = j2 + num6;
+					array[num7].x = array2[num8].x + wr * array2[num9].x - wi * array2[num9].y;
+					array[num7].y = array2[num8].y + wi * array2[num9].x + wr * array2[num9].y;
+				}
+			}
+			num3++;
+			num2++;
+		}
+		num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int index = (num2 + 1) % 2;
+			Vector4[] array3 = data0[num];
+			Vector4[] array4 = data0[index];
+			int num4 = num3 * m_size;
+			for (int k = 0; k < m_size; k++)
+			{
+				int num5 = k + num4;
+				int j = m_butterflyLookupTable[num5].j1 * m_size;
+				int j2 = m_butterflyLookupTable[num5].j2 * m_size;
+				float wr = m_butterflyLookupTable[num5].wr;
+				float wi = m_butterflyLookupTable[num5].wi;
+				for (int i = 0; i < m_size; i++)
+				{
+					if (token.Cancelled)
+					{
+						return -1;
+					}
+					int num7 = i + k * m_size;
+					int num8 = i + j;
+					int num9 = i + j2;
+					array3[num7].x = array4[num8].x + wr * array4[num9].x - wi * array4[num9].y;
+					array3[num7].y = array4[num8].y + wi * array4[num9].x + wr * array4[num9].y;
+				}
+			}
+			num3++;
+			num2++;
+		}
+		return num;
+	}
+
+	public int PeformFFT_DoublePacked(int startIdx, IList<Vector4[]> data0, ICancelToken token)
+	{
+		int num = 0;
+		int num2 = startIdx;
+		int num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int index = (num2 + 1) % 2;
+			Vector4[] array = data0[num];
+			Vector4[] array2 = data0[index];
+			int num4 = num3 * m_size;
+			for (int i = 0; i < m_size; i++)
+			{
+				int num5 = i + num4;
+				int j = m_butterflyLookupTable[num5].j1;
+				int j2 = m_butterflyLookupTable[num5].j2;
+				float wr = m_butterflyLookupTable[num5].wr;
+				float wi = m_butterflyLookupTable[num5].wi;
+				for (int k = 0; k < m_size; k++)
+				{
+					if (token.Cancelled)
+					{
+						return -1;
+					}
+					int num6 = k * m_size;
+					int num7 = i + num6;
+					int num8 = j + num6;
+					int num9 = j2 + num6;
+					array[num7].x = array2[num8].x + wr * array2[num9].x - wi * array2[num9].y;
+					array[num7].y = array2[num8].y + wi * array2[num9].x + wr * array2[num9].y;
+					array[num7].z = array2[num8].z + wr * array2[num9].z - wi * array2[num9].w;
+					array[num7].w = array2[num8].w + wi * array2[num9].z + wr * array2[num9].w;
+				}
+			}
+			num3++;
+			num2++;
+		}
+		num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int index = (num2 + 1) % 2;
+			Vector4[] array3 = data0[num];
+			Vector4[] array4 = data0[index];
+			int num4 = num3 * m_size;
+			for (int k = 0; k < m_size; k++)
+			{
+				int num5 = k + num4;
+				int j = m_butterflyLookupTable[num5].j1 * m_size;
+				int j2 = m_butterflyLookupTable[num5].j2 * m_size;
+				float wr = m_butterflyLookupTable[num5].wr;
+				float wi = m_butterflyLookupTable[num5].wi;
+				for (int i = 0; i < m_size; i++)
+				{
+					if (token.Cancelled)
+					{
+						return -1;
+					}
+					int num7 = i + k * m_size;
+					int num8 = i + j;
+					int num9 = i + j2;
+					array3[num7].x = array4[num8].x + wr * array4[num9].x - wi * array4[num9].y;
+					array3[num7].y = array4[num8].y + wi * array4[num9].x + wr * array4[num9].y;
+					array3[num7].z = array4[num8].z + wr * array4[num9].z - wi * array4[num9].w;
+					array3[num7].w = array4[num8].w + wi * array4[num9].z + wr * array4[num9].w;
+				}
+			}
+			num3++;
+			num2++;
+		}
+		return num;
+	}
+}
+
+
+==================== Ceto_FourierGPU.cs ====================
+using System;
+using Ceto.Common.Unity.Utility;
+using UnityEngine;
+
+namespace Ceto;
+
+public class FourierGPU
+{
+	private const int PASS_X_1 = 0;
+
+	private const int PASS_Y_1 = 1;
+
+	private const int PASS_X_2 = 2;
+
+	private const int PASS_Y_2 = 3;
+
+	private const int PASS_X_3 = 4;
+
+	private const int PASS_Y_3 = 5;
+
+	private const int PASS_X_4 = 6;
+
+	private const int PASS_Y_4 = 7;
+
+	private int m_size;
+
+	private float m_fsize;
+
+	private int m_passes;
+
+	private Texture2D[] m_butterflyLookupTable;
+
+	private Material m_fourier;
+
+	private RenderBuffer[] m_pass0RT2;
+
+	private RenderBuffer[] m_pass1RT2;
+
+	private RenderBuffer[] m_pass0RT3;
+
+	private RenderBuffer[] m_pass1RT3;
+
+	private RenderBuffer[] m_pass0RT4;
+
+	private RenderBuffer[] m_pass1RT4;
+
+	public int size => m_size;
+
+	public int passes => m_passes;
+
+	public FourierGPU(int size, Shader sdr)
+	{
+		if (!Mathf.IsPowerOfTwo(size))
+		{
+			throw new ArgumentException("Fourier grid size must be pow2 number");
+		}
+		m_fourier = new Material(sdr);
+		m_size = size;
+		m_fsize = m_size;
+		m_passes = (int)(Mathf.Log(m_fsize) / Mathf.Log(2f));
+		m_butterflyLookupTable = new Texture2D[m_passes];
+		ComputeButterflyLookupTable();
+		m_fourier.SetFloat("Ceto_FourierSize", m_fsize);
+		m_pass0RT2 = new RenderBuffer[2];
+		m_pass1RT2 = new RenderBuffer[2];
+		m_pass0RT3 = new RenderBuffer[3];
+		m_pass1RT3 = new RenderBuffer[3];
+		m_pass0RT4 = new RenderBuffer[4];
+		m_pass1RT4 = new RenderBuffer[4];
+	}
+
+	public void Release()
+	{
+		int num = m_butterflyLookupTable.Length;
+		for (int i = 0; i < num; i++)
+		{
+			UnityEngine.Object.Destroy(m_butterflyLookupTable[i]);
+		}
+		m_butterflyLookupTable = null;
+	}
+
+	private int BitReverse(int i)
+	{
+		int num = i;
+		int num2 = 0;
+		int num3 = 1;
+		for (int num4 = m_size / 2; num4 != 0; num4 /= 2)
+		{
+			num = (((i & num4) > num4 - 1) ? 1 : 0);
+			num2 += num * num3;
+			num3 *= 2;
+		}
+		return num2;
+	}
+
+	private Texture2D Make1DTex(int i)
+	{
+		return new Texture2D(m_size, 1, TextureFormat.RGBAFloat, mipChain: false, linear: true)
+		{
+			filterMode = FilterMode.Point,
+			wrapMode = TextureWrapMode.Clamp,
+			hideFlags = HideFlags.HideAndDontSave,
+			name = "Ceto Fouier GPU Butterfly Lookup"
+		};
+	}
+
+	private void ComputeButterflyLookupTable()
+	{
+		float num = m_size;
+		float num2 = m_size - 1;
+		for (int i = 0; i < m_passes; i++)
+		{
+			int num3 = (int)Mathf.Pow(2f, m_passes - 1 - i);
+			int num4 = (int)Mathf.Pow(2f, i);
+			m_butterflyLookupTable[i] = Make1DTex(i);
+			for (int j = 0; j < num3; j++)
+			{
+				for (int k = 0; k < num4; k++)
+				{
+					int num5;
+					int num6;
+					int num7;
+					int num8;
+					if (i == 0)
+					{
+						num5 = j * num4 * 2 + k;
+						num6 = j * num4 * 2 + num4 + k;
+						num7 = BitReverse(num5);
+						num8 = BitReverse(num6);
+					}
+					else
+					{
+						num5 = j * num4 * 2 + k;
+						num6 = j * num4 * 2 + num4 + k;
+						num7 = num5;
+						num8 = num6;
+					}
+					float num9 = Mathf.Cos(MathF.PI * 2f * (float)(k * num3) / num);
+					float num10 = Mathf.Sin(MathF.PI * 2f * (float)(k * num3) / num);
+					m_butterflyLookupTable[i].SetPixel(num5, 0, new Color((float)num7 / num2, (float)num8 / num2, num9, num10));
+					m_butterflyLookupTable[i].SetPixel(num6, 0, new Color((float)num7 / num2, (float)num8 / num2, 0f - num9, 0f - num10));
+				}
+			}
+			m_butterflyLookupTable[i].Apply();
+		}
+	}
+
+	public int PeformFFT(RenderTexture[] data0)
+	{
+		if (m_butterflyLookupTable == null)
+		{
+			return -1;
+		}
+		RenderTexture dest = data0[0];
+		RenderTexture dest2 = data0[1];
+		int num = 0;
+		int num2 = 0;
+		int num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int num4 = (num2 + 1) % 2;
+			m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+			m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+			if (num == 0)
+			{
+				Graphics.Blit(null, dest, m_fourier, 0);
+			}
+			else
+			{
+				Graphics.Blit(null, dest2, m_fourier, 0);
+			}
+			num3++;
+			num2++;
+		}
+		num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int num4 = (num2 + 1) % 2;
+			m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+			m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+			if (num == 0)
+			{
+				Graphics.Blit(null, dest, m_fourier, 1);
+			}
+			else
+			{
+				Graphics.Blit(null, dest2, m_fourier, 1);
+			}
+			num3++;
+			num2++;
+		}
+		return num;
+	}
+
+	public int PeformFFT(RenderTexture[] data0, RenderTexture[] data1)
+	{
+		if (m_butterflyLookupTable == null)
+		{
+			return -1;
+		}
+		if (SystemInfo.supportedRenderTargetCount < 2)
+		{
+			throw new InvalidOperationException("System does not support at least 2 render targets");
+		}
+		m_pass0RT2[0] = data0[0].colorBuffer;
+		m_pass0RT2[1] = data1[0].colorBuffer;
+		m_pass1RT2[0] = data0[1].colorBuffer;
+		m_pass1RT2[1] = data1[1].colorBuffer;
+		RenderBuffer depthBuffer = data0[0].depthBuffer;
+		RenderBuffer depthBuffer2 = data0[1].depthBuffer;
+		int num = 0;
+		int num2 = 0;
+		int num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int num4 = (num2 + 1) % 2;
+			m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+			m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+			if (num == 0)
+			{
+				RTUtility.MultiTargetBlit(m_pass0RT2, depthBuffer, m_fourier, 2);
+			}
+			else
+			{
+				RTUtility.MultiTargetBlit(m_pass1RT2, depthBuffer2, m_fourier, 2);
+			}
+			num3++;
+			num2++;
+		}
+		num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int num4 = (num2 + 1) % 2;
+			m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+			m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+			if (num == 0)
+			{
+				RTUtility.MultiTargetBlit(m_pass0RT2, depthBuffer, m_fourier, 3);
+			}
+			else
+			{
+				RTUtility.MultiTargetBlit(m_pass1RT2, depthBuffer2, m_fourier, 3);
+			}
+			num3++;
+			num2++;
+		}
+		return num;
+	}
+
+	public int PeformFFT(RenderTexture[] data0, RenderTexture[] data1, RenderTexture[] data2)
+	{
+		if (m_butterflyLookupTable == null)
+		{
+			return -1;
+		}
+		if (SystemInfo.supportedRenderTargetCount < 3)
+		{
+			throw new InvalidOperationException("System does not support at least 3 render targets");
+		}
+		m_pass0RT3[0] = data0[0].colorBuffer;
+		m_pass0RT3[1] = data1[0].colorBuffer;
+		m_pass0RT3[2] = data2[0].colorBuffer;
+		m_pass1RT3[0] = data0[1].colorBuffer;
+		m_pass1RT3[1] = data1[1].colorBuffer;
+		m_pass1RT3[2] = data2[1].colorBuffer;
+		RenderBuffer depthBuffer = data0[0].depthBuffer;
+		RenderBuffer depthBuffer2 = data0[1].depthBuffer;
+		int num = 0;
+		int num2 = 0;
+		int num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int num4 = (num2 + 1) % 2;
+			m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+			m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer2", data2[num4]);
+			if (num == 0)
+			{
+				RTUtility.MultiTargetBlit(m_pass0RT3, depthBuffer, m_fourier, 4);
+			}
+			else
+			{
+				RTUtility.MultiTargetBlit(m_pass1RT3, depthBuffer2, m_fourier, 4);
+			}
+			num3++;
+			num2++;
+		}
+		num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int num4 = (num2 + 1) % 2;
+			m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+			m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer2", data2[num4]);
+			if (num == 0)
+			{
+				RTUtility.MultiTargetBlit(m_pass0RT3, depthBuffer, m_fourier, 5);
+			}
+			else
+			{
+				RTUtility.MultiTargetBlit(m_pass1RT3, depthBuffer2, m_fourier, 5);
+			}
+			num3++;
+			num2++;
+		}
+		return num;
+	}
+
+	public int PeformFFT(RenderTexture[] data0, RenderTexture[] data1, RenderTexture[] data2, RenderTexture[] data3)
+	{
+		if (m_butterflyLookupTable == null)
+		{
+			return -1;
+		}
+		if (SystemInfo.supportedRenderTargetCount < 4)
+		{
+			throw new InvalidOperationException("System does not support at least 4 render targets");
+		}
+		m_pass0RT4[0] = data0[0].colorBuffer;
+		m_pass0RT4[1] = data1[0].colorBuffer;
+		m_pass0RT4[2] = data2[0].colorBuffer;
+		m_pass0RT4[3] = data3[0].colorBuffer;
+		m_pass1RT4[0] = data0[1].colorBuffer;
+		m_pass1RT4[1] = data1[1].colorBuffer;
+		m_pass1RT4[2] = data2[1].colorBuffer;
+		m_pass1RT4[3] = data3[1].colorBuffer;
+		RenderBuffer depthBuffer = data0[0].depthBuffer;
+		RenderBuffer depthBuffer2 = data0[1].depthBuffer;
+		int num = 0;
+		int num2 = 0;
+		int num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int num4 = (num2 + 1) % 2;
+			m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+			m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer2", data2[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer3", data3[num4]);
+			if (num == 0)
+			{
+				RTUtility.MultiTargetBlit(m_pass0RT4, depthBuffer, m_fourier, 6);
+			}
+			else
+			{
+				RTUtility.MultiTargetBlit(m_pass1RT4, depthBuffer2, m_fourier, 6);
+			}
+			num3++;
+			num2++;
+		}
+		num3 = 0;
+		while (num3 < m_passes)
+		{
+			num = num2 % 2;
+			int num4 = (num2 + 1) % 2;
+			m_fourier.SetTexture("Ceto_ButterFlyLookUp", m_butterflyLookupTable[num3]);
+			m_fourier.SetTexture("Ceto_ReadBuffer0", data0[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer1", data1[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer2", data2[num4]);
+			m_fourier.SetTexture("Ceto_ReadBuffer3", data3[num4]);
+			if (num == 0)
+			{
+				RTUtility.MultiTargetBlit(m_pass0RT4, depthBuffer, m_fourier, 7);
+			}
+			else
+			{
+				RTUtility.MultiTargetBlit(m_pass1RT4, depthBuffer2, m_fourier, 7);
+			}
+			num3++;
+			num2++;
+		}
+		return num;
+	}
+}
+
+
+==================== Ceto_WaveSpectrumBuffer.cs ====================
+using UnityEngine;
+
+namespace Ceto;
+
+public abstract class WaveSpectrumBuffer
+{
+	public abstract bool Done { get; }
+
+	public abstract int Size { get; }
+
+	public abstract bool IsGPU { get; }
+
+	public float TimeValue { get; protected set; }
+
+	public bool HasRun { get; protected set; }
+
+	public bool BeenSampled { get; set; }
+
+	public Material InitMaterial { get; set; }
+
+	public int InitPass { get; set; }
+
+	public abstract Texture GetTexture(int idx);
+
+	public WaveSpectrumBuffer()
+	{
+	}
+
+	protected abstract void Initilize(WaveSpectrumCondition condition, float time);
+
+	public abstract void Run(WaveSpectrumCondition condition, float time);
+
+	public abstract void EnableBuffer(int idx);
+
+	public abstract void DisableBuffer(int idx);
+
+	public abstract int EnabledBuffers();
+
+	public abstract bool IsEnabledBuffer(int i);
+
+	public virtual void Release()
+	{
+	}
+
+	public virtual void EnableSampling()
+	{
+	}
+
+	public virtual void DisableSampling()
+	{
+	}
+}
+
+
+==================== Ceto_WaveSpectrumBufferCPU.cs ====================
+using System;
+using System.Collections.Generic;
+using Ceto.Common.Threading.Scheduling;
+using UnityEngine;
+
+namespace Ceto;
+
+public abstract class WaveSpectrumBufferCPU : WaveSpectrumBuffer
+{
+	public class Buffer
+	{
+		public IList<Vector4[]> data;
+
+		public Color[] results;
+
+		public Texture2D map;
+
+		public bool disabled;
+
+		public bool doublePacked;
+	}
+
+	public const int READ = 1;
+
+	public const int WRITE = 0;
+
+	protected Buffer[] m_buffers;
+
+	private FourierCPU m_fourier;
+
+	private Scheduler m_scheduler;
+
+	private List<FourierTask> m_fourierTasks;
+
+	protected InitSpectrumDisplacementsTask m_initTask;
+
+	public override bool Done => IsDone();
+
+	public override int Size => m_fourier.size;
+
+	public override bool IsGPU => false;
+
+	public Color[] WTable { get; private set; }
+
+	public WaveSpectrumBufferCPU(int size, int numBuffers, Scheduler scheduler)
+	{
+		m_buffers = new Buffer[numBuffers];
+		m_fourier = new FourierCPU(size);
+		m_fourierTasks = new List<FourierTask>(3);
+		m_fourierTasks.Add(null);
+		m_fourierTasks.Add(null);
+		m_fourierTasks.Add(null);
+		m_scheduler = scheduler;
+		for (int i = 0; i < numBuffers; i++)
+		{
+			m_buffers[i] = CreateBuffer(size);
+		}
+	}
+
+	private Buffer CreateBuffer(int size)
+	{
+		Buffer buffer = new Buffer();
+		buffer.doublePacked = true;
+		buffer.data = new List<Vector4[]>();
+		buffer.data.Add(new Vector4[size * size]);
+		buffer.data.Add(new Vector4[size * size]);
+		buffer.results = new Color[size * size];
+		buffer.map = new Texture2D(size, size, TextureFormat.RGBAFloat, mipChain: false, linear: true);
+		buffer.map.wrapMode = TextureWrapMode.Repeat;
+		buffer.map.filterMode = FilterMode.Bilinear;
+		buffer.map.hideFlags = HideFlags.HideAndDontSave;
+		buffer.map.name = "Ceto Wave Spectrum CPU Buffer";
+		buffer.map.SetPixels(buffer.results);
+		buffer.map.Apply();
+		return buffer;
+	}
+
+	public override void Release()
+	{
+		int num = m_buffers.Length;
+		for (int i = 0; i < num; i++)
+		{
+			UnityEngine.Object.Destroy(m_buffers[i].map);
+			m_buffers[i].map = null;
+		}
+	}
+
+	public override Texture GetTexture(int idx)
+	{
+		if (idx < 0 || idx >= m_buffers.Length)
+		{
+			return Texture2D.blackTexture;
+		}
+		if (m_buffers[idx].disabled)
+		{
+			return Texture2D.blackTexture;
+		}
+		return m_buffers[idx].map;
+	}
+
+	public Vector4[] GetWriteBuffer(int idx)
+	{
+		if (idx < 0 || idx >= m_buffers.Length)
+		{
+			return null;
+		}
+		if (m_buffers[idx].disabled)
+		{
+			return null;
+		}
+		return m_buffers[idx].data[0];
+	}
+
+	public Vector4[] GetReadBuffer(int idx)
+	{
+		if (idx < 0 || idx >= m_buffers.Length)
+		{
+			return null;
+		}
+		if (m_buffers[idx].disabled)
+		{
+			return null;
+		}
+		return m_buffers[idx].data[1];
+	}
+
+	public Buffer GetBuffer(int idx)
+	{
+		if (idx < 0 || idx >= m_buffers.Length)
+		{
+			return null;
+		}
+		if (m_buffers[idx].disabled)
+		{
+			return null;
+		}
+		return m_buffers[idx];
+	}
+
+	public override void EnableBuffer(int idx)
+	{
+		int num = m_buffers.Length;
+		if (idx < -1 || idx >= num)
+		{
+			return;
+		}
+		if (idx == -1)
+		{
+			for (int i = 0; i < num; i++)
+			{
+				m_buffers[i].disabled = false;
+			}
+		}
+		else
+		{
+			m_buffers[idx].disabled = false;
+		}
+	}
+
+	public override void DisableBuffer(int idx)
+	{
+		int num = m_buffers.Length;
+		if (idx < -1 || idx >= num)
+		{
+			return;
+		}
+		if (idx == -1)
+		{
+			for (int i = 0; i < num; i++)
+			{
+				m_buffers[i].disabled = true;
+			}
+		}
+		else
+		{
+			m_buffers[idx].disabled = true;
+		}
+	}
+
+	public bool IsDone()
+	{
+		if (m_initTask == null)
+		{
+			return true;
+		}
+		if (!m_initTask.Done)
+		{
+			return false;
+		}
+		int count = m_fourierTasks.Count;
+		for (int i = 0; i < count; i++)
+		{
+			if (m_fourierTasks[i] != null && !m_fourierTasks[i].Done)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public override int EnabledBuffers()
+	{
+		int num = 0;
+		int num2 = m_buffers.Length;
+		for (int i = 0; i < num2; i++)
+		{
+			if (!m_buffers[i].disabled)
+			{
+				num++;
+			}
+		}
+		return num;
+	}
+
+	public override bool IsEnabledBuffer(int idx)
+	{
+		if (idx < 0 || idx >= m_buffers.Length)
+		{
+			return false;
+		}
+		return !m_buffers[idx].disabled;
+	}
+
+	public override void Run(WaveSpectrumCondition condition, float time)
+	{
+		if (!IsDone())
+		{
+			throw new InvalidOperationException("Can not run when there are tasks that have not finished");
+		}
+		TimeValue = time;
+		HasRun = true;
+		BeenSampled = false;
+		if (EnabledBuffers() == 0)
+		{
+			return;
+		}
+		Initilize(condition, time);
+		if (Ocean.DISABLE_FOURIER_MULTITHREADING)
+		{
+			m_initTask.Start();
+			m_initTask.Run();
+			m_initTask.End();
+		}
+		int num = m_buffers.Length;
+		for (int i = 0; i < num; i++)
+		{
+			if (!m_buffers[i].disabled)
+			{
+				if (m_fourierTasks[i] == null)
+				{
+					m_fourierTasks[i] = new FourierTask(this, m_fourier, i, m_initTask.NumGrids);
+				}
+				else
+				{
+					m_fourierTasks[i].Reset(i, m_initTask.NumGrids);
+				}
+				FourierTask fourierTask = m_fourierTasks[i];
+				if (fourierTask.Done)
+				{
+					throw new InvalidOperationException("Fourier task should not be done before running");
+				}
+				if (Ocean.DISABLE_FOURIER_MULTITHREADING)
+				{
+					fourierTask.Start();
+					fourierTask.Run();
+					fourierTask.End();
+				}
+				else
+				{
+					fourierTask.RunOnStopWaiting = true;
+					fourierTask.WaitOn(m_initTask);
+					m_scheduler.AddWaiting(fourierTask);
+				}
+			}
+		}
+		if (!Ocean.DISABLE_FOURIER_MULTITHREADING)
+		{
+			m_initTask.NoFinish = true;
+			m_scheduler.Run(m_initTask);
+		}
+	}
+}
+
+
+==================== Ceto_WaveSpectrumBufferGPU.cs ====================
+using System;
+using System.Collections.Generic;
+using Ceto.Common.Unity.Utility;
+using UnityEngine;
+
+namespace Ceto;
+
+public class WaveSpectrumBufferGPU : WaveSpectrumBuffer
+{
+	private struct Buffer
+	{
+		public RenderTexture[] data;
+
+		public bool disabled;
+	}
+
+	private Buffer[] m_buffers;
+
+	private bool m_samplingEnabled;
+
+	private int m_index = -1;
+
+	private FourierGPU m_fourier;
+
+	private IList<RenderTexture[]> m_enabledData;
+
+	private string m_bufferName;
+
+	private IList<RenderTexture> m_tmpList;
+
+	private RenderBuffer[] m_tmpBuffer2;
+
+	private RenderBuffer[] m_tmpBuffer3;
+
+	private RenderBuffer[] m_tmpBuffer4;
+
+	private Vector4 m_offset;
+
+	public override bool Done => true;
+
+	public override int Size => m_fourier.size;
+
+	public override bool IsGPU => true;
+
+	public WaveSpectrumBufferGPU(int size, Shader fourierSdr, int numBuffers)
+	{
+		if (numBuffers < 1 || numBuffers > 4)
+		{
+			throw new InvalidOperationException("Number of buffers is " + numBuffers + " but must be between (inclusive) 1 and 4");
+		}
+		m_buffers = new Buffer[numBuffers];
+		m_fourier = new FourierGPU(size, fourierSdr);
+		m_tmpList = new List<RenderTexture>();
+		m_tmpBuffer2 = new RenderBuffer[2];
+		m_tmpBuffer3 = new RenderBuffer[3];
+		m_tmpBuffer4 = new RenderBuffer[4];
+		m_offset = new Vector4(1f + 0.5f / (float)Size, 1f + 0.5f / (float)Size, 0f, 0f);
+		for (int i = 0; i < numBuffers; i++)
+		{
+			m_buffers[i] = CreateBuffer(size);
+		}
+		m_enabledData = new List<RenderTexture[]>();
+		UpdateEnabledData();
+		m_bufferName = "Ceto Wave Spectrum GPU Buffer";
+	}
+
+	private Buffer CreateBuffer(int size)
+	{
+		return new Buffer
+		{
+			data = new RenderTexture[2]
+		};
+	}
+
+	public override Texture GetTexture(int idx)
+	{
+		if (m_index == -1)
+		{
+			return Texture2D.blackTexture;
+		}
+		if (idx < 0 || idx >= m_buffers.Length)
+		{
+			return Texture2D.blackTexture;
+		}
+		if (m_buffers[idx].disabled)
+		{
+			return Texture2D.blackTexture;
+		}
+		return m_buffers[idx].data[m_index];
+	}
+
+	public override void Release()
+	{
+		m_tmpList.Clear();
+		m_fourier.Release();
+		int num = m_buffers.Length;
+		for (int i = 0; i < num; i++)
+		{
+			m_buffers[i].data[0] = null;
+			m_buffers[i].data[1] = null;
+		}
+	}
+
+	protected override void Initilize(WaveSpectrumCondition condition, float time)
+	{
+		if (InitMaterial == null)
+		{
+			throw new InvalidOperationException("GPU buffer has not had its Init material set");
+		}
+		if (InitPass == -1)
+		{
+			throw new InvalidOperationException("GPU buffer has not had its Init material pass set");
+		}
+		InitMaterial.SetTexture("Ceto_Spectrum01", (condition.Spectrum01 != null) ? condition.Spectrum01 : Texture2D.blackTexture);
+		InitMaterial.SetTexture("Ceto_Spectrum23", (condition.Spectrum23 != null) ? condition.Spectrum23 : Texture2D.blackTexture);
+		InitMaterial.SetTexture("Ceto_WTable", condition.WTable);
+		InitMaterial.SetVector("Ceto_InverseGridSizes", condition.InverseGridSizes());
+		InitMaterial.SetVector("Ceto_GridSizes", condition.GridSizes);
+		InitMaterial.SetVector("Ceto_Offset", m_offset);
+		InitMaterial.SetFloat("Ceto_Time", time);
+		m_tmpList.Clear();
+		int num = m_buffers.Length;
+		for (int i = 0; i < num; i++)
+		{
+			if (!m_buffers[i].disabled)
+			{
+				m_tmpList.Add(m_buffers[i].data[1]);
+			}
+		}
+		switch (m_tmpList.Count)
+		{
+		case 1:
+			Graphics.Blit(null, m_tmpList[0], InitMaterial, InitPass);
+			break;
+		case 2:
+			m_tmpBuffer2[0] = m_tmpList[0].colorBuffer;
+			m_tmpBuffer2[1] = m_tmpList[1].colorBuffer;
+			RTUtility.MultiTargetBlit(m_tmpBuffer2, m_tmpList[0].depthBuffer, InitMaterial, InitPass);
+			break;
+		case 3:
+			m_tmpBuffer3[0] = m_tmpList[0].colorBuffer;
+			m_tmpBuffer3[1] = m_tmpList[1].colorBuffer;
+			m_tmpBuffer3[2] = m_tmpList[2].colorBuffer;
+			RTUtility.MultiTargetBlit(m_tmpBuffer3, m_tmpList[0].depthBuffer, InitMaterial, InitPass);
+			break;
+		case 4:
+			m_tmpBuffer4[0] = m_tmpList[0].colorBuffer;
+			m_tmpBuffer4[1] = m_tmpList[1].colorBuffer;
+			m_tmpBuffer4[2] = m_tmpList[2].colorBuffer;
+			m_tmpBuffer4[3] = m_tmpList[3].colorBuffer;
+			RTUtility.MultiTargetBlit(m_tmpBuffer4, m_tmpList[0].depthBuffer, InitMaterial, InitPass);
+			break;
+		}
+	}
+
+	public void UpdateEnabledData()
+	{
+		m_enabledData.Clear();
+		int num = m_buffers.Length;
+		for (int i = 0; i < num; i++)
+		{
+			if (!m_buffers[i].disabled)
+			{
+				m_enabledData.Add(m_buffers[i].data);
+			}
+		}
+	}
+
+	public override void EnableBuffer(int idx)
+	{
+		int num = m_buffers.Length;
+		if (idx < -1 || idx >= num)
+		{
+			return;
+		}
+		if (idx == -1)
+		{
+			for (int i = 0; i < num; i++)
+			{
+				m_buffers[i].disabled = false;
+			}
+		}
+		else
+		{
+			m_buffers[idx].disabled = false;
+		}
+		UpdateEnabledData();
+	}
+
+	public override void DisableBuffer(int idx)
+	{
+		int num = m_buffers.Length;
+		if (idx < -1 || idx >= num)
+		{
+			return;
+		}
+		if (idx == -1)
+		{
+			for (int i = 0; i < num; i++)
+			{
+				m_buffers[i].disabled = true;
+			}
+		}
+		else
+		{
+			m_buffers[idx].disabled = true;
+		}
+		UpdateEnabledData();
+	}
+
+	public override int EnabledBuffers()
+	{
+		return m_enabledData.Count;
+	}
+
+	public override bool IsEnabledBuffer(int idx)
+	{
+		if (idx < 0 || idx >= m_buffers.Length)
+		{
+			return false;
+		}
+		return !m_buffers[idx].disabled;
+	}
+
+	private void CreateTextures()
+	{
+		int count = m_enabledData.Count;
+		for (int i = 0; i < count; i++)
+		{
+			for (int j = 0; j < 2; j++)
+			{
+				if (m_enabledData[i][j] != null)
+				{
+					RenderTexture.ReleaseTemporary(m_enabledData[i][j]);
+				}
+				RenderTexture temporary = RenderTexture.GetTemporary(Size, Size, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+				temporary.filterMode = FilterMode.Point;
+				temporary.wrapMode = TextureWrapMode.Clamp;
+				temporary.name = m_bufferName;
+				temporary.anisoLevel = 0;
+				temporary.Create();
+				m_enabledData[i][j] = temporary;
+			}
+		}
+	}
+
+	public override void Run(WaveSpectrumCondition condition, float time)
+	{
+		TimeValue = time;
+		HasRun = true;
+		BeenSampled = false;
+		if (m_samplingEnabled)
+		{
+			throw new InvalidOperationException("Can not run if sampling enabled");
+		}
+		UpdateEnabledData();
+		CreateTextures();
+		int count = m_enabledData.Count;
+		if (count != 0)
+		{
+			Initilize(condition, time);
+			switch (count)
+			{
+			case 1:
+				m_index = m_fourier.PeformFFT(m_enabledData[0]);
+				break;
+			case 2:
+				m_index = m_fourier.PeformFFT(m_enabledData[0], m_enabledData[1]);
+				break;
+			case 3:
+				m_index = m_fourier.PeformFFT(m_enabledData[0], m_enabledData[1], m_enabledData[2]);
+				break;
+			case 4:
+				m_index = m_fourier.PeformFFT(m_enabledData[0], m_enabledData[1], m_enabledData[2], m_enabledData[3]);
+				break;
+			}
+		}
+	}
+
+	public override void EnableSampling()
+	{
+		if (m_index == -1)
+		{
+			return;
+		}
+		m_samplingEnabled = true;
+		int num = m_buffers.Length;
+		for (int i = 0; i < num; i++)
+		{
+			if (!(m_buffers[i].data[m_index] == null))
+			{
+				m_buffers[i].data[m_index].filterMode = FilterMode.Bilinear;
+				m_buffers[i].data[m_index].wrapMode = TextureWrapMode.Repeat;
+			}
+		}
+	}
+
+	public override void DisableSampling()
+	{
+		if (m_index == -1)
+		{
+			return;
+		}
+		m_samplingEnabled = false;
+		int num = m_buffers.Length;
+		for (int i = 0; i < num; i++)
+		{
+			if (!(m_buffers[i].data[m_index] == null))
+			{
+				m_buffers[i].data[m_index].filterMode = FilterMode.Point;
+				m_buffers[i].data[m_index].wrapMode = TextureWrapMode.Clamp;
+			}
+		}
+	}
+}
+
+
+==================== Ceto_DisplacementBufferCPU.cs ====================
+using System.Collections.Generic;
+using Ceto.Common.Containers.Interpolation;
+using Ceto.Common.Threading.Scheduling;
+using UnityEngine;
+
+namespace Ceto;
+
+public class DisplacementBufferCPU : WaveSpectrumBufferCPU, IDisplacementBuffer
+{
+	private const int NUM_BUFFERS = 3;
+
+	private IList<InterpolatedArray2f[]> m_displacements;
+
+	public DisplacementBufferCPU(int size, Scheduler scheduler)
+		: base(size, 3, scheduler)
+	{
+		int gRIDS = QueryDisplacements.GRIDS;
+		int cHANNELS = QueryDisplacements.CHANNELS;
+		m_displacements = new List<InterpolatedArray2f[]>(2);
+		m_displacements.Add(new InterpolatedArray2f[gRIDS]);
+		m_displacements.Add(new InterpolatedArray2f[gRIDS]);
+		for (int i = 0; i < gRIDS; i++)
+		{
+			m_displacements[0][i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+			m_displacements[1][i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+		}
+	}
+
+	protected override void Initilize(WaveSpectrumCondition condition, float time)
+	{
+		InterpolatedArray2f[] writeDisplacements = GetWriteDisplacements();
+		writeDisplacements[0].Clear();
+		writeDisplacements[1].Clear();
+		writeDisplacements[2].Clear();
+		writeDisplacements[3].Clear();
+		if (m_initTask == null)
+		{
+			m_initTask = condition.GetInitSpectrumDisplacementsTask(this, time);
+		}
+		else if (m_initTask.SpectrumType != condition.Key.SpectrumType || m_initTask.NumGrids != condition.Key.NumGrids)
+		{
+			m_initTask = condition.GetInitSpectrumDisplacementsTask(this, time);
+		}
+		else
+		{
+			m_initTask.Reset(condition, time);
+		}
+	}
+
+	public InterpolatedArray2f[] GetWriteDisplacements()
+	{
+		return m_displacements[0];
+	}
+
+	public InterpolatedArray2f[] GetReadDisplacements()
+	{
+		return m_displacements[1];
+	}
+
+	public override void Run(WaveSpectrumCondition condition, float time)
+	{
+		SwapDisplacements();
+		base.Run(condition, time);
+	}
+
+	public void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements)
+	{
+		QueryDisplacements.CopyAndCreateDisplacements(GetReadDisplacements(), out displacements);
+	}
+
+	public void CopyDisplacements(IList<InterpolatedArray2f> displacements)
+	{
+		QueryDisplacements.CopyDisplacements(GetReadDisplacements(), displacements);
+	}
+
+	private void SwapDisplacements()
+	{
+		InterpolatedArray2f[] value = m_displacements[0];
+		m_displacements[0] = m_displacements[1];
+		m_displacements[1] = value;
+	}
+
+	public Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale)
+	{
+		return QueryDisplacements.MaxRange(GetReadDisplacements(), choppyness, gridScale, null);
+	}
+
+	public void QueryWaves(WaveQuery query, QueryGridScaling scaling)
+	{
+		int num = EnabledBuffers();
+		if (num != 0)
+		{
+			InterpolatedArray2f[] readDisplacements = GetReadDisplacements();
+			QueryDisplacements.QueryWaves(query, num, readDisplacements, scaling);
+		}
+	}
+}
+
+
+==================== Ceto_DisplacementBufferGPU.cs ====================
+using System.Collections.Generic;
+using Ceto.Common.Containers.Interpolation;
+using UnityEngine;
+
+namespace Ceto;
+
+public class DisplacementBufferGPU : WaveSpectrumBufferGPU, IDisplacementBuffer
+{
+	private static readonly int NUM_BUFFERS = 3;
+
+	private InterpolatedArray2f[] m_displacements;
+
+	public DisplacementBufferGPU(int size, Shader fourierSdr)
+		: base(size, fourierSdr, NUM_BUFFERS)
+	{
+		int gRIDS = QueryDisplacements.GRIDS;
+		int cHANNELS = QueryDisplacements.CHANNELS;
+		m_displacements = new InterpolatedArray2f[gRIDS];
+		for (int i = 0; i < gRIDS; i++)
+		{
+			m_displacements[i] = new InterpolatedArray2f(size, size, cHANNELS, wrap: true);
+		}
+	}
+
+	public InterpolatedArray2f[] GetReadDisplacements()
+	{
+		return m_displacements;
+	}
+
+	public void CopyAndCreateDisplacements(out IList<InterpolatedArray2f> displacements)
+	{
+		QueryDisplacements.CopyAndCreateDisplacements(m_displacements, out displacements);
+	}
+
+	public void CopyDisplacements(IList<InterpolatedArray2f> displacements)
+	{
+		QueryDisplacements.CopyDisplacements(m_displacements, displacements);
+	}
+
+	public Vector4 MaxRange(Vector4 choppyness, Vector2 gridScale)
+	{
+		return QueryDisplacements.MaxRange(m_displacements, choppyness, gridScale, null);
+	}
+
+	public void QueryWaves(WaveQuery query, QueryGridScaling scaling)
+	{
+		int num = EnabledBuffers();
+		if (num != 0)
+		{
+			QueryDisplacements.QueryWaves(query, num, m_displacements, scaling);
+		}
+	}
+}
+
+
+==================== Ceto_ProjectedGrid.cs ====================
+using System;
+using System.Collections.Generic;
+using Ceto.Common.Unity.Utility;
+using UnityEngine;
+using UnityEngine.Rendering;
+
+namespace Ceto;
+
+[AddComponentMenu("Ceto/Components/ProjectedGrid")]
+[DisallowMultipleComponent]
+[RequireComponent(typeof(Ocean))]
+public class ProjectedGrid : OceanComponent
+{
+	public class Grid
+	{
+		public int screenWidth;
+
+		public int screenHeight;
+
+		public int resolution;
+
+		public int groups;
+
+		public IList<MeshFilter> topFilters = new List<MeshFilter>();
+
+		public IList<Renderer> topRenderer = new List<Renderer>();
+
+		public IList<GameObject> top = new List<GameObject>();
+
+		public IList<MeshFilter> underFilters = new List<MeshFilter>();
+
+		public IList<Renderer> underRenderer = new List<Renderer>();
+
+		public IList<GameObject> under = new List<GameObject>();
+	}
+
+	private static readonly int MAX_SCREEN_WIDTH = 2048;
+
+	private static readonly int MAX_SCREEN_HEIGHT = 2048;
+
+	public MESH_RESOLUTION resolution = MESH_RESOLUTION.HIGH;
+
+	private GRID_GROUPS gridGroups;
+
+	public bool receiveShadows;
+
+	private float borderLength = 200f;
+
+	private ReflectionProbeUsage reflectionProbes;
+
+	public Material oceanTopSideMat;
+
+	public Material oceanUnderSideMat;
+
+	private Dictionary<int, Grid> m_grids = new Dictionary<int, Grid>();
+
+	private void Start()
+	{
+		try
+		{
+			if (SystemInfo.graphicsShaderLevel < 30)
+			{
+				throw new InvalidOperationException("The projected grids needs at least SM3 to render.");
+			}
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	protected override void OnEnable()
+	{
+		base.OnEnable();
+		if (WasError)
+		{
+			return;
+		}
+		try
+		{
+			Dictionary<int, Grid>.Enumerator enumerator = m_grids.GetEnumerator();
+			while (enumerator.MoveNext())
+			{
+				Grid value = enumerator.Current.Value;
+				Activate(value.top, active: true);
+				Activate(value.under, active: true);
+			}
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	protected override void OnDisable()
+	{
+		base.OnDisable();
+		try
+		{
+			Dictionary<int, Grid>.Enumerator enumerator = m_grids.GetEnumerator();
+			while (enumerator.MoveNext())
+			{
+				Grid value = enumerator.Current.Value;
+				Activate(value.top, active: false);
+				Activate(value.under, active: false);
+			}
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	protected override void OnDestroy()
+	{
+		try
+		{
+			Dictionary<int, Grid>.Enumerator enumerator = m_grids.GetEnumerator();
+			while (enumerator.MoveNext())
+			{
+				Grid value = enumerator.Current.Value;
+				ClearGrid(value);
+			}
+			m_grids.Clear();
+			m_grids = null;
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	private void Update()
+	{
+		try
+		{
+			Shader.SetGlobalFloat("Ceto_GridEdgeBorder", Mathf.Max(0f, borderLength));
+			int num = ResolutionToNumber(resolution);
+			Vector2 vector = new Vector2((float)num / (float)ScreenWidth(), (float)num / (float)ScreenHeight());
+			Shader.SetGlobalVector("Ceto_ScreenGridSize", vector);
+			CreateGrid(resolution);
+			Dictionary<int, Grid>.Enumerator enumerator = m_grids.GetEnumerator();
+			while (enumerator.MoveNext())
+			{
+				Grid value = enumerator.Current.Value;
+				if (enumerator.Current.Key == (int)resolution)
+				{
+					UpdateGrid(value);
+					Activate(value.top, active: true);
+					Activate(value.under, active: true);
+				}
+				else
+				{
+					Activate(value.top, active: false);
+					Activate(value.under, active: false);
+				}
+			}
+			if (!UnderSideNeeded())
+			{
+				enumerator = m_grids.GetEnumerator();
+				while (enumerator.MoveNext())
+				{
+					Activate(enumerator.Current.Value.under, active: false);
+				}
+			}
+			if (!TopSideNeeded())
+			{
+				enumerator = m_grids.GetEnumerator();
+				while (enumerator.MoveNext())
+				{
+					Activate(enumerator.Current.Value.top, active: false);
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	public override void OceanOnPostRender(Camera cam, CameraData data)
+	{
+		if (enabled && !(cam == null) && data != null)
+		{
+			Grid value = null;
+			m_grids.TryGetValue((int)resolution, out value);
+			if (value != null)
+			{
+				ResetBounds(value);
+			}
+		}
+	}
+
+	private void Activate(IList<GameObject> list, bool active)
+	{
+		int count = list.Count;
+		for (int i = 0; i < count; i++)
+		{
+			if (list[i] != null)
+			{
+				list[i].SetActive(active);
+			}
+		}
+	}
+
+	private void UpdateGrid(Grid grid)
+	{
+		ResetBounds(grid);
+		int count = grid.topRenderer.Count;
+		for (int i = 0; i < count; i++)
+		{
+			grid.topRenderer[i].receiveShadows = receiveShadows;
+			grid.topRenderer[i].reflectionProbeUsage = reflectionProbes;
+			if (oceanTopSideMat != null)
+			{
+				grid.topRenderer[i].sharedMaterial = oceanTopSideMat;
+			}
+		}
+		count = grid.underRenderer.Count;
+		for (int j = 0; j < count; j++)
+		{
+			grid.underRenderer[j].receiveShadows = receiveShadows;
+			grid.underRenderer[j].reflectionProbeUsage = reflectionProbes;
+			if (oceanUnderSideMat != null)
+			{
+				grid.underRenderer[j].sharedMaterial = oceanUnderSideMat;
+			}
+		}
+		count = grid.top.Count;
+		for (int k = 0; k < count; k++)
+		{
+			grid.top[k].transform.localPosition = Vector3.zero;
+			grid.top[k].transform.localRotation = Quaternion.identity;
+			grid.top[k].transform.localScale = Vector3.one;
+		}
+		count = grid.under.Count;
+		for (int l = 0; l < count; l++)
+		{
+			grid.under[l].transform.localPosition = Vector3.zero;
+			grid.under[l].transform.localRotation = Quaternion.identity;
+			grid.under[l].transform.localScale = Vector3.one;
+		}
+	}
+
+	private void ResetBounds(Grid grid)
+	{
+		float level = m_ocean.level;
+		float num = m_ocean.FindMaxDisplacement(inculdeOverlays: true);
+		float num2 = 100000000f;
+		int num3 = 0;
+		Bounds bounds = new Bounds(Vector3.zero, new Vector3(num2, level + num, num2));
+		num3 = grid.topFilters.Count;
+		for (int i = 0; i < num3; i++)
+		{
+			grid.topFilters[i].mesh.bounds = bounds;
+		}
+		num3 = grid.underFilters.Count;
+		for (int j = 0; j < num3; j++)
+		{
+			grid.underFilters[j].mesh.bounds = bounds;
+		}
+	}
+
+	private void UpdateBounds(GameObject go, Camera cam)
+	{
+		MeshFilter component = go.GetComponent<MeshFilter>();
+		if (!(component == null))
+		{
+			Vector3 position = cam.transform.position;
+			float level = m_ocean.level;
+			float y = m_ocean.FindMaxDisplacement(inculdeOverlays: true);
+			float num = cam.farClipPlane * 2f;
+			position.y = level;
+			component.mesh.bounds = new Bounds(position, new Vector3(num, y, num));
+		}
+	}
+
+	private bool UnderSideNeeded()
+	{
+		if (!(m_ocean.UnderWater == null) && m_ocean.UnderWater.enabled)
+		{
+			return m_ocean.UnderWater.underwaterMode != UNDERWATER_MODE.ABOVE_ONLY;
+		}
+		return false;
+	}
+
+	private bool TopSideNeeded()
+	{
+		if (!(m_ocean.UnderWater == null))
+		{
+			return m_ocean.UnderWater.underwaterMode != UNDERWATER_MODE.BELOW_ONLY;
+		}
+		return true;
+	}
+
+	private int ScreenWidth()
+	{
+		return Mathf.Min(Screen.width, MAX_SCREEN_WIDTH);
+	}
+
+	private int ScreenHeight()
+	{
+		return Mathf.Min(Screen.height, MAX_SCREEN_HEIGHT);
+	}
+
+	private void ApplyProjection(GameObject go)
+	{
+		try
+		{
+			if (!enabled)
+			{
+				return;
+			}
+			Camera current = Camera.current;
+			if (current == null)
+			{
+				return;
+			}
+			CameraData cameraData = m_ocean.FindCameraData(current);
+			if (cameraData.projection == null)
+			{
+				cameraData.projection = new ProjectionData();
+			}
+			if (!cameraData.projection.IsViewUpdated(current))
+			{
+				m_ocean.Projection.UpdateProjection(current, cameraData);
+				Shader.SetGlobalMatrix("Ceto_Interpolation", cameraData.projection.interpolation);
+				Shader.SetGlobalMatrix("Ceto_ProjectorVP", cameraData.projection.projectorVP);
+			}
+			if (!cameraData.projection.checkedForFlipping)
+			{
+				int num = 2;
+				int num2 = 1;
+				if (!Ocean.DISABLE_PROJECTION_FLIPPING)
+				{
+					bool isFlipped = m_ocean.Projection.IsFlipped;
+					if (oceanTopSideMat != null)
+					{
+						oceanTopSideMat.SetInt("_CullFace", isFlipped ? num2 : num);
+					}
+					if (oceanUnderSideMat != null)
+					{
+						oceanUnderSideMat.SetInt("_CullFace", isFlipped ? num : num2);
+					}
+				}
+				else
+				{
+					if (oceanTopSideMat != null)
+					{
+						oceanTopSideMat.SetInt("_CullFace", num);
+					}
+					if (oceanUnderSideMat != null)
+					{
+						oceanUnderSideMat.SetInt("_CullFace", num2);
+					}
+				}
+				cameraData.projection.checkedForFlipping = true;
+			}
+			UpdateBounds(go, current);
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	private void CreateGrid(MESH_RESOLUTION meshRes)
+	{
+		Grid value = null;
+		if (!m_grids.TryGetValue((int)meshRes, out value))
+		{
+			value = new Grid();
+			m_grids.Add((int)meshRes, value);
+		}
+		int num = ScreenWidth();
+		int num2 = ScreenHeight();
+		int num3 = ResolutionToNumber(meshRes);
+		int num4 = ChooseGroupSize(num3, gridGroups, num, num2);
+		if (value.screenWidth == num && value.screenHeight == num2 && value.groups == num4)
+		{
+			return;
+		}
+		ClearGrid(value);
+		value.screenWidth = num;
+		value.screenHeight = num2;
+		value.resolution = num3;
+		value.groups = num4;
+		foreach (Mesh item in CreateScreenQuads(num3, num4, num, num2))
+		{
+			if (oceanTopSideMat != null)
+			{
+				GameObject gameObject = new GameObject("Ceto TopSide Grid LOD: " + meshRes);
+				MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
+				MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
+				NotifyOnWillRender notifyOnWillRender = gameObject.AddComponent<NotifyOnWillRender>();
+				meshFilter.sharedMesh = item;
+				meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+				meshRenderer.receiveShadows = receiveShadows;
+				meshRenderer.sharedMaterial = oceanTopSideMat;
+				meshRenderer.reflectionProbeUsage = reflectionProbes;
+				gameObject.layer = LayerMask.NameToLayer(Ocean.OCEAN_LAYER);
+				gameObject.hideFlags = HideFlags.HideAndDontSave;
+				notifyOnWillRender.AddAction(m_ocean.RenderReflection);
+				notifyOnWillRender.AddAction(ApplyProjection);
+				notifyOnWillRender.AddAction(m_ocean.RenderWaveOverlays);
+				notifyOnWillRender.AddAction(m_ocean.RenderOceanMask);
+				notifyOnWillRender.AddAction(m_ocean.RenderOceanDepth);
+				value.top.Add(gameObject);
+				value.topRenderer.Add(meshRenderer);
+				value.topFilters.Add(meshFilter);
+			}
+			if ((bool)oceanUnderSideMat)
+			{
+				GameObject gameObject2 = new GameObject("Ceto UnderSide Grid LOD: " + meshRes);
+				MeshFilter meshFilter2 = gameObject2.AddComponent<MeshFilter>();
+				MeshRenderer meshRenderer2 = gameObject2.AddComponent<MeshRenderer>();
+				NotifyOnWillRender notifyOnWillRender2 = gameObject2.AddComponent<NotifyOnWillRender>();
+				meshFilter2.sharedMesh = item;
+				meshRenderer2.shadowCastingMode = ShadowCastingMode.Off;
+				meshRenderer2.receiveShadows = receiveShadows;
+				meshRenderer2.reflectionProbeUsage = reflectionProbes;
+				meshRenderer2.sharedMaterial = oceanUnderSideMat;
+				gameObject2.layer = LayerMask.NameToLayer(Ocean.OCEAN_LAYER);
+				gameObject2.hideFlags = HideFlags.HideAndDontSave;
+				notifyOnWillRender2.AddAction(ApplyProjection);
+				notifyOnWillRender2.AddAction(m_ocean.RenderWaveOverlays);
+				notifyOnWillRender2.AddAction(m_ocean.RenderOceanMask);
+				notifyOnWillRender2.AddAction(m_ocean.RenderOceanDepth);
+				value.under.Add(gameObject2);
+				value.underRenderer.Add(meshRenderer2);
+				value.underFilters.Add(meshFilter2);
+			}
+			UnityEngine.Object.Destroy(item);
+		}
+	}
+
+	private void ClearGrid(Grid grid)
+	{
+		if (grid == null)
+		{
+			return;
+		}
+		grid.screenWidth = 0;
+		grid.screenHeight = 0;
+		grid.resolution = 0;
+		grid.groups = 0;
+		if (grid.top != null)
+		{
+			int count = grid.top.Count;
+			for (int i = 0; i < count; i++)
+			{
+				if (!(grid.top[i] == null))
+				{
+					UnityEngine.Object.Destroy(grid.top[i]);
+				}
+			}
+			grid.top.Clear();
+		}
+		if (grid.topFilters != null)
+		{
+			int count2 = grid.topFilters.Count;
+			for (int j = 0; j < count2; j++)
+			{
+				if (!(grid.topFilters[j] == null))
+				{
+					UnityEngine.Object.Destroy(grid.topFilters[j].mesh);
+				}
+			}
+			grid.topFilters.Clear();
+		}
+		if (grid.under != null)
+		{
+			int count3 = grid.under.Count;
+			for (int k = 0; k < count3; k++)
+			{
+				if (!(grid.under[k] == null))
+				{
+					UnityEngine.Object.Destroy(grid.under[k]);
+				}
+			}
+			grid.under.Clear();
+		}
+		if (grid.underFilters != null)
+		{
+			int count4 = grid.underFilters.Count;
+			for (int l = 0; l < count4; l++)
+			{
+				if (!(grid.underFilters[l] == null))
+				{
+					UnityEngine.Object.Destroy(grid.underFilters[l].mesh);
+				}
+			}
+			grid.underFilters.Clear();
+		}
+		if (grid.topRenderer != null)
+		{
+			grid.topRenderer.Clear();
+		}
+		if (grid.underRenderer != null)
+		{
+			grid.underRenderer.Clear();
+		}
+	}
+
+	private int ResolutionToNumber(MESH_RESOLUTION resolution)
+	{
+		return resolution switch
+		{
+			MESH_RESOLUTION.EXTREME => 1, 
+			MESH_RESOLUTION.ULTRA => 2, 
+			MESH_RESOLUTION.HIGH => 4, 
+			MESH_RESOLUTION.MEDIUM => 8, 
+			MESH_RESOLUTION.LOW => 16, 
+			_ => 16, 
+		};
+	}
+
+	private int GroupToNumber(GRID_GROUPS groups)
+	{
+		return groups switch
+		{
+			GRID_GROUPS.EXTREME => 128, 
+			GRID_GROUPS.HIGH => 196, 
+			GRID_GROUPS.MEDIUM => 256, 
+			GRID_GROUPS.LOW => 512, 
+			GRID_GROUPS.SINGLE => -1, 
+			_ => 128, 
+		};
+	}
+
+	private int ChooseGroupSize(int resolution, GRID_GROUPS groups, int width, int height)
+	{
+		int num = 0;
+		int num2 = 0;
+		int num3 = GroupToNumber(groups);
+		if (num3 == -1)
+		{
+			num = width / resolution;
+			num2 = height / resolution;
+		}
+		else
+		{
+			num = num3 / resolution;
+			num2 = num3 / resolution;
+		}
+		while (num * num2 > 65000)
+		{
+			if (groups == GRID_GROUPS.EXTREME)
+			{
+				throw new InvalidOperationException("Can not increase group size");
+			}
+			groups++;
+			num3 = GroupToNumber(groups);
+			num = num3 / resolution;
+			num2 = num3 / resolution;
+		}
+		return num3;
+	}
+
+	private IList<Mesh> CreateScreenQuads(int resolution, int groupSize, int width, int height)
+	{
+		float num = 0f;
+		float num2 = 0f;
+		int num3 = 0;
+		int num4 = 0;
+		int num5 = 0;
+		int num6 = 0;
+		if (groupSize != -1)
+		{
+			while (width % groupSize != 0)
+			{
+				width++;
+			}
+			while (height % groupSize != 0)
+			{
+				height++;
+			}
+			num3 = groupSize / resolution;
+			num4 = groupSize / resolution;
+			num5 = width / groupSize;
+			num6 = height / groupSize;
+			num = (float)groupSize / (float)width;
+			num2 = (float)groupSize / (float)height;
+		}
+		else
+		{
+			num3 = width / resolution;
+			num4 = height / resolution;
+			num5 = 1;
+			num6 = 1;
+			num = 1f;
+			num2 = 1f;
+		}
+		List<Mesh> list = new List<Mesh>();
+		for (int i = 0; i < num5; i++)
+		{
+			for (int j = 0; j < num6; j++)
+			{
+				float ux = (float)i * num;
+				float uy = (float)j * num2;
+				Mesh item = CreateQuad(num3, num4, ux, uy, num, num2);
+				list.Add(item);
+			}
+		}
+		return list;
+	}
+
+	public Mesh CreateQuad(int numVertsX, int numVertsY, float ux, float uy, float w, float h)
+	{
+		Vector3[] array = new Vector3[numVertsX * numVertsY];
+		Vector2[] array2 = new Vector2[numVertsX * numVertsY];
+		int[] array3 = new int[numVertsX * numVertsY * 6];
+		float num = 0.1f;
+		for (int i = 0; i < numVertsX; i++)
+		{
+			for (int j = 0; j < numVertsY; j++)
+			{
+				Vector2 vector = new Vector3((float)i / (float)(numVertsX - 1), (float)j / (float)(numVertsY - 1));
+				vector.x *= w;
+				vector.x += ux;
+				vector.y *= h;
+				vector.y += uy;
+				if (!Ocean.DISABLE_PROJECTED_GRID_BORDER)
+				{
+					vector.x = vector.x * (1f + num * 2f) - num;
+					vector.y = vector.y * (1f + num * 2f) - num;
+					Vector2 vector2 = vector;
+					vector2.x = Mathf.Clamp01(vector2.x);
+					vector2.y = Mathf.Clamp01(vector2.y);
+					Vector2 vector3 = vector;
+					if (vector3.x < 0f)
+					{
+						vector3.x = Mathf.Abs(vector3.x) / num;
+					}
+					else if (vector3.x > 1f)
+					{
+						vector3.x = Mathf.Max(0f, vector3.x - 1f) / num;
+					}
+					else
+					{
+						vector3.x = 0f;
+					}
+					if (vector3.y < 0f)
+					{
+						vector3.y = Mathf.Abs(vector3.y) / num;
+					}
+					else if (vector3.y > 1f)
+					{
+						vector3.y = Mathf.Max(0f, vector3.y - 1f) / num;
+					}
+					else
+					{
+						vector3.y = 0f;
+					}
+					vector3.x = Mathf.Pow(vector3.x, 2f);
+					vector3.y = Mathf.Pow(vector3.y, 2f);
+					array2[i + j * numVertsX] = vector3;
+					array[i + j * numVertsX] = new Vector3(vector2.x, vector2.y, 0f);
+				}
+				else
+				{
+					array2[i + j * numVertsX] = new Vector2(0f, 0f);
+					array[i + j * numVertsX] = new Vector3(vector.x, vector.y, 0f);
+				}
+			}
+		}
+		int num2 = 0;
+		for (int k = 0; k < numVertsX - 1; k++)
+		{
+			for (int l = 0; l < numVertsY - 1; l++)
+			{
+				array3[num2++] = k + l * numVertsX;
+				array3[num2++] = k + (l + 1) * numVertsX;
+				array3[num2++] = k + 1 + l * numVertsX;
+				array3[num2++] = k + (l + 1) * numVertsX;
+				array3[num2++] = k + 1 + (l + 1) * numVertsX;
+				array3[num2++] = k + 1 + l * numVertsX;
+			}
+		}
+		return new Mesh
+		{
+			vertices = array,
+			uv = array2,
+			triangles = array3,
+			name = "Ceto Projected Grid Mesh",
+			hideFlags = HideFlags.HideAndDontSave
+		};
+	}
+}
+
+
+==================== Ceto_Ocean.cs ====================
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Ceto.Common.Threading.Scheduling;
+using Ceto.Common.Unity.Utility;
+using UnityEngine;
+
+namespace Ceto;
+
+[AddComponentMenu("Ceto/Components/Ocean")]
+[DisallowMultipleComponent]
+public class Ocean : MonoBehaviour, ICoroutine
+{
+	public static readonly bool DISABLE_FOURIER_MULTITHREADING = false;
+
+	public static readonly bool DISABLE_PROJECTED_GRID_BORDER = false;
+
+	public static bool DISABLE_ALL_MULTITHREADING = false;
+
+	public static readonly bool DISABLE_PROJECTION_FLIPPING = true;
+
+	public static readonly bool DISABLE_PROJECT_SCENE_VIEW = false;
+
+	public static readonly string VERSION = "1.1.3";
+
+	public static string OCEAN_LAYER = "Water";
+
+	public static readonly string REFLECTION_TEXTURE_NAME0 = "Ceto_Reflections0";
+
+	public static readonly string REFLECTION_TEXTURE_NAME1 = "Ceto_Reflections1";
+
+	public static readonly string REFRACTION_GRAB_TEXTURE_NAME = "Ceto_RefractionGrab";
+
+	public static readonly string DEPTH_GRAB_TEXTURE_NAME = "Ceto_DepthBuffer";
+
+	public static readonly string OCEAN_DEPTH_TEXTURE_NAME0 = "Ceto_OceanDepth0";
+
+	public static readonly string OCEAN_DEPTH_TEXTURE_NAME1 = "Ceto_OceanDepth1";
+
+	public static readonly string OCEAN_MASK_TEXTURE_NAME0 = "Ceto_OceanMask0";
+
+	public static readonly string OCEAN_MASK_TEXTURE_NAME1 = "Ceto_OceanMask1";
+
+	public static readonly string NORMAL_FADE_TEXTURE_NAME = "Ceto_NormalFade";
+
+	public const float MAX_SPECTRUM_WAVE_HEIGHT = 40f;
+
+	public const float MAX_OVERLAY_WAVE_HEIGHT = 20f;
+
+	public bool disableWarnings;
+
+	public bool disableInfo;
+
+	public bool doublePrecisionProjection = true;
+
+	public bool tightProjectionFit = true;
+
+	public GameObject m_sun;
+
+	public float level;
+
+	public OVERLAY_MAP_SIZE heightOverlaySize = OVERLAY_MAP_SIZE.HALF;
+
+	public OVERLAY_MAP_SIZE normalOverlaySize = OVERLAY_MAP_SIZE.FULL;
+
+	public OVERLAY_MAP_SIZE foamOverlaySize = OVERLAY_MAP_SIZE.FULL;
+
+	public OVERLAY_MAP_SIZE clipOverlaySize = OVERLAY_MAP_SIZE.HALF;
+
+	public OVERLAY_BLEND_MODE heightBlendMode;
+
+	public OVERLAY_BLEND_MODE foamBlendMode;
+
+	public Color defaultSkyColor = new Color32(96, 147, 210, byte.MaxValue);
+
+	public Color defaultOceanColor = new Color32(0, 19, 30, byte.MaxValue);
+
+	[Range(0f, 360f)]
+	public float windDir;
+
+	[Range(0f, 1f)]
+	public float specularRoughness = 0.2f;
+
+	[Range(0f, 1f)]
+	public float specularIntensity = 0.2f;
+
+	[Range(0f, 10f)]
+	public float fresnelPower = 5f;
+
+	[Range(0f, 1f)]
+	public float minFresnel = 0.02f;
+
+	public Color foamTint = Color.white;
+
+	[Range(0f, 3f)]
+	public float foamIntensity = 1f;
+
+	public FoamTexture foamTexture0;
+
+	public FoamTexture foamTexture1;
+
+	[HideInInspector]
+	public Shader waveOverlaySdr;
+
+	private Vector3 m_positionOffset;
+
+	private Dictionary<Camera, CameraData> m_cameraData = new Dictionary<Camera, CameraData>();
+
+	private Material m_waveOverlayMat;
+
+	private Scheduler m_scheduler;
+
+	private WaveQuery m_query = new WaveQuery(0f, 0f);
+
+	public static Ocean Instance { get; private set; }
+
+	public static float MAX_WAVE_HEIGHT => 60f;
+
+	public Vector3 WindDirVector { get; private set; }
+
+	public ProjectedGrid Grid { get; set; }
+
+	public PlanarReflection Reflection { get; set; }
+
+	public WaveSpectrum Spectrum { get; set; }
+
+	public UnderWater UnderWater { get; set; }
+
+	public IOceanTime OceanTime { get; set; }
+
+	public IProjection Projection { get; private set; }
+
+	public Vector3 PositionOffset
+	{
+		get
+		{
+			return m_positionOffset;
+		}
+		set
+		{
+			m_positionOffset = value;
+			Shader.SetGlobalVector("Ceto_PosOffset", m_positionOffset);
+		}
+	}
+
+	public int CameraCount => m_cameraData.Count;
+
+	public OverlayManager OverlayManager { get; private set; }
+
+	public bool WasError { get; private set; }
+
+	private void Awake()
+	{
+		try
+		{
+			if (Instance != null)
+			{
+				throw new InvalidOperationException("There can only be one ocean instance.");
+			}
+			Instance = this;
+			if (DISABLE_ALL_MULTITHREADING)
+			{
+				LogInfo("Disabled multithreading is on");
+			}
+			if (DISABLE_FOURIER_MULTITHREADING)
+			{
+				LogInfo("Disabled Fourier multithreading is on");
+			}
+			if (DISABLE_PROJECTED_GRID_BORDER)
+			{
+				LogInfo("Disabled projection border is on");
+			}
+			if (DISABLE_PROJECTION_FLIPPING)
+			{
+				LogInfo("Disabled flipping is on");
+			}
+			if (DISABLE_PROJECT_SCENE_VIEW)
+			{
+				LogInfo("Disabled project scene is on");
+			}
+			WindDirVector = CalculateWindDirVector();
+			if (doublePrecisionProjection)
+			{
+				Projection = new Projection3d(this);
+			}
+			else
+			{
+				Projection = new Projection3f(this);
+			}
+			OceanTime = new OceanTime();
+			m_waveOverlayMat = new Material(waveOverlaySdr);
+			OverlayManager = new OverlayManager(m_waveOverlayMat);
+			m_scheduler = new Scheduler(100, 100, this);
+		}
+		catch (Exception ex)
+		{
+			LogError(ex.ToString());
+			DisableOcean();
+		}
+	}
+
+	private void Start()
+	{
+		try
+		{
+			Matrix4x4 identity = Matrix4x4.identity;
+			identity.m00 = 2f;
+			identity.m03 = -1f;
+			identity.m11 = 2f;
+			identity.m13 = -1f;
+			for (int i = 0; i < 4; i++)
+			{
+				identity[1, i] = 0f - identity[1, i];
+			}
+			Shader.SetGlobalMatrix("Ceto_T2S", identity);
+			Shader.SetGlobalTexture("Ceto_Overlay_NormalMap", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_Overlay_HeightMap", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_Overlay_FoamMap", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_Overlay_ClipMap", Texture2D.blackTexture);
+			Shader.SetGlobalTexture(REFRACTION_GRAB_TEXTURE_NAME, Texture2D.blackTexture);
+			Shader.SetGlobalTexture(DEPTH_GRAB_TEXTURE_NAME, Texture2D.whiteTexture);
+			Shader.SetGlobalTexture(OCEAN_MASK_TEXTURE_NAME0, Texture2D.blackTexture);
+			Shader.SetGlobalTexture(OCEAN_MASK_TEXTURE_NAME1, Texture2D.blackTexture);
+			Shader.SetGlobalTexture(OCEAN_DEPTH_TEXTURE_NAME0, Texture2D.blackTexture);
+			Shader.SetGlobalTexture(OCEAN_DEPTH_TEXTURE_NAME1, Texture2D.blackTexture);
+			Shader.SetGlobalTexture(NORMAL_FADE_TEXTURE_NAME, Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_FoamMap1", Texture2D.blackTexture);
+			Shader.SetGlobalVector("Ceto_GridSizes", Vector4.one);
+			Shader.SetGlobalVector("Ceto_GridScale", Vector4.one);
+			Shader.SetGlobalVector("Ceto_Choppyness", Vector4.one);
+			Shader.SetGlobalFloat("Ceto_MapSize", 1f);
+			Shader.SetGlobalColor("Ceto_FoamTint", Color.white);
+			Shader.SetGlobalTexture("Ceto_FoamTexture0", Texture2D.whiteTexture);
+			Shader.SetGlobalTexture("Ceto_FoamTexture1", Texture2D.whiteTexture);
+			Shader.SetGlobalVector("Ceto_FoamTextureScale0", Vector4.one);
+			Shader.SetGlobalVector("Ceto_FoamTextureScale1", Vector4.one);
+			Shader.SetGlobalFloat("Ceto_MaxWaveHeight", 40f);
+			Shader.SetGlobalVector("Ceto_PosOffset", Vector3.zero);
+			Shader.SetGlobalTexture("Ceto_CausticTexture", Texture2D.blackTexture);
+			Shader.SetGlobalVector("Ceto_CausticTextureScale", new Vector4(1f, 1f, 0f, 0f));
+			Shader.SetGlobalColor("Ceto_CausticTint", Color.white);
+			Shader.SetGlobalFloat("Ceto_Stero_Enabled", 0f);
+		}
+		catch (Exception ex)
+		{
+			LogError(ex.ToString());
+			DisableOcean();
+		}
+	}
+
+	private void OnEnable()
+	{
+		if (WasError)
+		{
+			DisableOcean();
+		}
+		Camera.onPostRender = (Camera.CameraCallback)Delegate.Combine(Camera.onPostRender, new Camera.CameraCallback(OceanOnPostRender));
+	}
+
+	private void OnDisable()
+	{
+		if (!WasError)
+		{
+			enabled = true;
+		}
+		Camera.onPostRender = (Camera.CameraCallback)Delegate.Remove(Camera.onPostRender, new Camera.CameraCallback(OceanOnPostRender));
+	}
+
+	private void DisableOcean()
+	{
+		WasError = true;
+		enabled = false;
+		gameObject.AddComponent<DisableGameObject>();
+	}
+
+	private void Update()
+	{
+		try
+		{
+			WindDirVector = CalculateWindDirVector();
+			Projection.TightFit = tightProjectionFit;
+			UpdateOceanScheduler();
+			OverlayManager.Update();
+			specularRoughness = Mathf.Clamp01(specularRoughness);
+			specularIntensity = Mathf.Max(0f, specularIntensity);
+			minFresnel = Mathf.Clamp01(minFresnel);
+			fresnelPower = Mathf.Max(0f, fresnelPower);
+			foamIntensity = Math.Max(0f, foamIntensity);
+			float value = Mathf.Lerp(2E-05f, 0.02f, specularRoughness);
+			Shader.SetGlobalColor("Ceto_DefaultSkyColor", defaultSkyColor);
+			Shader.SetGlobalColor("Ceto_DefaultOceanColor", defaultOceanColor);
+			Shader.SetGlobalFloat("Ceto_SpecularRoughness", value);
+			Shader.SetGlobalFloat("Ceto_FresnelPower", fresnelPower);
+			Shader.SetGlobalFloat("Ceto_SpecularIntensity", specularIntensity);
+			Shader.SetGlobalFloat("Ceto_MinFresnel", minFresnel);
+			Shader.SetGlobalFloat("Ceto_OceanLevel", level);
+			Shader.SetGlobalFloat("Ceto_MaxWaveHeight", 40f);
+			Shader.SetGlobalColor("Ceto_FoamTint", foamTint * foamIntensity);
+			Shader.SetGlobalVector("Ceto_SunDir", SunDir());
+			Shader.SetGlobalVector("Ceto_SunColor", SunColor());
+			Vector4 value2 = new Vector4
+			{
+				x = ((foamTexture0.scale.x != 0f) ? (1f / foamTexture0.scale.x) : 1f),
+				y = ((foamTexture0.scale.y != 0f) ? (1f / foamTexture0.scale.y) : 1f),
+				z = foamTexture0.scrollSpeed * OceanTime.Now,
+				w = 0f
+			};
+			Vector4 value3 = new Vector4
+			{
+				x = ((foamTexture1.scale.x != 0f) ? (1f / foamTexture1.scale.x) : 1f),
+				y = ((foamTexture1.scale.y != 0f) ? (1f / foamTexture1.scale.y) : 1f),
+				z = foamTexture1.scrollSpeed * OceanTime.Now,
+				w = 0f
+			};
+			Shader.SetGlobalTexture("Ceto_FoamTexture0", (foamTexture0.tex != null) ? foamTexture0.tex : Texture2D.whiteTexture);
+			Shader.SetGlobalVector("Ceto_FoamTextureScale0", value2);
+			Shader.SetGlobalTexture("Ceto_FoamTexture1", (foamTexture1.tex != null) ? foamTexture1.tex : Texture2D.whiteTexture);
+			Shader.SetGlobalVector("Ceto_FoamTextureScale1", value3);
+			Dictionary<Camera, CameraData>.Enumerator enumerator = m_cameraData.GetEnumerator();
+			while (enumerator.MoveNext())
+			{
+				CameraData value4 = enumerator.Current.Value;
+				if (value4.mask != null)
+				{
+					value4.mask.ClearUpdatedViews();
+				}
+				if (value4.depth != null)
+				{
+					value4.depth.ClearUpdatedViews();
+				}
+				if (value4.overlay != null)
+				{
+					value4.overlay.ClearUpdatedViews();
+				}
+				if (value4.reflection != null)
+				{
+					value4.reflection.ClearUpdatedViews();
+				}
+				if (value4.projection != null)
+				{
+					value4.projection.ClearUpdatedViews();
+					value4.projection.checkedForFlipping = false;
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			LogError(ex.ToString());
+			DisableOcean();
+		}
+	}
+
+	private void OnDestroy()
+	{
+		try
+		{
+			Instance = null;
+			if (OverlayManager != null)
+			{
+				OverlayManager.Release();
+			}
+			if (m_scheduler != null)
+			{
+				m_scheduler.ShutingDown = true;
+				m_scheduler.CancelAllTasks();
+			}
+			foreach (Camera item in new List<Camera>(m_cameraData.Keys))
+			{
+				RemoveCameraData(item);
+			}
+		}
+		catch (Exception ex)
+		{
+			LogError(ex.ToString());
+			DisableOcean();
+		}
+	}
+
+	private void OnDrawGizmos()
+	{
+	}
+
+	public void Register(OceanComponent component)
+	{
+		if (component is ProjectedGrid)
+		{
+			Grid = component as ProjectedGrid;
+			return;
+		}
+		if (component is WaveSpectrum)
+		{
+			Spectrum = component as WaveSpectrum;
+			return;
+		}
+		if (component is PlanarReflection)
+		{
+			Reflection = component as PlanarReflection;
+			return;
+		}
+		if (component is UnderWater)
+		{
+			UnderWater = component as UnderWater;
+			return;
+		}
+		throw new InvalidCastException("Could not cast ocean component " + component.GetType());
+	}
+
+	public void Deregister(OceanComponent component)
+	{
+		if (component is ProjectedGrid)
+		{
+			Grid = null;
+			return;
+		}
+		if (component is WaveSpectrum)
+		{
+			Spectrum = null;
+			return;
+		}
+		if (component is PlanarReflection)
+		{
+			Reflection = null;
+			return;
+		}
+		if (component is UnderWater)
+		{
+			UnderWater = null;
+			return;
+		}
+		throw new InvalidCastException("Could not cast ocean component " + component.GetType());
+	}
+
+	public static void LogError(string msg)
+	{
+		Debug.Log("<color=red>Ceto (" + VERSION + ") Error:</color> " + msg);
+	}
+
+	public static void LogWarning(string msg)
+	{
+		if (!(Instance != null) || !Instance.disableWarnings)
+		{
+			Debug.Log("<color=yellow>Ceto (" + VERSION + ") Warning:</color> " + msg);
+		}
+	}
+
+	public static void LogInfo(string msg)
+	{
+		if (!(Instance != null) || !Instance.disableInfo)
+		{
+			Debug.Log("<color=cyan>Ceto (" + VERSION + ") Info:</color> " + msg);
+		}
+	}
+
+	public void RunCoroutine(IEnumerator e)
+	{
+		StartCoroutine(e);
+	}
+
+	private void UpdateOceanScheduler()
+	{
+		try
+		{
+			if (m_scheduler != null)
+			{
+				m_scheduler.DisableMultithreading = DISABLE_ALL_MULTITHREADING;
+				m_scheduler.CheckForException();
+				m_scheduler.Update();
+			}
+		}
+		catch (Exception ex)
+		{
+			LogError(ex.ToString());
+			DisableOcean();
+		}
+	}
+
+	public Vector3 CalculateWindDirVector()
+	{
+		float f = windDir * MathF.PI / 180f;
+		float x = 0f - Mathf.Cos(f);
+		float z = Mathf.Sin(f);
+		return new Vector3(x, 0f, z).normalized;
+	}
+
+	public Vector3 SunDir()
+	{
+		if (m_sun == null || m_sun.GetComponent<Light>() == null)
+		{
+			return Vector3.up;
+		}
+		return m_sun.transform.forward * -1f;
+	}
+
+	public Color SunColor()
+	{
+		if (m_sun == null || m_sun.GetComponent<Light>() == null)
+		{
+			return Color.white;
+		}
+		return m_sun.GetComponent<Light>().color;
+	}
+
+	public CameraData FindCameraData(Camera cam)
+	{
+		if (cam == null)
+		{
+			throw new InvalidOperationException("Can not find camera data for null camera");
+		}
+		CameraData value = null;
+		if (!m_cameraData.TryGetValue(cam, out value))
+		{
+			value = new CameraData();
+			m_cameraData.Add(cam, value);
+		}
+		if (value.settings == null && !value.checkedForSettings)
+		{
+			value.settings = cam.GetComponent<OceanCameraSettings>();
+			value.checkedForSettings = true;
+		}
+		return value;
+	}
+
+	public void RemoveCameraData(Camera cam)
+	{
+		if (m_cameraData.ContainsKey(cam))
+		{
+			CameraData cameraData = m_cameraData[cam];
+			if (cameraData.overlay != null)
+			{
+				OverlayManager.DestroyBuffers(cameraData.overlay);
+			}
+			if (cameraData.reflection != null)
+			{
+				cameraData.reflection.DestroyTargets();
+				cameraData.reflection.DestroyCamera();
+			}
+			if (cameraData.depth != null)
+			{
+				cameraData.depth.DestroyTargets();
+				cameraData.depth.DestroyCamera();
+			}
+			if (cameraData.mask != null)
+			{
+				cameraData.mask.DestroyTargets();
+				cameraData.mask.DestroyCamera();
+			}
+			m_cameraData.Remove(cam);
+		}
+	}
+
+	public float FindMaxDisplacement(bool inculdeOverlays)
+	{
+		float num = 0f;
+		if (!enabled)
+		{
+			return num;
+		}
+		if (Spectrum != null && Spectrum.enabled)
+		{
+			num += Spectrum.MaxDisplacement.y;
+		}
+		if (inculdeOverlays && OverlayManager != null)
+		{
+			num += OverlayManager.MaxDisplacement;
+		}
+		return Mathf.Max(0f, num);
+	}
+
+	public void SetQueryWavesSampling(bool overlays, bool grid0, bool grid1, bool grid2, bool grid3)
+	{
+		m_query.sampleOverlay = overlays;
+		m_query.sampleSpectrum[0] = grid0;
+		m_query.sampleSpectrum[1] = grid1;
+		m_query.sampleSpectrum[2] = grid2;
+		m_query.sampleSpectrum[3] = grid3;
+	}
+
+	public Vector3 QueryNormal(float x, float z)
+	{
+		float num = 0.5f;
+		float num2 = QueryWaves(x - num, z);
+		float num3 = QueryWaves(x, z - num);
+		float num4 = QueryWaves(x + num, z);
+		float num5 = QueryWaves(x, z + num);
+		float num6 = num2 - num4;
+		float num7 = num3 - num5;
+		return new Vector3(num6, Mathf.Sqrt(1f - num6 * num6 - num7 * num7), num7);
+	}
+
+	public float QueryWaves(float x, float z)
+	{
+		m_query.result.Clear();
+		m_query.posX = x;
+		m_query.posZ = z;
+		if (enabled)
+		{
+			if (Spectrum != null)
+			{
+				Spectrum.QueryWaves(m_query);
+			}
+			if (OverlayManager != null)
+			{
+				OverlayManager.QueryWaves(m_query);
+			}
+		}
+		return m_query.result.height + level;
+	}
+
+	public float QueryWaves(float x, float z, out bool isClipped)
+	{
+		m_query.result.Clear();
+		m_query.posX = x;
+		m_query.posZ = z;
+		if (enabled)
+		{
+			if (Spectrum != null)
+			{
+				Spectrum.QueryWaves(m_query);
+			}
+			if (OverlayManager != null)
+			{
+				OverlayManager.QueryWaves(m_query);
+			}
+		}
+		isClipped = m_query.result.isClipped;
+		return m_query.result.height + level;
+	}
+
+	public void QueryWaves(WaveQuery query)
+	{
+		query.result.Clear();
+		if (enabled)
+		{
+			if (Spectrum != null)
+			{
+				Spectrum.QueryWaves(query);
+			}
+			if (OverlayManager != null)
+			{
+				OverlayManager.QueryWaves(query);
+			}
+		}
+		query.result.height += level;
+	}
+
+	public void QueryWaves(IEnumerable<WaveQuery> querys)
+	{
+		foreach (WaveQuery query in querys)
+		{
+			query.result.Clear();
+			if (enabled)
+			{
+				if (Spectrum != null)
+				{
+					Spectrum.QueryWaves(query);
+				}
+				if (OverlayManager != null)
+				{
+					OverlayManager.QueryWaves(query);
+				}
+			}
+			query.result.height += level;
+		}
+	}
+
+	public void QueryWavesWithAsyncTask(WaveQueryTask task)
+	{
+		if (task != null && m_scheduler != null && (!task.IsScheduled || task.Done) && enabled)
+		{
+			task.Reset(Spectrum, PositionOffset, level);
+			if (task.SupportsOverlays)
+			{
+				task.OverlaySampler = OverlayManager;
+			}
+			else
+			{
+				task.OverlaySampler = null;
+			}
+			task.IsScheduled = true;
+			m_scheduler.Run(task);
+		}
+	}
+
+	private void OceanOnPreRender(Camera cam)
+	{
+		if (cam.enabled)
+		{
+			CameraData data = FindCameraData(cam);
+			if (Grid != null)
+			{
+				Grid.OceanOnPreRender(cam, data);
+			}
+			if (Spectrum != null)
+			{
+				Spectrum.OceanOnPreRender(cam, data);
+			}
+			if (Reflection != null)
+			{
+				Reflection.OceanOnPreRender(cam, data);
+			}
+			if (UnderWater != null)
+			{
+				UnderWater.OceanOnPreRender(cam, data);
+			}
+		}
+	}
+
+	private void OceanOnPreCull(Camera cam)
+	{
+		if (cam.enabled)
+		{
+			CameraData data = FindCameraData(cam);
+			if (Grid != null)
+			{
+				Grid.OceanOnPreCull(cam, data);
+			}
+			if (Spectrum != null)
+			{
+				Spectrum.OceanOnPreCull(cam, data);
+			}
+			if (Reflection != null)
+			{
+				Reflection.OceanOnPreCull(cam, data);
+			}
+			if (UnderWater != null)
+			{
+				UnderWater.OceanOnPreCull(cam, data);
+			}
+		}
+	}
+
+	private void OceanOnPostRender(Camera cam)
+	{
+		if (cam.enabled)
+		{
+			CameraData data = FindCameraData(cam);
+			if (Grid != null)
+			{
+				Grid.OceanOnPostRender(cam, data);
+			}
+			if (Spectrum != null)
+			{
+				Spectrum.OceanOnPostRender(cam, data);
+			}
+			if (Reflection != null)
+			{
+				Reflection.OceanOnPostRender(cam, data);
+			}
+			if (UnderWater != null)
+			{
+				UnderWater.OceanOnPostRender(cam, data);
+			}
+		}
+	}
+
+	private bool GetDisableAllOverlays(OceanCameraSettings settings)
+	{
+		if (!(settings != null))
+		{
+			return false;
+		}
+		return settings.disableAllOverlays;
+	}
+
+	public void RenderWaveOverlays(GameObject go)
+	{
+		try
+		{
+			if (!enabled)
+			{
+				return;
+			}
+			Camera current = Camera.current;
+			if (!m_cameraData.ContainsKey(current))
+			{
+				m_cameraData.Add(current, new CameraData());
+			}
+			CameraData cameraData = m_cameraData[current];
+			if (cameraData.overlay == null)
+			{
+				cameraData.overlay = new WaveOverlayData();
+			}
+			if (cameraData.projection == null)
+			{
+				cameraData.projection = new ProjectionData();
+			}
+			if (!cameraData.overlay.IsViewUpdated(current))
+			{
+				if (!cameraData.projection.IsViewUpdated(current))
+				{
+					Projection.UpdateProjection(current, cameraData);
+					Shader.SetGlobalMatrix("Ceto_Interpolation", cameraData.projection.interpolation);
+					Shader.SetGlobalMatrix("Ceto_ProjectorVP", cameraData.projection.projectorVP);
+				}
+				if (GetDisableAllOverlays(cameraData.settings))
+				{
+					OverlayManager.DestroyBuffers(cameraData.overlay);
+					Shader.SetGlobalTexture("Ceto_Overlay_NormalMap", Texture2D.blackTexture);
+					Shader.SetGlobalTexture("Ceto_Overlay_HeightMap", Texture2D.blackTexture);
+					Shader.SetGlobalTexture("Ceto_Overlay_FoamMap", Texture2D.blackTexture);
+					Shader.SetGlobalTexture("Ceto_Overlay_ClipMap", Texture2D.blackTexture);
+				}
+				else
+				{
+					OVERLAY_MAP_SIZE oVERLAY_MAP_SIZE = ((cameraData.settings != null) ? cameraData.settings.normalOverlaySize : normalOverlaySize);
+					OVERLAY_MAP_SIZE oVERLAY_MAP_SIZE2 = ((cameraData.settings != null) ? cameraData.settings.heightOverlaySize : heightOverlaySize);
+					OVERLAY_MAP_SIZE oVERLAY_MAP_SIZE3 = ((cameraData.settings != null) ? cameraData.settings.foamOverlaySize : foamOverlaySize);
+					OVERLAY_MAP_SIZE oVERLAY_MAP_SIZE4 = ((cameraData.settings != null) ? cameraData.settings.clipOverlaySize : clipOverlaySize);
+					OverlayManager.CreateOverlays(current, cameraData.overlay, oVERLAY_MAP_SIZE, oVERLAY_MAP_SIZE2, oVERLAY_MAP_SIZE3, oVERLAY_MAP_SIZE4);
+					OverlayManager.HeightOverlayBlendMode = heightBlendMode;
+					OverlayManager.FoamOverlayBlendMode = foamBlendMode;
+					OverlayManager.RenderWaveOverlays(current, cameraData.overlay);
+				}
+				cameraData.overlay.SetViewAsUpdated(current);
+			}
+		}
+		catch (Exception ex)
+		{
+			LogError(ex.ToString());
+			DisableOcean();
+		}
+	}
+
+	public void RenderReflection(GameObject go)
+	{
+		if (enabled && !(Reflection == null))
+		{
+			Reflection.RenderReflection(go);
+		}
+	}
+
+	public void RenderOceanMask(GameObject go)
+	{
+		if (enabled && !(UnderWater == null))
+		{
+			UnderWater.RenderOceanMask(go);
+		}
+	}
+
+	public void RenderOceanDepth(GameObject go)
+	{
+		if (enabled && !(UnderWater == null))
+		{
+			UnderWater.RenderOceanDepth(go);
+		}
+	}
+}
+
+
+==================== Ceto_WaveSpectrum.cs ====================
+using System;
+using System.Collections.Generic;
+using Ceto.Common.Containers.Interpolation;
+using Ceto.Common.Containers.Queues;
+using Ceto.Common.Threading.Scheduling;
+using Ceto.Common.Threading.Tasks;
+using Ceto.Common.Unity.Utility;
+using UnityEngine;
+
+namespace Ceto;
+
+[AddComponentMenu("Ceto/Components/WaveSpectrum")]
+[DisallowMultipleComponent]
+[RequireComponent(typeof(Ocean))]
+public class WaveSpectrum : OceanComponent
+{
+	private struct BufferSettings
+	{
+		public bool beenCreated;
+
+		public bool isCpu;
+
+		public int size;
+	}
+
+	public const float MAX_CHOPPYNESS = 1.2f;
+
+	public const float MAX_FOAM_AMOUNT = 6f;
+
+	public const float MAX_FOAM_COVERAGE = 0.5f;
+
+	public const float MAX_WIND_SPEED = 30f;
+
+	public const float MIN_WAVE_AGE = 0.5f;
+
+	public const float MAX_WAVE_AGE = 1f;
+
+	public const float MAX_WAVE_SPEED = 10f;
+
+	public const float MIN_GRID_SCALE = 0.1f;
+
+	public const float MAX_GRID_SCALE = 1f;
+
+	public const float MAX_WAVE_SMOOTHING = 6f;
+
+	public const float MIN_WAVE_SMOOTHING = 1f;
+
+	public const float MAX_SLOPE_SMOOTHING = 6f;
+
+	public const float MIN_SLOPE_SMOOTHING = 1f;
+
+	public const float MAX_FOAM_SMOOTHING = 6f;
+
+	public const float MIN_FOAM_SMOOTHING = 1f;
+
+	public FOURIER_SIZE fourierSize = FOURIER_SIZE.MEDIUM_64_CPU;
+
+	public SPECTRUM_TYPE spectrumType;
+
+	[Range(1f, 4f)]
+	public int numberOfGrids = 4;
+
+	public bool disableReadBack = true;
+
+	public bool disableDisplacements;
+
+	public bool disableSlopes;
+
+	public bool disableFoam;
+
+	public bool textureFoam = true;
+
+	[Range(0f, 1.2f)]
+	public float choppyness = 0.8f;
+
+	[Range(0f, 6f)]
+	public float foamAmount = 1f;
+
+	[Range(0f, 0.5f)]
+	public float foamCoverage = 0.1f;
+
+	[Range(0f, 30f)]
+	public float windSpeed = 8f;
+
+	[Range(0.5f, 1f)]
+	public float waveAge = 0.64f;
+
+	[Range(0f, 10f)]
+	public float waveSpeed = 1f;
+
+	[Range(0.1f, 1f)]
+	public float gridScale = 0.5f;
+
+	[Range(1f, 6f)]
+	public float waveSmoothing = 2f;
+
+	[Range(1f, 6f)]
+	private float slopeSmoothing = 1f;
+
+	[Range(1f, 6f)]
+	private float foamSmoothing = 2f;
+
+	private RenderTexture[] m_displacementMaps;
+
+	private RenderTexture[] m_slopeMaps;
+
+	private RenderTexture[] m_foamMaps;
+
+	private Material m_slopeCopyMat;
+
+	private Material m_displacementCopyMat;
+
+	private Material m_foamCopyMat;
+
+	private Material m_slopeInitMat;
+
+	private Material m_displacementInitMat;
+
+	private Material m_foamInitMat;
+
+	private Vector4 m_gridSizes = Vector4.one;
+
+	private Vector4 m_choppyness = Vector4.one;
+
+	private Scheduler m_scheduler;
+
+	private WaveSpectrumCondition[] m_conditions;
+
+	private WaveSpectrumBuffer m_displacementBuffer;
+
+	private WaveSpectrumBuffer m_slopeBuffer;
+
+	private WaveSpectrumBuffer m_jacobianBuffer;
+
+	private FindRangeTask m_findRangeTask;
+
+	private ComputeBuffer m_readBuffer;
+
+	private QueryGridScaling m_queryScaling = new QueryGridScaling();
+
+	private BufferSettings m_bufferSettings;
+
+	private DictionaryQueue<WaveSpectrumConditionKey, WaveSpectrumCondition> m_conditionCache = new DictionaryQueue<WaveSpectrumConditionKey, WaveSpectrumCondition>();
+
+	private int m_maxConditionCacheSize = 10;
+
+	[HideInInspector]
+	public Shader initSlopeSdr;
+
+	[HideInInspector]
+	public Shader initDisplacementSdr;
+
+	[HideInInspector]
+	public Shader initJacobianSdr;
+
+	[HideInInspector]
+	public Shader fourierSdr;
+
+	[HideInInspector]
+	public Shader slopeCopySdr;
+
+	[HideInInspector]
+	public Shader displacementCopySdr;
+
+	[HideInInspector]
+	public Shader foamCopySdr;
+
+	[HideInInspector]
+	public ComputeShader readSdr;
+
+	public IList<RenderTexture> DisplacementMaps => m_displacementMaps;
+
+	public IList<RenderTexture> SlopeMaps => m_slopeMaps;
+
+	public IList<RenderTexture> FoamMaps => m_foamMaps;
+
+	public Vector2 MaxDisplacement { get; set; }
+
+	public bool IsCreatingNewCondition
+	{
+		get
+		{
+			if (m_conditions != null)
+			{
+				return m_conditions[1] != null;
+			}
+			return false;
+		}
+	}
+
+	public Vector4 GridSizes => m_gridSizes;
+
+	public Vector4 Choppyness => m_choppyness;
+
+	public int MaxConditionCacheSize
+	{
+		get
+		{
+			return m_maxConditionCacheSize;
+		}
+		set
+		{
+			m_maxConditionCacheSize = value;
+		}
+	}
+
+	public IDisplacementBuffer DisplacementBuffer => m_displacementBuffer as IDisplacementBuffer;
+
+	public ICustomWaveSpectrum CustomWaveSpectrum { get; set; }
+
+	private void Start()
+	{
+		try
+		{
+			Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
+			m_slopeCopyMat = new Material(slopeCopySdr);
+			m_displacementCopyMat = new Material(displacementCopySdr);
+			m_foamCopyMat = new Material(foamCopySdr);
+			m_slopeInitMat = new Material(initSlopeSdr);
+			m_displacementInitMat = new Material(initDisplacementSdr);
+			m_foamInitMat = new Material(initJacobianSdr);
+			m_scheduler = new Scheduler();
+			CreateBuffers();
+			CreateRenderTextures();
+			CreateConditions();
+			UpdateQueryScaling();
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	protected override void OnDisable()
+	{
+		base.OnDisable();
+		Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+		Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+		Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+		Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+		Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+		Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+		Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+		Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
+	}
+
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+		try
+		{
+			if (m_scheduler != null)
+			{
+				m_scheduler.ShutingDown = true;
+				m_scheduler.CancelAllTasks();
+			}
+			if (m_conditionCache != null)
+			{
+				foreach (WaveSpectrumCondition item in m_conditionCache)
+				{
+					item.Release();
+				}
+				m_conditionCache.Clear();
+				m_conditionCache = null;
+			}
+			Release();
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	private void Release()
+	{
+		if (m_displacementBuffer != null)
+		{
+			m_displacementBuffer.Release();
+			m_displacementBuffer = null;
+		}
+		if (m_slopeBuffer != null)
+		{
+			m_slopeBuffer.Release();
+			m_slopeBuffer = null;
+		}
+		if (m_jacobianBuffer != null)
+		{
+			m_jacobianBuffer.Release();
+			m_jacobianBuffer = null;
+		}
+		if (m_readBuffer != null)
+		{
+			m_readBuffer.Release();
+			m_readBuffer = null;
+		}
+		if (m_conditions != null && m_conditions[0] != null && m_conditions[0].Done)
+		{
+			CacheCondition(m_conditions[0]);
+			if (m_conditionCache == null || !m_conditionCache.ContainsKey(m_conditions[0].Key))
+			{
+				m_conditions[0].Release();
+				m_conditions[0] = null;
+			}
+		}
+		if (m_conditions != null && m_conditions[1] != null && m_conditions[1].Done && (m_conditionCache == null || !m_conditionCache.ContainsKey(m_conditions[1].Key)))
+		{
+			m_conditions[1].Release();
+			m_conditions[1] = null;
+		}
+		m_conditions = null;
+		m_findRangeTask = null;
+		RTUtility.ReleaseAndDestroy(m_displacementMaps);
+		m_displacementMaps = null;
+		RTUtility.ReleaseAndDestroy(m_slopeMaps);
+		m_slopeMaps = null;
+		RTUtility.ReleaseAndDestroy(m_foamMaps);
+		m_foamMaps = null;
+	}
+
+	private void Update()
+	{
+		try
+		{
+			gridScale = Mathf.Clamp(gridScale, 0.1f, 1f);
+			windSpeed = Mathf.Clamp(windSpeed, 0f, 30f);
+			waveAge = Mathf.Clamp(waveAge, 0.5f, 1f);
+			waveSpeed = Mathf.Clamp(waveSpeed, 0f, 10f);
+			foamAmount = Mathf.Clamp(foamAmount, 0f, 6f);
+			foamCoverage = Mathf.Clamp(foamCoverage, 0f, 0.5f);
+			waveSmoothing = Mathf.Clamp(waveSmoothing, 1f, 6f);
+			slopeSmoothing = Mathf.Clamp(slopeSmoothing, 1f, 6f);
+			foamSmoothing = Mathf.Clamp(foamSmoothing, 1f, 6f);
+			numberOfGrids = Mathf.Clamp(numberOfGrids, 1, 4);
+			float time = m_ocean.OceanTime.Now * waveSpeed;
+			CreateBuffers();
+			CreateRenderTextures();
+			CreateConditions();
+			if (m_conditions[0].Key.NumGrids > 2)
+			{
+				Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+			}
+			else
+			{
+				Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
+			}
+			UpdateQueryScaling();
+			Shader.SetGlobalVector("Ceto_GridSizes", GridSizes);
+			Shader.SetGlobalVector("Ceto_GridScale", new Vector2(gridScale, gridScale));
+			Shader.SetGlobalVector("Ceto_Choppyness", Choppyness);
+			Shader.SetGlobalFloat("Ceto_MapSize", m_bufferSettings.size);
+			Shader.SetGlobalFloat("Ceto_WaveSmoothing", waveSmoothing);
+			Shader.SetGlobalFloat("Ceto_SlopeSmoothing", slopeSmoothing);
+			Shader.SetGlobalFloat("Ceto_FoamSmoothing", foamSmoothing);
+			Shader.SetGlobalFloat("Ceto_TextureWaveFoam", textureFoam ? 1f : 0f);
+			UpdateSpectrumScheduler();
+			GenerateDisplacement(time);
+			GenerateSlopes(time);
+			GenerateFoam(time);
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	private void UpdateSpectrumScheduler()
+	{
+		try
+		{
+			m_scheduler.DisableMultithreading = Ocean.DISABLE_ALL_MULTITHREADING;
+			m_scheduler.CheckForException();
+			m_scheduler.Update();
+		}
+		catch (Exception ex)
+		{
+			Ocean.LogError(ex.ToString());
+			WasError = true;
+			enabled = false;
+		}
+	}
+
+	private void UpdateQueryScaling()
+	{
+		m_choppyness = m_conditions[0].Choppyness * Mathf.Clamp(choppyness, 0f, 1.2f);
+		m_gridSizes = m_conditions[0].GridSizes;
+		Vector4 invGridSizes = new Vector4
+		{
+			x = 1f / (GridSizes.x * gridScale),
+			y = 1f / (GridSizes.y * gridScale),
+			z = 1f / (GridSizes.z * gridScale),
+			w = 1f / (GridSizes.w * gridScale)
+		};
+		m_queryScaling.invGridSizes = invGridSizes;
+		m_queryScaling.scaleY = gridScale;
+		m_queryScaling.choppyness = Choppyness * gridScale;
+		m_queryScaling.offset = m_ocean.PositionOffset;
+		m_queryScaling.numGrids = m_conditions[0].Key.NumGrids;
+	}
+
+	private void GenerateSlopes(float time)
+	{
+		if (!disableSlopes && SystemInfo.graphicsShaderLevel < 30)
+		{
+			Ocean.LogWarning("Spectrum slopes needs at least SM3 to run. Disabling slopes.");
+			disableSlopes = true;
+		}
+		if (disableSlopes)
+		{
+			m_slopeBuffer.DisableBuffer(-1);
+		}
+		else
+		{
+			m_slopeBuffer.EnableBuffer(-1);
+		}
+		if (m_slopeBuffer.EnabledBuffers() == 0)
+		{
+			Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+			return;
+		}
+		int numGrids = m_conditions[0].Key.NumGrids;
+		if (numGrids <= 2)
+		{
+			m_slopeBuffer.DisableBuffer(1);
+		}
+		if (!m_slopeBuffer.HasRun || m_slopeBuffer.TimeValue != time)
+		{
+			m_slopeBuffer.InitMaterial = m_slopeInitMat;
+			m_slopeBuffer.InitPass = numGrids - 1;
+			m_slopeBuffer.Run(m_conditions[0], time);
+		}
+		if (!m_slopeBuffer.BeenSampled)
+		{
+			m_slopeBuffer.EnableSampling();
+			if (numGrids > 0)
+			{
+				m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(0));
+				Graphics.Blit(null, m_slopeMaps[0], m_slopeCopyMat, 0);
+				Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMaps[0]);
+			}
+			else
+			{
+				Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+			}
+			if (numGrids > 2)
+			{
+				m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(1));
+				Graphics.Blit(null, m_slopeMaps[1], m_slopeCopyMat, 0);
+				Shader.SetGlobalTexture("Ceto_SlopeMap1", m_slopeMaps[1]);
+			}
+			else
+			{
+				Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+			}
+			m_slopeBuffer.DisableSampling();
+			m_slopeBuffer.BeenSampled = true;
+		}
+	}
+
+	private void GenerateDisplacement(float time)
+	{
+		if (!disableDisplacements && SystemInfo.graphicsShaderLevel < 30 && m_displacementBuffer.IsGPU)
+		{
+			Ocean.LogWarning("Spectrum displacements needs at least SM3 to run on GPU. Disabling displacement.");
+			disableDisplacements = true;
+		}
+		m_displacementBuffer.EnableBuffer(-1);
+		if (disableDisplacements)
+		{
+			m_displacementBuffer.DisableBuffer(-1);
+		}
+		if (!disableDisplacements && choppyness == 0f)
+		{
+			m_displacementBuffer.DisableBuffer(1);
+			m_displacementBuffer.DisableBuffer(2);
+		}
+		if (!disableDisplacements && choppyness > 0f)
+		{
+			m_displacementBuffer.EnableBuffer(1);
+			m_displacementBuffer.EnableBuffer(2);
+		}
+		if (m_displacementBuffer.EnabledBuffers() == 0)
+		{
+			Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+		}
+		else
+		{
+			if (!m_displacementBuffer.Done)
+			{
+				return;
+			}
+			int numGrids = m_conditions[0].Key.NumGrids;
+			if (numGrids <= 2)
+			{
+				m_displacementBuffer.DisableBuffer(2);
+			}
+			if (!m_displacementBuffer.HasRun || m_displacementBuffer.TimeValue != time)
+			{
+				m_displacementBuffer.InitMaterial = m_displacementInitMat;
+				m_displacementBuffer.InitPass = numGrids - 1;
+				m_displacementBuffer.Run(m_conditions[0], time);
+			}
+			if (!m_displacementBuffer.BeenSampled)
+			{
+				m_displacementBuffer.EnableSampling();
+				m_displacementCopyMat.SetTexture("Ceto_HeightBuffer", m_displacementBuffer.GetTexture(0));
+				m_displacementCopyMat.SetTexture("Ceto_DisplacementBuffer", m_displacementBuffer.GetTexture(1));
+				if (numGrids > 0)
+				{
+					Graphics.Blit(null, m_displacementMaps[0], m_displacementCopyMat, (numGrids == 1) ? 4 : 0);
+					Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMaps[0]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+				}
+				if (numGrids > 1)
+				{
+					Graphics.Blit(null, m_displacementMaps[1], m_displacementCopyMat, 1);
+					Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMaps[1]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+				}
+				m_displacementCopyMat.SetTexture("Ceto_DisplacementBuffer", m_displacementBuffer.GetTexture(2));
+				if (numGrids > 2)
+				{
+					Graphics.Blit(null, m_displacementMaps[2], m_displacementCopyMat, 2);
+					Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMaps[2]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+				}
+				if (numGrids > 3)
+				{
+					Graphics.Blit(null, m_displacementMaps[3], m_displacementCopyMat, 3);
+					Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMaps[3]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+				}
+				m_displacementBuffer.DisableSampling();
+				m_displacementBuffer.BeenSampled = true;
+				if (m_displacementBuffer.IsGPU)
+				{
+					ReadFromGPU(numGrids);
+				}
+				FindRanges();
+			}
+		}
+	}
+
+	private void ReadFromGPU(int numGrids)
+	{
+		if (!disableReadBack && readSdr == null)
+		{
+			Ocean.LogWarning("Trying to read GPU displacement data but the read shader is null");
+		}
+		bool flag = SystemInfo.graphicsShaderLevel >= 50 && SystemInfo.supportsComputeShaders;
+		if ((!disableReadBack && readSdr != null && m_readBuffer != null) & flag)
+		{
+			InterpolatedArray2f[] readDisplacements = DisplacementBuffer.GetReadDisplacements();
+			if (numGrids > 0)
+			{
+				CBUtility.ReadFromRenderTexture(m_displacementMaps[0], 3, m_readBuffer, readSdr);
+				m_readBuffer.GetData(readDisplacements[0].Data);
+			}
+			else
+			{
+				readDisplacements[0].Clear();
+			}
+			if (numGrids > 1)
+			{
+				CBUtility.ReadFromRenderTexture(m_displacementMaps[1], 3, m_readBuffer, readSdr);
+				m_readBuffer.GetData(readDisplacements[1].Data);
+			}
+			else
+			{
+				readDisplacements[1].Clear();
+			}
+			if (numGrids > 2)
+			{
+				CBUtility.ReadFromRenderTexture(m_displacementMaps[2], 3, m_readBuffer, readSdr);
+				m_readBuffer.GetData(readDisplacements[2].Data);
+			}
+			else
+			{
+				readDisplacements[2].Clear();
+			}
+			_ = 3;
+		}
+	}
+
+	private void FindRanges()
+	{
+		if (disableReadBack && DisplacementBuffer.IsGPU)
+		{
+			MaxDisplacement = new Vector2(0f, 40f * gridScale);
+		}
+		else if (m_findRangeTask == null || m_findRangeTask.Done)
+		{
+			if (m_findRangeTask == null)
+			{
+				m_findRangeTask = new FindRangeTask(this);
+			}
+			m_findRangeTask.Reset();
+			m_scheduler.Run(m_findRangeTask);
+		}
+	}
+
+	private void GenerateFoam(float time)
+	{
+		Vector4 value = Choppyness;
+		if (!disableFoam && SystemInfo.graphicsShaderLevel < 30)
+		{
+			Ocean.LogWarning("Spectrum foam needs at least SM3 to run. Disabling foam.");
+			disableFoam = true;
+		}
+		float sqrMagnitude = value.sqrMagnitude;
+		m_jacobianBuffer.EnableBuffer(-1);
+		if (disableFoam || foamAmount == 0f || sqrMagnitude == 0f || !m_conditions[0].SupportsJacobians)
+		{
+			m_jacobianBuffer.DisableBuffer(-1);
+		}
+		if (m_jacobianBuffer.EnabledBuffers() == 0)
+		{
+			Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
+			return;
+		}
+		int numGrids = m_conditions[0].Key.NumGrids;
+		switch (numGrids)
+		{
+		case 1:
+			m_jacobianBuffer.DisableBuffer(1);
+			m_jacobianBuffer.DisableBuffer(2);
+			break;
+		case 2:
+			m_jacobianBuffer.DisableBuffer(2);
+			break;
+		}
+		if (!m_jacobianBuffer.HasRun || m_jacobianBuffer.TimeValue != time)
+		{
+			m_foamInitMat.SetFloat("Ceto_FoamAmount", foamAmount);
+			m_jacobianBuffer.InitMaterial = m_foamInitMat;
+			m_jacobianBuffer.InitPass = numGrids - 1;
+			m_jacobianBuffer.Run(m_conditions[0], time);
+		}
+		if (!m_jacobianBuffer.BeenSampled)
+		{
+			m_jacobianBuffer.EnableSampling();
+			m_foamCopyMat.SetTexture("Ceto_JacobianBuffer0", m_jacobianBuffer.GetTexture(0));
+			m_foamCopyMat.SetTexture("Ceto_JacobianBuffer1", m_jacobianBuffer.GetTexture(1));
+			m_foamCopyMat.SetTexture("Ceto_JacobianBuffer2", m_jacobianBuffer.GetTexture(2));
+			m_foamCopyMat.SetTexture("Ceto_HeightBuffer", m_displacementBuffer.GetTexture(0));
+			m_foamCopyMat.SetVector("Ceto_FoamChoppyness", value);
+			m_foamCopyMat.SetFloat("Ceto_FoamCoverage", foamCoverage);
+			Graphics.Blit(null, m_foamMaps[0], m_foamCopyMat, numGrids - 1);
+			Shader.SetGlobalTexture("Ceto_FoamMap0", m_foamMaps[0]);
+			m_jacobianBuffer.DisableSampling();
+			m_jacobianBuffer.BeenSampled = true;
+		}
+	}
+
+	public void QueryWaves(WaveQuery query)
+	{
+		if (enabled)
+		{
+			IDisplacementBuffer displacementBuffer = DisplacementBuffer;
+			if (displacementBuffer != null && (!disableReadBack || !displacementBuffer.IsGPU) && (query.mode == QUERY_MODE.DISPLACEMENT || query.mode == QUERY_MODE.POSITION) && (query.sampleSpectrum[0] || query.sampleSpectrum[1] || query.sampleSpectrum[2] || query.sampleSpectrum[3]))
+			{
+				displacementBuffer.QueryWaves(query, m_queryScaling);
+			}
+		}
+	}
+
+	private void CreateBuffers()
+	{
+		GetFourierSize(out var size, out var isCpu);
+		if (m_bufferSettings.beenCreated)
+		{
+			if (m_bufferSettings.size == size && m_bufferSettings.isCpu == isCpu)
+			{
+				return;
+			}
+			while (m_scheduler.HasTasks())
+			{
+				UpdateSpectrumScheduler();
+			}
+			Release();
+			m_bufferSettings.beenCreated = false;
+		}
+		if (isCpu)
+		{
+			m_displacementBuffer = new DisplacementBufferCPU(size, m_scheduler);
+		}
+		else
+		{
+			m_displacementBuffer = new DisplacementBufferGPU(size, fourierSdr);
+		}
+		m_slopeBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 2);
+		m_jacobianBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 3);
+		m_readBuffer = new ComputeBuffer(size * size, 12);
+		m_conditions = new WaveSpectrumCondition[2];
+		m_displacementMaps = new RenderTexture[4];
+		m_slopeMaps = new RenderTexture[2];
+		m_foamMaps = new RenderTexture[1];
+		m_bufferSettings.beenCreated = true;
+		m_bufferSettings.size = size;
+		m_bufferSettings.isCpu = isCpu;
+	}
+
+	private void CreateRenderTextures()
+	{
+		int size = m_bufferSettings.size;
+		int ansio = 9;
+		RenderTextureFormat format = RenderTextureFormat.ARGBFloat;
+		for (int i = 0; i < m_displacementMaps.Length; i++)
+		{
+			CreateMap(ref m_displacementMaps[i], "Displacement", format, size, ansio);
+		}
+		for (int j = 0; j < m_slopeMaps.Length; j++)
+		{
+			CreateMap(ref m_slopeMaps[j], "Slope", format, size, ansio);
+		}
+		for (int k = 0; k < m_foamMaps.Length; k++)
+		{
+			CreateMap(ref m_foamMaps[k], "Foam", format, size, ansio);
+		}
+	}
+
+	private void CreateMap(ref RenderTexture map, string name, RenderTextureFormat format, int size, int ansio)
+	{
+		if (map != null)
+		{
+			if (!map.IsCreated())
+			{
+				map.Create();
+			}
+			return;
+		}
+		map = new RenderTexture(size, size, 0, format, RenderTextureReadWrite.Linear);
+		map.filterMode = FilterMode.Trilinear;
+		map.wrapMode = TextureWrapMode.Repeat;
+		map.anisoLevel = ansio;
+		map.useMipMap = true;
+		map.hideFlags = HideFlags.HideAndDontSave;
+		map.name = "Ceto Wave Spectrum " + name + " Texture";
+		map.Create();
+	}
+
+	private void CreateConditions()
+	{
+		int size = m_bufferSettings.size;
+		WaveSpectrumConditionKey waveSpectrumConditionKey = NewSpectrumConditionKey(size, windSpeed, m_ocean.windDir, waveAge);
+		if (m_conditions[0] == null)
+		{
+			if (m_conditionCache.ContainsKey(waveSpectrumConditionKey))
+			{
+				m_conditions[0] = m_conditionCache[waveSpectrumConditionKey];
+				return;
+			}
+			m_conditions[0] = NewSpectrumCondition(size, windSpeed, m_ocean.windDir, waveAge);
+			SpectrumTask createSpectrumConditionTask = m_conditions[0].GetCreateSpectrumConditionTask();
+			((IThreadedTask)createSpectrumConditionTask).Start();
+			((IThreadedTask)createSpectrumConditionTask).Run();
+			((IThreadedTask)createSpectrumConditionTask).End();
+			CacheCondition(m_conditions[0]);
+		}
+		else if (m_conditions[1] != null && m_conditions[1].Done)
+		{
+			m_conditions[0] = m_conditions[1];
+			m_conditions[1] = null;
+			CacheCondition(m_conditions[0]);
+		}
+		else if (m_conditions[1] == null && m_conditions[0].Done && waveSpectrumConditionKey != m_conditions[0].Key)
+		{
+			if (m_conditionCache.ContainsKey(waveSpectrumConditionKey))
+			{
+				m_conditions[0] = m_conditionCache[waveSpectrumConditionKey];
+				return;
+			}
+			m_conditions[1] = NewSpectrumCondition(size, windSpeed, m_ocean.windDir, waveAge);
+			IThreadedTask createSpectrumConditionTask2 = m_conditions[1].GetCreateSpectrumConditionTask();
+			m_scheduler.Add(createSpectrumConditionTask2);
+		}
+	}
+
+	private void CacheCondition(WaveSpectrumCondition condition)
+	{
+		if (condition != null && m_conditionCache != null && !m_conditionCache.ContainsKey(condition.Key))
+		{
+			m_conditionCache.AddFirst(condition.Key, condition);
+			while (m_conditionCache.Count != 0 && m_conditionCache.Count > MaxConditionCacheSize)
+			{
+				m_conditionCache.RemoveLast().Release();
+			}
+		}
+	}
+
+	public void CreateAndCacheCondition(int fourierSize, float windSpeed, float windDir, float waveAge)
+	{
+		if (m_conditionCache == null)
+		{
+			return;
+		}
+		if (m_conditionCache.Count >= MaxConditionCacheSize)
+		{
+			Ocean.LogWarning("Condition cache full. Condition not cached.");
+			return;
+		}
+		if (!Mathf.IsPowerOfTwo(fourierSize) || fourierSize < 32 || fourierSize > 512)
+		{
+			Ocean.LogWarning("Fourier size must be a pow2 number from 32 to 512. Condition not cached.");
+			return;
+		}
+		WaveSpectrumCondition waveSpectrumCondition = NewSpectrumCondition(fourierSize, windSpeed, windDir, waveAge);
+		if (!m_conditionCache.ContainsKey(waveSpectrumCondition.Key))
+		{
+			SpectrumTask createSpectrumConditionTask = waveSpectrumCondition.GetCreateSpectrumConditionTask();
+			((IThreadedTask)createSpectrumConditionTask).Start();
+			((IThreadedTask)createSpectrumConditionTask).Run();
+			((IThreadedTask)createSpectrumConditionTask).End();
+			m_conditionCache.AddFirst(waveSpectrumCondition.Key, waveSpectrumCondition);
+		}
+	}
+
+	private WaveSpectrumCondition NewSpectrumCondition(int fourierSize, float windSpeed, float windDir, float waveAge)
+	{
+		WaveSpectrumCondition waveSpectrumCondition = null;
+		switch (spectrumType)
+		{
+		case SPECTRUM_TYPE.UNIFIED:
+			return new UnifiedSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+		case SPECTRUM_TYPE.UNIFIED_PHILLIPS:
+			return new UnifiedPhillipsSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+		case SPECTRUM_TYPE.PHILLIPS:
+			return new PhillipsSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+		case SPECTRUM_TYPE.CUSTOM:
+			if (CustomWaveSpectrum == null)
+			{
+				Ocean.LogWarning("Custom spectrum type selected but no custom spectrum interface has been added to the wave spectrum. Defaulting to Unified Spectrum");
+				spectrumType = SPECTRUM_TYPE.UNIFIED;
+				return new UnifiedSpectrumCondition(fourierSize, windSpeed, windDir, waveAge, numberOfGrids);
+			}
+			return new CustomWaveSpectrumCondition(CustomWaveSpectrum, fourierSize, windDir, numberOfGrids);
+		default:
+			throw new InvalidOperationException("Invalid spectrum type = " + spectrumType);
+		}
+	}
+
+	private WaveSpectrumConditionKey NewSpectrumConditionKey(int fourierSize, float windSpeed, float windDir, float waveAge)
+	{
+		WaveSpectrumConditionKey waveSpectrumConditionKey = null;
+		switch (spectrumType)
+		{
+		case SPECTRUM_TYPE.UNIFIED:
+			return new UnifiedSpectrumConditionKey(windSpeed, waveAge, fourierSize, windDir, spectrumType, numberOfGrids);
+		case SPECTRUM_TYPE.UNIFIED_PHILLIPS:
+			return new UnifiedSpectrumConditionKey(windSpeed, waveAge, fourierSize, windDir, spectrumType, numberOfGrids);
+		case SPECTRUM_TYPE.PHILLIPS:
+			return new PhillipsSpectrumConditionKey(windSpeed, fourierSize, windDir, spectrumType, numberOfGrids);
+		case SPECTRUM_TYPE.CUSTOM:
+			if (CustomWaveSpectrum == null)
+			{
+				Ocean.LogWarning("Custom spectrum type selected but no custom spectrum interface has been added to the wave spectrum. Defaulting to Unified Spectrum");
+				spectrumType = SPECTRUM_TYPE.UNIFIED;
+				return new UnifiedSpectrumConditionKey(windSpeed, waveAge, fourierSize, windDir, spectrumType, numberOfGrids);
+			}
+			return CustomWaveSpectrum.CreateKey(fourierSize, windDir, spectrumType, numberOfGrids);
+		default:
+			throw new InvalidOperationException("Invalid spectrum type = " + spectrumType);
+		}
+	}
+
+	private void GetFourierSize(out int size, out bool isCpu)
+	{
+		switch ((int)fourierSize)
+		{
+		case 0:
+			size = 32;
+			isCpu = true;
+			break;
+		case 1:
+			size = 32;
+			isCpu = false;
+			break;
+		case 2:
+			size = 64;
+			isCpu = true;
+			break;
+		case 3:
+			size = 64;
+			isCpu = false;
+			break;
+		case 4:
+			size = 128;
+			isCpu = true;
+			break;
+		case 5:
+			size = 128;
+			isCpu = false;
+			break;
+		case 6:
+			size = 256;
+			isCpu = false;
+			break;
+		case 7:
+			size = 512;
+			isCpu = false;
+			break;
+		default:
+			size = 64;
+			isCpu = true;
+			break;
+		}
+		bool flag = SystemInfo.graphicsShaderLevel >= 50 && SystemInfo.supportsComputeShaders;
+		if (!isCpu && !disableReadBack && !flag)
+		{
+			Ocean.LogWarning("You card does not support dx11. Fourier can not be GPU. Changing to CPU. Disable read backs to use GPU but with no height querys.");
+			fourierSize = FOURIER_SIZE.MEDIUM_64_CPU;
+			size = 64;
+			isCpu = true;
+		}
+	}
+}
+
+
+==================== Ceto_FoamTexture.cs ====================
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+[Serializable]
+public class FoamTexture
+{
+	public Texture tex;
+
+	public Vector2 scale = Vector2.one;
+
+	public float scrollSpeed = 1f;
+}
+
+
+==================== Ceto_CausticTexture.cs ====================
+using System;
+using UnityEngine;
+
+namespace Ceto;
+
+[Serializable]
+public class CausticTexture
+{
+	public Texture tex;
+
+	public Vector2 scale = Vector2.one;
+}
+
+
+==================== Ceto_OverlayManager.cs ====================
+using System;
+using System.Collections.Generic;
+using Ceto.Common.Unity.Utility;
+using UnityEngine;
+
+namespace Ceto;
+
+public class OverlayManager : IOverlaySampler
+{
+	private static readonly Vector2 TEXTURE_FOAM = new Vector2(1f, 0f);
+
+	private static readonly Vector2 DONT_TEXTURE_FOAM = new Vector2(0f, 1f);
+
+	private Material m_overlayMat;
+
+	private LinkedList<WaveOverlay> m_waveOverlays;
+
+	private List<WaveOverlay> m_queryableOverlays;
+
+	private List<WaveOverlay> m_removeOverlays;
+
+	private List<QueryableOverlayResult> m_containingOverlays;
+
+	private Texture2D m_blankNormal;
+
+	private bool m_beenCleared;
+
+	private List<WaveOverlay> m_heightOverlays;
+
+	private List<WaveOverlay> m_normalOverlays;
+
+	private List<WaveOverlay> m_foamOverlays;
+
+	private List<WaveOverlay> m_clipOverlays;
+
+	private Plane[] m_planes;
+
+	private Color m_clearColor;
+
+	public bool HasHeightOverlay { get; private set; }
+
+	public bool HasNormalOverlay { get; private set; }
+
+	public bool HasFoamOverlay { get; private set; }
+
+	public bool HasClipOverlay { get; private set; }
+
+	public float MaxDisplacement { get; private set; }
+
+	public OVERLAY_BLEND_MODE HeightOverlayBlendMode { get; set; }
+
+	public OVERLAY_BLEND_MODE FoamOverlayBlendMode { get; set; }
+
+	public OverlayManager(Material mat)
+	{
+		HeightOverlayBlendMode = OVERLAY_BLEND_MODE.ADD;
+		FoamOverlayBlendMode = OVERLAY_BLEND_MODE.ADD;
+		MaxDisplacement = 1f;
+		m_overlayMat = mat;
+		m_waveOverlays = new LinkedList<WaveOverlay>();
+		m_queryableOverlays = new List<WaveOverlay>(32);
+		m_removeOverlays = new List<WaveOverlay>(32);
+		m_containingOverlays = new List<QueryableOverlayResult>(32);
+		m_heightOverlays = new List<WaveOverlay>(32);
+		m_normalOverlays = new List<WaveOverlay>(32);
+		m_foamOverlays = new List<WaveOverlay>(32);
+		m_clipOverlays = new List<WaveOverlay>(32);
+		m_blankNormal = new Texture2D(1, 1, TextureFormat.ARGB32, mipChain: false, linear: true);
+		m_blankNormal.SetPixel(0, 0, new Color(0.5f, 0.5f, 1f, 0.5f));
+		m_blankNormal.hideFlags = HideFlags.HideAndDontSave;
+		m_blankNormal.name = "Ceto Blank Normal Texture";
+		m_blankNormal.Apply();
+		m_clearColor = new Color(0f, 0f, 0f, 0f);
+		m_planes = new Plane[6];
+	}
+
+	public void Release()
+	{
+		UnityEngine.Object.DestroyImmediate(m_blankNormal);
+	}
+
+	public void Update()
+	{
+		HasHeightOverlay = false;
+		HasNormalOverlay = false;
+		HasFoamOverlay = false;
+		HasClipOverlay = false;
+		MaxDisplacement = 1f;
+		m_queryableOverlays.Clear();
+		m_removeOverlays.Clear();
+		LinkedList<WaveOverlay>.Enumerator enumerator = m_waveOverlays.GetEnumerator();
+		while (enumerator.MoveNext())
+		{
+			WaveOverlay current = enumerator.Current;
+			if (current.Kill)
+			{
+				m_removeOverlays.Add(current);
+			}
+			else
+			{
+				if (current.Hide)
+				{
+					continue;
+				}
+				bool flag = false;
+				if (current.HeightTex.IsDrawable)
+				{
+					HasHeightOverlay = true;
+					flag = true;
+					if (current.HeightTex.alpha > MaxDisplacement)
+					{
+						MaxDisplacement = current.HeightTex.alpha;
+					}
+				}
+				if (current.NormalTex.IsDrawable)
+				{
+					HasNormalOverlay = true;
+				}
+				if (current.FoamTex.IsDrawable)
+				{
+					HasFoamOverlay = true;
+				}
+				if (current.ClipTex.IsDrawable)
+				{
+					HasClipOverlay = true;
+					flag = true;
+				}
+				if (flag)
+				{
+					m_queryableOverlays.Add(current);
+				}
+			}
+		}
+		MaxDisplacement = Mathf.Min(MaxDisplacement, 20f);
+		for (int i = 0; i < m_removeOverlays.Count; i++)
+		{
+			m_waveOverlays.Remove(m_removeOverlays[i]);
+		}
+	}
+
+	public void Add(WaveOverlay overlay)
+	{
+		if (!overlay.Kill)
+		{
+			m_waveOverlays.AddLast(overlay);
+		}
+	}
+
+	public void Remove(WaveOverlay overlay)
+	{
+		m_waveOverlays.Remove(overlay);
+	}
+
+	public void Clear()
+	{
+		m_waveOverlays.Clear();
+	}
+
+	public void ClearBuffers(WaveOverlayData data)
+	{
+		RTUtility.ClearColor(data.height, m_clearColor);
+		RTUtility.ClearColor(data.normal, m_clearColor);
+		RTUtility.ClearColor(data.foam, m_clearColor);
+		RTUtility.ClearColor(data.clip, m_clearColor);
+	}
+
+	public void DestroyBuffers(WaveOverlayData data)
+	{
+		RTUtility.ReleaseAndDestroy(data.normal);
+		RTUtility.ReleaseAndDestroy(data.height);
+		RTUtility.ReleaseAndDestroy(data.foam);
+		RTUtility.ReleaseAndDestroy(data.clip);
+		data.normal = null;
+		data.height = null;
+		data.foam = null;
+		data.clip = null;
+	}
+
+	public bool QueryableContains(float x, float z, bool overrideIqnoreQuerys)
+	{
+		for (int i = 0; i < m_queryableOverlays.Count; i++)
+		{
+			WaveOverlay waveOverlay = m_queryableOverlays[i];
+			if (!waveOverlay.Hide)
+			{
+				bool num = (overrideIqnoreQuerys || !waveOverlay.HeightTex.ignoreQuerys) && waveOverlay.HeightTex.IsDrawable;
+				bool flag = (overrideIqnoreQuerys || !waveOverlay.ClipTex.ignoreQuerys) && waveOverlay.ClipTex.IsDrawable;
+				if ((num || flag) && waveOverlay.Contains(x, z))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public void GetQueryableContaining(float x, float z, bool overrideIqnoreQuerys, bool clipOnly)
+	{
+		m_containingOverlays.Clear();
+		QueryableOverlayResult item = default;
+		for (int i = 0; i < m_queryableOverlays.Count; i++)
+		{
+			WaveOverlay waveOverlay = m_queryableOverlays[i];
+			if (!waveOverlay.Hide)
+			{
+				bool num = !clipOnly && (overrideIqnoreQuerys || !waveOverlay.HeightTex.ignoreQuerys) && waveOverlay.HeightTex.IsDrawable;
+				bool flag = (overrideIqnoreQuerys || !waveOverlay.ClipTex.ignoreQuerys) && waveOverlay.ClipTex.IsDrawable;
+				if ((num || flag) && waveOverlay.Contains(x, z, out var u, out var v))
+				{
+					item.overlay = waveOverlay;
+					item.u = u;
+					item.v = v;
+					m_containingOverlays.Add(item);
+				}
+			}
+		}
+	}
+
+	public void QueryWaves(WaveQuery query)
+	{
+		if (m_queryableOverlays.Count == 0 || !query.sampleOverlay)
+		{
+			return;
+		}
+		bool flag = query.mode == QUERY_MODE.CLIP_TEST;
+		float posX = query.posX;
+		float posZ = query.posZ;
+		GetQueryableContaining(posX, posZ, query.overrideIgnoreQuerys, flag);
+		float num = 0f;
+		float num2 = 0f;
+		float num3 = 0f;
+		OverlayClipTexture overlayClipTexture = null;
+		OverlayHeightTexture overlayHeightTexture = null;
+		for (int i = 0; i < m_containingOverlays.Count; i++)
+		{
+			QueryableOverlayResult queryableOverlayResult = m_containingOverlays[i];
+			try
+			{
+				overlayClipTexture = queryableOverlayResult.overlay.ClipTex;
+				overlayHeightTexture = queryableOverlayResult.overlay.HeightTex;
+				if (overlayClipTexture.IsDrawable && overlayClipTexture.tex is Texture2D)
+				{
+					float a = (overlayClipTexture.tex as Texture2D).GetPixelBilinear(queryableOverlayResult.u, queryableOverlayResult.v).a;
+					num += a * Mathf.Max(0f, overlayClipTexture.alpha);
+				}
+				if (!flag && overlayHeightTexture.IsDrawable)
+				{
+					float alpha = overlayHeightTexture.alpha;
+					float num4 = Mathf.Max(0f, overlayHeightTexture.maskAlpha);
+					float num5 = 0f;
+					float num6 = 0f;
+					if (overlayHeightTexture.tex != null && overlayHeightTexture.tex is Texture2D)
+					{
+						num5 = (overlayHeightTexture.tex as Texture2D).GetPixelBilinear(queryableOverlayResult.u, queryableOverlayResult.v).a;
+					}
+					if (overlayHeightTexture.mask != null && overlayHeightTexture.mask is Texture2D)
+					{
+						num6 = (overlayHeightTexture.mask as Texture2D).GetPixelBilinear(queryableOverlayResult.u, queryableOverlayResult.v).a;
+						num6 = Mathf.Clamp01(num6 * num4);
+					}
+					if (overlayHeightTexture.maskMode == OVERLAY_MASK_MODE.WAVES)
+					{
+						num5 *= alpha;
+					}
+					else if (overlayHeightTexture.maskMode == OVERLAY_MASK_MODE.OVERLAY)
+					{
+						num5 *= alpha * num6;
+						num6 = 0f;
+					}
+					else if (overlayHeightTexture.maskMode == OVERLAY_MASK_MODE.WAVES_AND_OVERLAY)
+					{
+						num5 *= alpha * (1f - num6);
+					}
+					else if (overlayHeightTexture.maskMode == OVERLAY_MASK_MODE.WAVES_AND_OVERLAY_BLEND)
+					{
+						num5 *= alpha * num6;
+					}
+					if (HeightOverlayBlendMode == OVERLAY_BLEND_MODE.ADD)
+					{
+						num2 += num5;
+						num3 += num6;
+					}
+					else if (HeightOverlayBlendMode == OVERLAY_BLEND_MODE.MAX)
+					{
+						num2 = Mathf.Max(num5, num2);
+						num3 = Mathf.Max(num6, num3);
+					}
+				}
+			}
+			catch
+			{
+			}
+		}
+		num = Mathf.Clamp01(num);
+		if (0.5f - num < 0f)
+		{
+			query.result.isClipped = true;
+		}
+		num3 = 1f - Mathf.Clamp01(num3);
+		query.result.height *= num3;
+		query.result.displacementX *= num3;
+		query.result.displacementZ *= num3;
+		query.result.height += num2;
+		query.result.overlayHeight = num2;
+	}
+
+	public void RenderWaveOverlays(Camera cam, WaveOverlayData data)
+	{
+		if (!m_beenCleared)
+		{
+			ClearBuffers(data);
+			m_beenCleared = true;
+		}
+		if (m_waveOverlays.Count == 0)
+		{
+			return;
+		}
+		GetFrustumPlanes(cam.projectionMatrix * cam.worldToCameraMatrix);
+		m_heightOverlays.Clear();
+		m_normalOverlays.Clear();
+		m_foamOverlays.Clear();
+		m_clipOverlays.Clear();
+		LinkedList<WaveOverlay>.Enumerator enumerator = m_waveOverlays.GetEnumerator();
+		while (enumerator.MoveNext())
+		{
+			WaveOverlay current = enumerator.Current;
+			if (!current.Hide && GeometryUtility.TestPlanesAABB(m_planes, current.BoundingBox))
+			{
+				if (current.HeightTex.IsDrawable)
+				{
+					m_heightOverlays.Add(current);
+				}
+				if (current.NormalTex.IsDrawable)
+				{
+					m_normalOverlays.Add(current);
+				}
+				if (current.FoamTex.IsDrawable)
+				{
+					m_foamOverlays.Add(current);
+				}
+				if (current.ClipTex.IsDrawable)
+				{
+					m_clipOverlays.Add(current);
+				}
+			}
+		}
+		RenderHeightOverlays(data.height);
+		RenderNormalOverlays(data.normal);
+		RenderFoamOverlays(data.foam);
+		RenderClipOverlays(data.clip);
+		if (data.normal != null)
+		{
+			Shader.SetGlobalTexture("Ceto_Overlay_NormalMap", data.normal);
+		}
+		else
+		{
+			Shader.SetGlobalTexture("Ceto_Overlay_NormalMap", Texture2D.blackTexture);
+		}
+		if (data.height != null)
+		{
+			Shader.SetGlobalTexture("Ceto_Overlay_HeightMap", data.height);
+		}
+		else
+		{
+			Shader.SetGlobalTexture("Ceto_Overlay_HeightMap", Texture2D.blackTexture);
+		}
+		if (data.foam != null)
+		{
+			Shader.SetGlobalTexture("Ceto_Overlay_FoamMap", data.foam);
+		}
+		else
+		{
+			Shader.SetGlobalTexture("Ceto_Overlay_FoamMap", Texture2D.blackTexture);
+		}
+		if (data.clip != null)
+		{
+			Shader.SetGlobalTexture("Ceto_Overlay_ClipMap", data.clip);
+		}
+		else
+		{
+			Shader.SetGlobalTexture("Ceto_Overlay_ClipMap", Texture2D.blackTexture);
+		}
+		m_beenCleared = false;
+	}
+
+	public void GetFrustumPlanes(Matrix4x4 mat)
+	{
+		float x = mat.m30 + mat.m00;
+		float y = mat.m31 + mat.m01;
+		float z = mat.m32 + mat.m02;
+		m_planes[0].normal = new Vector3(x, y, z);
+		m_planes[0].distance = mat.m33 + mat.m03;
+		x = mat.m30 - mat.m00;
+		y = mat.m31 - mat.m01;
+		z = mat.m32 - mat.m02;
+		m_planes[1].normal = new Vector3(x, y, z);
+		m_planes[1].distance = mat.m33 - mat.m03;
+		x = mat.m30 + mat.m10;
+		y = mat.m31 + mat.m11;
+		z = mat.m32 + mat.m12;
+		m_planes[2].normal = new Vector3(x, y, z);
+		m_planes[2].distance = mat.m33 + mat.m13;
+		x = mat.m30 - mat.m10;
+		y = mat.m31 - mat.m11;
+		z = mat.m32 - mat.m12;
+		m_planes[3].normal = new Vector3(x, y, z);
+		m_planes[3].distance = mat.m33 - mat.m13;
+		x = mat.m30 + mat.m20;
+		y = mat.m31 + mat.m21;
+		z = mat.m32 + mat.m22;
+		m_planes[4].normal = new Vector3(x, y, z);
+		m_planes[4].distance = mat.m33 + mat.m23;
+		x = mat.m30 - mat.m20;
+		y = mat.m31 - mat.m21;
+		z = mat.m32 - mat.m22;
+		m_planes[5].normal = new Vector3(x, y, z);
+		m_planes[5].distance = mat.m33 - mat.m23;
+	}
+
+	private void RenderHeightOverlays(RenderTexture target)
+	{
+		if (!(target == null))
+		{
+			int pass = ((HeightOverlayBlendMode != OVERLAY_BLEND_MODE.ADD) ? 4 : 0);
+			for (int i = 0; i < m_heightOverlays.Count; i++)
+			{
+				WaveOverlay waveOverlay = m_heightOverlays[i];
+				m_overlayMat.SetFloat("Ceto_Overlay_Alpha", waveOverlay.HeightTex.alpha);
+				m_overlayMat.SetFloat("Ceto_Overlay_MaskAlpha", Mathf.Max(0f, waveOverlay.HeightTex.maskAlpha));
+				m_overlayMat.SetTexture("Ceto_Overlay_Height", (waveOverlay.HeightTex.tex != null) ? waveOverlay.HeightTex.tex : Texture2D.blackTexture);
+				m_overlayMat.SetTexture("Ceto_Overlay_HeightMask", (waveOverlay.HeightTex.mask != null) ? waveOverlay.HeightTex.mask : Texture2D.blackTexture);
+				m_overlayMat.SetFloat("Ceto_Overlay_MaskMode", (float)waveOverlay.HeightTex.maskMode);
+				Blit(waveOverlay.Corners, waveOverlay.HeightTex.scaleUV, waveOverlay.HeightTex.offsetUV, target, m_overlayMat, pass);
+			}
+		}
+	}
+
+	private void RenderNormalOverlays(RenderTexture target)
+	{
+		if (!(target == null))
+		{
+			Matrix4x4 matrix4x = default;
+			for (int i = 0; i < m_normalOverlays.Count; i++)
+			{
+				WaveOverlay waveOverlay = m_normalOverlays[i];
+				RotateY(matrix4x, waveOverlay.Rotation);
+				m_overlayMat.SetMatrix("Ceto_Overlay_Rotation", matrix4x);
+				m_overlayMat.SetFloat("Ceto_Overlay_Alpha", Mathf.Max(0f, waveOverlay.NormalTex.alpha));
+				m_overlayMat.SetFloat("Ceto_Overlay_MaskAlpha", Mathf.Max(0f, waveOverlay.NormalTex.maskAlpha));
+				m_overlayMat.SetTexture("Ceto_Overlay_Normal", (waveOverlay.NormalTex.tex != null) ? waveOverlay.NormalTex.tex : m_blankNormal);
+				m_overlayMat.SetTexture("Ceto_Overlay_NormalMask", (waveOverlay.NormalTex.mask != null) ? waveOverlay.NormalTex.mask : Texture2D.blackTexture);
+				m_overlayMat.SetFloat("Ceto_Overlay_MaskMode", (float)waveOverlay.NormalTex.maskMode);
+				Blit(waveOverlay.Corners, waveOverlay.NormalTex.scaleUV, waveOverlay.NormalTex.offsetUV, target, m_overlayMat, 1);
+			}
+		}
+	}
+
+	private void RotateY(Matrix4x4 m, float angle)
+	{
+		float num = Mathf.Cos(angle * MathF.PI / 180f);
+		float num2 = Mathf.Sin(angle * MathF.PI / 180f);
+		m.m00 = num;
+		m.m01 = 0f;
+		m.m02 = num2;
+		m.m03 = 0f;
+		m.m10 = 0f;
+		m.m11 = 1f;
+		m.m12 = 0f;
+		m.m13 = 0f;
+		m.m20 = 0f - num2;
+		m.m21 = 0f;
+		m.m22 = num;
+		m.m23 = 1f;
+		m.m30 = 0f;
+		m.m31 = 0f;
+		m.m32 = 0f;
+		m.m33 = 0f;
+	}
+
+	private void RenderFoamOverlays(RenderTexture target)
+	{
+		if (!(target == null))
+		{
+			int pass = ((FoamOverlayBlendMode == OVERLAY_BLEND_MODE.ADD) ? 2 : 5);
+			for (int i = 0; i < m_foamOverlays.Count; i++)
+			{
+				WaveOverlay waveOverlay = m_foamOverlays[i];
+				m_overlayMat.SetFloat("Ceto_Overlay_Alpha", Mathf.Max(0f, waveOverlay.FoamTex.alpha));
+				m_overlayMat.SetFloat("Ceto_Overlay_MaskAlpha", Mathf.Max(0f, waveOverlay.FoamTex.maskAlpha));
+				m_overlayMat.SetTexture("Ceto_Overlay_Foam", (waveOverlay.FoamTex.tex != null) ? waveOverlay.FoamTex.tex : Texture2D.blackTexture);
+				m_overlayMat.SetTexture("Ceto_Overlay_FoamMask", (waveOverlay.FoamTex.mask != null) ? waveOverlay.FoamTex.mask : Texture2D.blackTexture);
+				m_overlayMat.SetFloat("Ceto_Overlay_MaskMode", (float)waveOverlay.FoamTex.maskMode);
+				m_overlayMat.SetVector("Ceto_TextureFoam", waveOverlay.FoamTex.textureFoam ? TEXTURE_FOAM : DONT_TEXTURE_FOAM);
+				Blit(waveOverlay.Corners, waveOverlay.FoamTex.scaleUV, waveOverlay.FoamTex.offsetUV, target, m_overlayMat, pass);
+			}
+		}
+	}
+
+	private void RenderClipOverlays(RenderTexture target)
+	{
+		if (!(target == null))
+		{
+			for (int i = 0; i < m_clipOverlays.Count; i++)
+			{
+				WaveOverlay waveOverlay = m_clipOverlays[i];
+				m_overlayMat.SetFloat("Ceto_Overlay_Alpha", Mathf.Max(0f, waveOverlay.ClipTex.alpha));
+				m_overlayMat.SetTexture("Ceto_Overlay_Clip", (waveOverlay.ClipTex.tex != null) ? waveOverlay.ClipTex.tex : Texture2D.blackTexture);
+				Blit(waveOverlay.Corners, waveOverlay.ClipTex.scaleUV, waveOverlay.ClipTex.offsetUV, target, m_overlayMat, 3);
+			}
+		}
+	}
+
+	private void Blit(Vector4[] corners, Vector2 scale, Vector2 offset, RenderTexture des, Material mat, int pass)
+	{
+		Graphics.SetRenderTarget(des);
+		GL.PushMatrix();
+		GL.LoadOrtho();
+		mat.SetPass(pass);
+		GL.Begin(7);
+		GL.MultiTexCoord2(0, offset.x, offset.y);
+		GL.MultiTexCoord2(1, 0f, 0f);
+		GL.Vertex(corners[0]);
+		GL.MultiTexCoord2(0, offset.x + 1f * scale.x, offset.y);
+		GL.MultiTexCoord2(1, 1f, 0f);
+		GL.Vertex(corners[1]);
+		GL.MultiTexCoord2(0, offset.x + 1f * scale.x, offset.y + 1f * scale.y);
+		GL.MultiTexCoord2(1, 1f, 1f);
+		GL.Vertex(corners[2]);
+		GL.MultiTexCoord2(0, offset.x, offset.y + 1f * scale.y);
+		GL.MultiTexCoord2(1, 0f, 1f);
+		GL.Vertex(corners[3]);
+		GL.End();
+		GL.PopMatrix();
+	}
+
+	public void CreateOverlays(Camera cam, WaveOverlayData overlay, OVERLAY_MAP_SIZE normalOverlaySize, OVERLAY_MAP_SIZE heightOverlaySize, OVERLAY_MAP_SIZE foamOverlaySize, OVERLAY_MAP_SIZE clipOverlaySize)
+	{
+		if (HasNormalOverlay)
+		{
+			RenderTextureFormat format = RenderTextureFormat.ARGBHalf;
+			if (!SystemInfo.SupportsRenderTextureFormat(format))
+			{
+				format = RenderTextureFormat.ARGB32;
+			}
+			CreateBuffer("Normal", cam, normalOverlaySize, format, isLinear: true, ref overlay.normal);
+		}
+		if (HasHeightOverlay)
+		{
+			RenderTextureFormat format2 = RenderTextureFormat.RGHalf;
+			if (!SystemInfo.SupportsRenderTextureFormat(format2))
+			{
+				format2 = RenderTextureFormat.ARGBHalf;
+			}
+			if (!SystemInfo.SupportsRenderTextureFormat(format2))
+			{
+				format2 = RenderTextureFormat.ARGB32;
+			}
+			CreateBuffer("Height", cam, heightOverlaySize, format2, isLinear: true, ref overlay.height);
+		}
+		if (HasFoamOverlay)
+		{
+			RenderTextureFormat format3 = RenderTextureFormat.ARGB32;
+			CreateBuffer("Foam", cam, foamOverlaySize, format3, isLinear: false, ref overlay.foam);
+		}
+		if (HasClipOverlay)
+		{
+			RenderTextureFormat format4 = RenderTextureFormat.R8;
+			if (!SystemInfo.SupportsRenderTextureFormat(format4))
+			{
+				format4 = RenderTextureFormat.RHalf;
+			}
+			if (!SystemInfo.SupportsRenderTextureFormat(format4))
+			{
+				format4 = RenderTextureFormat.ARGB32;
+			}
+			CreateBuffer("Clip", cam, clipOverlaySize, format4, isLinear: true, ref overlay.clip);
+		}
+	}
+
+	public void CreateBuffer(string name, Camera cam, OVERLAY_MAP_SIZE size, RenderTextureFormat format, bool isLinear, ref RenderTexture map)
+	{
+		float num = SizeToValue(size);
+		int num2 = Mathf.Min(4096, (int)((float)cam.pixelWidth * num));
+		int num3 = Mathf.Min(4096, (int)((float)cam.pixelHeight * num));
+		if (map == null || map.width != num2 || map.height != num3)
+		{
+			if (map != null)
+			{
+				RTUtility.ReleaseAndDestroy(map);
+			}
+			RenderTextureReadWrite readWrite = (isLinear ? RenderTextureReadWrite.Linear : RenderTextureReadWrite.Default);
+			map = new RenderTexture(num2, num3, 0, format, readWrite);
+			map.useMipMap = false;
+			map.filterMode = FilterMode.Bilinear;
+			map.hideFlags = HideFlags.DontSave;
+			map.name = "Ceto Overlay " + name + " Buffer: " + cam.name;
+		}
+	}
+
+	private float SizeToValue(OVERLAY_MAP_SIZE size)
+	{
+		return (int)size switch
+		{
+			0 => 2f, 
+			1 => 1.5f, 
+			2 => 1f, 
+			3 => 0.5f, 
+			4 => 0.25f, 
+			_ => 1f, 
+		};
+	}
+}
+
+
+==================== Ceto_FoamOverlay.cs ====================
+using UnityEngine;
+
+namespace Ceto;
+
+public class FoamOverlay : WaveOverlay
+{
+	public Vector3 Momentum { get; set; }
+
+	public float Spin { get; set; }
+
+	public float Expansion { get; set; }
+
+	public float Size { get; set; }
+
+	public FoamOverlay(Vector3 pos, float rotation, float size, float duration, Texture texture)
+		: base(pos, rotation, new Vector2(size * 0.5f, size * 0.5f), duration)
+	{
+		Size = size;
+		FoamTex.tex = texture;
+	}
+
+	public void Reset(Vector3 pos, float rotation, float size, float duration, Texture texture)
+	{
+		Reset(pos, rotation, new Vector2(size * 0.5f, size * 0.5f), duration);
+		Size = size;
+		FoamTex.tex = texture;
+		Momentum = Vector3.zero;
+		Spin = 0f;
+		Expansion = 0f;
+	}
+
+	public override void UpdateOverlay()
+	{
+		Position += Momentum * Time.deltaTime;
+		Size += Expansion * Time.deltaTime;
+		Rotation += Spin * Time.deltaTime;
+		HalfSize = new Vector2(Size * 0.5f, Size * 0.5f);
+		base.UpdateOverlay();
+	}
+}
+
+
+==================== Ceto_AddWaveOverlay.cs ====================
+using UnityEngine;
+
+namespace Ceto;
+
+[AddComponentMenu("Ceto/Overlays/AddWaveOverlay")]
+public class AddWaveOverlay : AddWaveOverlayBase
+{
+	public enum ROTATION
+	{
+		RELATIVE_TO_PARENT,
+		INDEPENDANT_TO_PARENT
+	}
+
+	public bool checkTextures = true;
+
+	public OverlayHeightTexture heightTexture = new OverlayHeightTexture();
+
+	public OverlayNormalTexture normalTexture = new OverlayNormalTexture();
+
+	public OverlayFoamTexture foamTexture = new OverlayFoamTexture();
+
+	public OverlayClipTexture clipTexture = new OverlayClipTexture();
+
+	public float width = 10f;
+
+	public float height = 10f;
+
+	public ROTATION m_rotationMode;
+
+	[Range(0f, 360f)]
+	public float rotation;
+
+	private bool m_registered;
+
+	protected override void Start()
+	{
+		if (checkTextures)
+		{
+			if (!heightTexture.ignoreQuerys)
+			{
+				CheckCanSampleTex(heightTexture.tex, "height texture");
+			}
+			if (!heightTexture.ignoreQuerys)
+			{
+				CheckCanSampleTex(heightTexture.mask, "height mask");
+			}
+			if (!clipTexture.ignoreQuerys)
+			{
+				CheckCanSampleTex(clipTexture.tex, "clip texture");
+			}
+		}
+		Vector2 halfSize = new Vector2(width * 0.5f, height * 0.5f);
+		m_overlays.Add(new WaveOverlay(transform.position, Rotation(), halfSize, 0f));
+		m_overlays[0].HeightTex = heightTexture;
+		m_overlays[0].NormalTex = normalTexture;
+		m_overlays[0].FoamTex = foamTexture;
+		m_overlays[0].ClipTex = clipTexture;
+		if (!m_registered && Ocean.Instance != null)
+		{
+			Ocean.Instance.OverlayManager.Add(m_overlays[0]);
+			m_registered = true;
+		}
+	}
+
+	protected override void Update()
+	{
+		if (m_overlays != null && m_overlays.Count == 1)
+		{
+			if (!m_registered && Ocean.Instance != null)
+			{
+				Ocean.Instance.OverlayManager.Add(m_overlays[0]);
+				m_registered = true;
+			}
+			m_overlays[0].Position = transform.position;
+			m_overlays[0].HalfSize = new Vector2(width * 0.5f, height * 0.5f);
+			m_overlays[0].Rotation = Rotation();
+			m_overlays[0].UpdateOverlay();
+		}
+	}
+
+	private float Rotation()
+	{
+		return m_rotationMode switch
+		{
+			ROTATION.RELATIVE_TO_PARENT => transform.eulerAngles.y + rotation, 
+			ROTATION.INDEPENDANT_TO_PARENT => rotation, 
+			_ => rotation, 
+		};
+	}
+
+	private void OnDrawGizmos()
+	{
+		if (enabled)
+		{
+			Vector3 s = new Vector3(width * 0.5f, 1f, height * 0.5f);
+			Vector3 position = transform.position;
+			Matrix4x4 matrix = Matrix4x4.TRS(new Vector3(position.x, 0f, position.z), Quaternion.Euler(0f, Rotation(), 0f), s);
+			Gizmos.color = Color.yellow;
+			Gizmos.matrix = matrix;
+			Gizmos.DrawWireCube(Vector3.zero, new Vector3(2f, 10f, 2f));
+		}
+	}
+}
+
+
