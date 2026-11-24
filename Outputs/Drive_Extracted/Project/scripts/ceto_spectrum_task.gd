@@ -8,8 +8,8 @@ const DotNetRandom = preload("res://scripts/ceto_dotnet_random.gd")
 const GRAVITY: float = 9.818286
 const WAVE_CM: float = 0.23
 const WAVE_KM: float = 370.0
-const DISTRIBUTION_LINEAR: int = 0
-const DISTRIBUTION_GAUSSIAN: int = 1
+const DISTRIBUTION_LINEAR: String = "LINEAR"
+const DISTRIBUTION_GAUSSIAN: String = "GAUSSIAN"
 
 var size: int
 var num_grids: int
@@ -17,7 +17,7 @@ var grid_sizes: Vector4
 var inverse_grid_sizes: Vector4
 var wave_amps: Vector4
 var spectrums: Array
-var distribution: int = DISTRIBUTION_LINEAR
+var distribution: String = DISTRIBUTION_LINEAR
 
 var spectrum01: PackedColorArray = PackedColorArray()
 var spectrum23: PackedColorArray = PackedColorArray()
