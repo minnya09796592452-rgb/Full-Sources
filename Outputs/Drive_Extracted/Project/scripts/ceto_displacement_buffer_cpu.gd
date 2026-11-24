@@ -75,6 +75,12 @@ func get_buffer_result(buffer_index: int) -> PackedColorArray:
 	return _buffers[buffer_index].results
 
 
+func set_read_buffer(buffer_index: int, values: PackedVector4Array) -> void:
+	if not _valid_buffer_index(buffer_index) or values.size() != size * size:
+		return
+	_buffers[buffer_index].data[1] = values
+
+
 func run(condition: Variant, time_value: float) -> bool:
 	if not _fourier.is_valid or condition == null or int(condition.num_grids) != NUM_GRIDS or int(condition.size) != size:
 		push_error("CetoDisplacementBufferCPU: expected a matching four-grid spectrum condition.")
