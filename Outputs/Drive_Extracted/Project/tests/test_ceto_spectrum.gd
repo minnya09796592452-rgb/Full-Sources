@@ -5,6 +5,8 @@ const PhillipsCondition = preload("res://scripts/ceto_phillips_spectrum_conditio
 const UnifiedCondition = preload("res://scripts/ceto_unified_spectrum_condition.gd")
 const MixedCondition = preload("res://scripts/ceto_unified_phillips_spectrum_condition.gd")
 const SpectrumTask = preload("res://scripts/ceto_spectrum_task.gd")
+const UnifiedSpectrum = preload("res://scripts/ceto_unified_spectrum.gd")
+const PhillipsSpectrum = preload("res://scripts/ceto_phillips_spectrum.gd")
 
 
 func _initialize() -> void:
@@ -51,10 +53,10 @@ func _test_grid_presets() -> void:
 func _test_mixed_grid_spectrum_selection() -> void:
 	var mixed = MixedCondition.new(64, 8.0, 0.0, 0.64, 4)
 	assert(mixed.spectrums.size() == 4)
-	assert(mixed.spectrums[0] is preload("res://scripts/ceto_unified_spectrum.gd"))
-	assert(mixed.spectrums[1] is preload("res://scripts/ceto_unified_spectrum.gd"))
-	assert(mixed.spectrums[2] is preload("res://scripts/ceto_phillips_spectrum.gd"))
-	assert(mixed.spectrums[3] is preload("res://scripts/ceto_unified_spectrum.gd"))
+	assert(mixed.spectrums[0].get_script() == UnifiedSpectrum)
+	assert(mixed.spectrums[1].get_script() == UnifiedSpectrum)
+	assert(mixed.spectrums[2].get_script() == PhillipsSpectrum)
+	assert(mixed.spectrums[3].get_script() == UnifiedSpectrum)
 
 
 func _test_spectrum_task_is_deterministic() -> void:
