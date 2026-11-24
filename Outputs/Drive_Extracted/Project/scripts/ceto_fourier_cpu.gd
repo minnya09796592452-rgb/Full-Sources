@@ -35,13 +35,13 @@ func _is_power_of_two(value: int) -> bool:
 func _bit_reverse(value: int) -> int:
 	var reversed_value := 0
 	var output_bit := 1
-	var input_bit := size / 2
+	var input_bit: int = size >> 1
 
 	while input_bit != 0:
 		var bit_value := 1 if (value & input_bit) > input_bit - 1 else 0
 		reversed_value += bit_value * output_bit
 		output_bit *= 2
-		input_bit /= 2
+		input_bit >>= 1
 
 	return reversed_value
 
