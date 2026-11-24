@@ -76,7 +76,9 @@ func _test_ping_pong_swap() -> void:
 	var condition = _make_condition()
 	var buffer = DisplacementBuffer.new(8)
 	assert(buffer.run(condition, 0.25))
-	var first_write: Array = buffer.copy_read_displacements()
+	var first_write: Array = []
+	for grid in buffer.get_write_displacements():
+		first_write.append(grid.duplicate())
 	# Ceto swaps at the beginning of the next update, so the prior write
 	# becomes the read set while the other set is reused for new output.
 	assert(buffer.run(condition, 0.5))
