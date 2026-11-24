@@ -110,33 +110,30 @@ root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
 
 -------------
 
-root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#                                                                                          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
-> import UnityPy, os, json
-> from UnityPy.helpers.TypeTreeGenerator import TypeTreeGenerator
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, os
 >
+> json_path = "/storage/emulated/0/NYAMIST GODOT/data/unity_atmosphere/atmosphere_monobehaviour.json"
 > sd4_dir = "/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded Deep 4"
-> level2_path = None
-> managed_dir = None
-> for root, dirs, files in os.walk(sd4_dir):
->     if "Managed" in dirs:
->         managed_dir = os.path.join(root, "Managed")
->     if "level2" in files:
->         level2_path = os.path.join(root, "level2")
 >
-> env = UnityPy.load(level2_path)
-> ver = str(next(iter(env.assets)).unity_version)
-> ttg = TypeTreeGenerator(ver)
-> ttg.load_local_dll_folder(managed_dir)
-> env.typetree_generator = ttg
+> print("==================== 1. atmosphere_monobehaviour.json ====================")
+> with open(json_path, "r", encoding="utf-8") as f:
+>     print(f.read())
 >
+> print("\n==================== 2. ORIGINAL LUT TEXTURE FORMATS (resources.assets) ====================")
+> res_path = None
+> for root, _, files in os.walk(sd4_dir):
+>     if "resources.assets" in files:
+>         res_path = os.path.join(root, "resources.assets")
+>         break
+>
+> env = UnityPy.load(res_path)
 > for obj in env.objects:
->     if obj.type.name == "MonoBehaviour" and obj.path_id == 287:
->         tree = obj.read_typetree()
->         print(json.dumps(tree, indent=2, default=str))
-> EOF
-{
-  "m_GameObject": {
-    "m_FileID": 0,
+>     if obj.type.name == "Texture2D" and obj.path_id in (69, 77, 98):
+>         tex = obj.read()
+>         print(f"PID={obj.path_id:3d} | Name={tex.m_Name:15s} | Size={tex.m_Width}x{tex.m_Height} | Format={tex.m_TextureFormat.name} ({int(tex.m_TextureFormat)}) | Mips={tex.m_MipCount} | ColorSpace={tex.m_ColorSpace} | Filter={tex.m_TextureSettings.m_FilterMode} | WrapU={tex.m_TextureSettings.m_WrapU} | RawDataLen={len(tex.image_data)}B")                                                                                                                                > EOF
+==================== 1. atmosphere_monobehaviour.json ====================
+{                                                                                                                                                              "m_GameObject": {                                                                                                                                              "m_FileID": 0,
     "m_PathID": 58
   },
   "m_Enabled": 1,
@@ -178,6 +175,439 @@ root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#             
         "b": 0.7411764860153198,
         "a": 0.0
       },
+      "key3": {
+        "r": 1.0,
+        "g": 0.9686274528503418,
+        "b": 0.9019607901573181,
+        "a": 0.0
+      },
+      "key4": {
+        "r": 1.0,
+        "g": 0.9686274528503418,
+        "b": 0.9019607901573181,
+        "a": 0.0
+      },
+      "key5": {
+        "r": 1.0,
+        "g": 0.8823529481887817,
+        "b": 0.7411764860153198,
+        "a": 0.0
+      },
+      "key6": {
+        "r": 1.0,
+        "g": 0.5176470875740051,
+        "b": 0.11764705926179886,
+        "a": 0.0
+      },
+      "key7": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      },
+      "ctime0": 16384,
+      "ctime1": 16593,
+      "ctime2": 21627,
+      "ctime3": 26214,
+      "ctime4": 39321,
+      "ctime5": 43908,
+      "ctime6": 48955,
+      "ctime7": 49151,
+      "atime0": 0,
+      "atime1": 65535,
+      "atime2": 0,
+      "atime3": 0,
+      "atime4": 0,
+      "atime5": 0,
+      "atime6": 0,
+      "atime7": 0,
+      "m_Mode": 0,
+      "m_NumColorKeys": 8,
+      "m_NumAlphaKeys": 2
+    }
+  },
+  "_moonIlluminary": {
+    "_gameObject": {
+      "m_FileID": 0,
+      "m_PathID": 50
+    },
+    "Light": {
+      "m_FileID": 0,
+      "m_PathID": 238
+    },
+    "Renderer": {
+      "m_FileID": 0,
+      "m_PathID": 181
+    },
+    "_intensity": 0.3499999940395355,
+    "_gradient": {
+      "key0": {
+        "r": 0.4156862795352936,
+        "g": 0.6549019813537598,                                                                                                                                     "b": 0.8588235378265381,                                                                                                                                     "a": 1.0
+      },
+      "key1": {
+        "r": 0.4156862795352936,
+        "g": 0.6549019813537598,
+        "b": 0.8588235378265381,
+        "a": 1.0
+      },
+      "key2": {
+        "r": 0.0784313753247261,
+        "g": 0.125490203499794,
+        "b": 0.16078431904315948,
+        "a": 0.0
+      },
+      "key3": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      },
+      "key4": {
+        "r": 0.0784313753247261,
+        "g": 0.125490203499794,
+        "b": 0.16078431904315948,
+        "a": 0.0
+      },
+      "key5": {
+        "r": 0.4156862795352936,
+        "g": 0.6549019813537598,
+        "b": 0.8588235378265381,
+        "a": 0.0
+      },
+      "key6": {
+        "r": 0.4156862795352936,
+        "g": 0.6549019813537598,
+        "b": 0.8588235378265381,
+        "a": 0.0
+      },
+      "key7": {
+        "r": 0.21568627655506134,
+        "g": 0.5607843399047852,
+        "b": 0.8588235378265381,
+        "a": 0.0
+      },
+      "ctime0": 0,
+      "ctime1": 15728,
+      "ctime2": 16384,
+      "ctime3": 32768,
+      "ctime4": 49151,
+      "ctime5": 49807,
+      "ctime6": 65535,
+      "ctime7": 65535,
+      "atime0": 0,
+      "atime1": 65535,                                                                                                                                             "atime2": 0,
+      "atime3": 0,
+      "atime4": 0,
+      "atime5": 0,
+      "atime6": 0,
+      "atime7": 0,
+      "m_Mode": 0,
+      "m_NumColorKeys": 7,
+      "m_NumAlphaKeys": 2
+    }
+  },
+  "_skyDome": {
+    "m_FileID": 0,
+    "m_PathID": 178
+  },
+  "_skyColorPolariser": {
+    "key0": {
+      "r": 1.0,
+      "g": 1.0,
+      "b": 1.0,
+      "a": 1.0
+    },
+    "key1": {
+      "r": 0.4402616024017334,
+      "g": 0.45824018120765686,
+      "b": 0.5275862216949463,
+      "a": 1.0
+    },
+    "key2": {
+      "r": 0.4402616024017334,
+      "g": 0.45824018120765686,
+      "b": 0.5275862216949463,
+      "a": 0.0
+    },
+    "key3": {
+      "r": 0.4402616024017334,
+      "g": 0.45824018120765686,
+      "b": 0.5275862216949463,                                                                                                                                     "a": 0.0
+    },
+    "key4": {
+      "r": 1.0,
+      "g": 1.0,
+      "b": 1.0,
+      "a": 0.0
+    },
+    "key5": {
+      "r": 1.0,
+      "g": 1.0,
+      "b": 1.0,
+      "a": 0.0
+    },
+    "key6": {
+      "r": 1.0,
+      "g": 1.0,
+      "b": 1.0,
+      "a": 0.0
+    },
+    "key7": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "ctime0": 15008,                                                                                                                                             "ctime1": 18677,
+    "ctime2": 32768,
+    "ctime3": 46858,
+    "ctime4": 50511,
+    "ctime5": 50511,
+    "ctime6": 50511,
+    "ctime7": 0,
+    "atime0": 0,
+    "atime1": 65535,
+    "atime2": 0,
+    "atime3": 0,                                                                                                                                                 "atime4": 0,
+    "atime5": 0,
+    "atime6": 0,
+    "atime7": 0,
+    "m_Mode": 0,
+    "m_NumColorKeys": 5,
+    "m_NumAlphaKeys": 2
+  },
+  "_ambientSkyColorGradient": {
+    "key0": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 1.0
+    },
+    "key1": {
+      "r": 0.14901961386203766,
+      "g": 0.21176470816135406,
+      "b": 0.25882354378700256,
+      "a": 1.0
+    },
+    "key2": {
+      "r": 0.2666666805744171,
+      "g": 0.32156863808631897,
+      "b": 0.3686274588108063,
+      "a": 0.0
+    },
+    "key3": {
+      "r": 0.33725491166114807,
+      "g": 0.48235294222831726,
+      "b": 0.6235294342041016,
+      "a": 0.0
+    },
+    "key4": {
+      "r": 0.2666666805744171,
+      "g": 0.32156863808631897,
+      "b": 0.3686274588108063,
+      "a": 0.0
+    },
+    "key5": {
+      "r": 0.14901961386203766,
+      "g": 0.21176470816135406,
+      "b": 0.25882354378700256,
+      "a": 0.0
+    },
+    "key6": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "key7": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "ctime0": 15008,
+    "ctime1": 16974,
+    "ctime2": 18677,
+    "ctime3": 32768,
+    "ctime4": 46858,
+    "ctime5": 48559,
+    "ctime6": 50511,
+    "ctime7": 0,
+    "atime0": 0,
+    "atime1": 65535,
+    "atime2": 0,
+    "atime3": 0,
+    "atime4": 0,
+    "atime5": 0,
+    "atime6": 0,
+    "atime7": 0,
+    "m_Mode": 0,
+    "m_NumColorKeys": 7,
+    "m_NumAlphaKeys": 2
+  },
+  "_ambientGroundColorGradient": {
+    "key0": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 1.0
+    },
+    "key1": {
+      "r": 0.4470588266849518,
+      "g": 0.3176470696926117,
+      "b": 0.20000000298023224,
+      "a": 1.0
+    },
+    "key2": {
+      "r": 0.7019608020782471,
+      "g": 0.6392157077789307,
+      "b": 0.4901960790157318,
+      "a": 1.0
+    },
+    "key3": {
+      "r": 0.4470588266849518,
+      "g": 0.3176470696926117,
+      "b": 0.20000000298023224,
+      "a": 0.0
+    },
+    "key4": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "key5": {
+      "r": 0.7058823704719543,
+      "g": 0.6078431606292725,
+      "b": 0.5686274766921997,
+      "a": 0.0
+    },
+    "key6": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "key7": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "ctime0": 16358,
+    "ctime1": 17367,
+    "ctime2": 32802,
+    "ctime3": 48168,
+    "ctime4": 49151,
+    "ctime5": 48496,
+    "ctime6": 49151,
+    "ctime7": 49151,
+    "atime0": 0,
+    "atime1": 65535,
+    "atime2": 65535,
+    "atime3": 0,
+    "atime4": 0,
+    "atime5": 0,
+    "atime6": 0,
+    "atime7": 0,
+    "m_Mode": 0,
+    "m_NumColorKeys": 5,
+    "m_NumAlphaKeys": 2
+  },
+  "_ambientUnderwaterGroundColorGradient": {
+    "key0": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 1.0
+    },
+    "key1": {
+      "r": 0.0,
+      "g": 0.4431372582912445,
+      "b": 0.6431372761726379,
+      "a": 1.0
+    },
+    "key2": {
+      "r": 0.0,
+      "g": 0.4431372582912445,
+      "b": 0.6431372761726379,
+      "a": 0.0
+    },
+    "key3": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "key4": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "key5": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "key6": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "key7": {
+      "r": 0.0,
+      "g": 0.0,
+      "b": 0.0,
+      "a": 0.0
+    },
+    "ctime0": 16358,
+    "ctime1": 20651,
+    "ctime2": 44884,
+    "ctime3": 49151,
+    "ctime4": 0,
+    "ctime5": 0,
+    "ctime6": 0,
+    "ctime7": 0,
+    "atime0": 0,
+    "atime1": 65535,
+    "atime2": 0,
+    "atime3": 0,
+    "atime4": 0,
+    "atime5": 0,
+    "atime6": 0,
+    "atime7": 0,
+    "m_Mode": 0,
+    "m_NumColorKeys": 4,
+    "m_NumAlphaKeys": 2
+  },
+  "_transmittance": {
+    "m_FileID": 4,
+    "m_PathID": 77
+  },
+  "_inscatter": {
+    "m_FileID": 4,
+    "m_PathID": 98
+  },
+  "_irradiance": {
+    "m_FileID": 4,
+    "m_PathID": 69
+  },
+  "_atmosphereLookupTexture": {
+    "m_FileID": 0,
+    "m_PathID": 0
+  },
+  "_mieG": 0.8500000238418579,
+  "MilitaryTimeDiffToUpdate": 0.004999999888241291
+}
+
+==================== 2. ORIGINAL LUT TEXTURE FORMATS (resources.assets) ====================
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+---------
       "key3": {
         "r": 1.0,
         "g": 0.9686274528503418,
