@@ -1,0 +1,263 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# /root/.venv_mission3/bin/python - <<'PY'
+> import UnityPy
+> from pathlib import Path
+>
+> path = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded Deep 4/Stranded Deep/Stranded_Deep_Data/resources.assets")
+> env = UnityPy.load(str(path))
+>
+> targets = {2403, 3920, 3942}
+>
+> for obj in env.objects:
+>     if obj.path_id not in targets:
+>         continue
+>
+>     tree = obj.read_typetree()
+>     print(f"\n{'='*65}")
+>     print("PATH:", obj.path_id, "TYPE:", obj.type.name)
+>     print("NAME:", tree.get("m_Name"))
+>
+>     if obj.path_id == 2403:
+>         poses = tree.get("m_BindPose", [])
+>         print("\nBIND POSES:", len(poses))
+>         for i, pose in enumerate(poses):
+>             print(f"\nBINDPOSE[{i}]")
+>             print(pose)
+>
+>         vd = tree.get("m_VertexData", {})
+>         print("\nVERTEX DATA KEYS:", list(vd.keys()))
+>         print("VERTEX COUNT:", vd.get("m_VertexCount"))
+>         print("CHANNELS:")
+>         for ch in vd.get("m_Channels", []):
+>             print(ch)
+>         print("STREAMS:")
+>         for stream in vd.get("m_Streams", []):
+>             print(stream)
+>
+>     elif obj.path_id == 3920:
+>         tos = tree.get("m_TOS", [])
+>         print("\nAVATAR PATH COUNT:", len(tos))
+>         for i, entry in enumerate(tos):
+>             print(i, entry[1])
+>
+>     elif obj.path_id == 3942:
+>         controller = tree.get("m_Controller", {})
+>         print("\nCONTROLLER KEYS:", list(controller.keys()))
+>         print("CONTROLLER DATA:")
+>         print(controller)
+>
+> print("\n========== EEL STRUCTURE INSPECTION COMPLETE ==========")
+> PY
+
+=================================================================
+PATH: 2403 TYPE: Mesh
+NAME: Eel_Rig_Final:Eel_Mesh
+
+BIND POSES: 42
+
+BINDPOSE[0]
+{'e00': 5.431337782241328e-16, 'e01': 0.21693047881126404, 'e02': 0.9761871695518494, 'e03': -2.1185762882232666, 'e10': -5.962100141345e-17, 'e11': 0.9761871099472046, 'e12': -0.21693049371242523, 'e13': 0.3522990942001343, 'e20': -1.0, 'e21': 5.96210080308949e-17, 'e22': 5.431337782241328e-16, 'e23': -1.171674735552864e-15, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[1]
+{'e00': 5.573193566291558e-16, 'e01': 0.04540766030550003, 'e02': 0.9989686012268066, 'e03': -1.68708336353302, 'e10': -1.2659813986666877e-17, 'e11': 0.9989686012268066, 'e12': -0.04540766403079033, 'e13': 0.03494704142212868, 'e20': -1.0, 'e21': 1.265981481384749e-17, 'e22': 5.573193566291558e-16, 'e23': -9.400613053018193e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[2]
+{'e00': 5.544408739765897e-16, 'e01': 0.06049505993723869, 'e02': 0.9981683492660522, 'e03': -1.233609914779663, 'e10': -1.6785840512918132e-17, 'e11': 0.9981684684753418, 'e12': -0.060495056211948395, 'e13': 0.06200872361660004, 'e20': -1.0, 'e21': 1.6785845476001807e-17, 'e22': 5.544409269161489e-16, 'e23': -8.558390723508705e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[3]
+{'e00': 5.5765335230817e-16, 'e01': 0.055470023304224014, 'e02': 0.9984604120254517, 'e03': -0.8043019771575928, 'e10': -1.547843523266377e-17, 'e11': 0.9984604120254517, 'e12': -0.05547002702951431, 'e13': 0.06093968451023102, 'e20': -1.0, 'e21': 1.5478436887024994e-17, 'e22': 5.576534052477292e-16, 'e23': -7.920929609272879e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[4]
+{'e00': 5.57179384434622e-16, 'e01': 0.041630543768405914, 'e02': 0.9991331100463867, 'e03': -0.3873938322067261, 'e10': -1.160286576100377e-17, 'e11': 0.9991330504417419, 'e12': -0.041630540043115616, 'e13': 0.055577490478754044, 'e20': -1.0, 'e21': 1.1602870724087445e-17, 'e22': 5.57179384434622e-16, 'e23': -7.462837250738809e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[5]
+{'e00': 5.496027276609915e-16, 'e01': 0.024683836847543716, 'e02': 0.999695360660553, 'e03': 0.06963038444519043, 'e10': -6.784189622663886e-18, 'e11': 0.999695360660553, 'e12': -0.024683834984898567, 'e13': 0.05507795140147209, 'e20': -1.0, 'e21': 6.784180937267454e-18, 'e22': 5.496026747214323e-16, 'e23': -6.968161009817233e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[6]
+{'e00': 5.569432740005749e-16, 'e01': 0.035691529512405396, 'e02': 0.9993628263473511, 'e03': 0.49903082847595215, 'e10': -9.942251050466813e-18, 'e11': 0.9993628859519958, 'e12': -0.035691533237695694, 'e13': 0.05058632045984268, 'e20': -1.0, 'e21': 9.942241951480075e-18, 'e22': 5.569433269401341e-16, 'e23': -6.489771624284581e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[7]
+{'e00': 5.588885910430628e-16, 'e01': 0.013512279838323593, 'e02': 0.9999087452888489, 'e03': 0.9845607280731201, 'e10': 2.1826849234150223e-16, 'e11': 0.9999086260795593, 'e12': -0.013512278907001019, 'e13': 0.07244622707366943, 'e20': -1.0, 'e21': 2.258004548922753e-16, 'e22': 5.558882415252105e-16, 'e23': -5.781639374885777e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[8]
+{'e00': 5.58991982002187e-16, 'e01': 0.013887547887861729, 'e02': 0.9999035596847534, 'e03': 1.4132847785949707, 'e10': 2.1816287792089146e-16, 'e11': 0.9999034404754639, 'e12': -0.013887548819184303, 'e13': 0.07191582024097443, 'e20': -1.0, 'e21': 2.259049311123632e-16, 'e22': 5.559083585577078e-16, 'e23': -5.299101645493947e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[9]
+{'e00': 5.565301866201108e-16, 'e01': 0.02630668319761753, 'e02': 0.9996538758277893, 'e03': 1.8311493396759033, 'e10': -7.32149306135383e-18, 'e11': 0.9996539354324341, 'e12': -0.02630668133497238, 'e13': 0.049174174666404724, 'e20': -1.0, 'e21': 7.321498024437506e-18, 'e22': 5.5653023955967e-16, 'e23': -5.030992424281911e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[10]
+{'e00': 5.591013551315012e-16, 'e01': 0.014284256845712662, 'e02': 0.9998980164527893, 'e03': 2.270789384841919, 'e10': 2.180512151556417e-16, 'e11': 0.9998978972434998, 'e12': -0.014284255914390087, 'e13': 0.07648522406816483, 'e20': -1.0, 'e21': 2.2601533656308186e-16, 'e22': 5.559295343813891e-16, 'e23': -4.3240883726566263e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[11]
+{'e00': 5.55000815694284e-16, 'e01': 0.032769277691841125, 'e02': 0.9994628429412842, 'e03': 2.677274703979492, 'e10': -9.095932787261759e-18, 'e11': 0.9994630217552185, 'e12': -0.032769281417131424, 'e13': 0.026988770812749863, 'e20': -1.0, 'e21': 9.095925342636246e-18, 'e22': 5.550008686338432e-16, 'e23': -4.1409429088013015e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[12]
+{'e00': 5.543066192544499e-16, 'e01': 0.014923710376024246, 'e02': 0.9998887181282043, 'e03': 3.029852867126465, 'e10': -4.136386136242869e-18, 'e11': 0.99988853931427, 'e12': -0.014923710376024246, 'e13': 0.08108437061309814, 'e20': -1.0, 'e21': 4.1363952352296074e-18, 'e22': 5.543066192544499e-16, 'e23': -3.7873595928818345e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[13]
+{'e00': 1.0, 'e01': -6.189421285075392e-17, 'e02': -1.1108471820281646e-16, 'e03': 1.8434867415689955e-15, 'e10': 6.189420623330902e-17, 'e11': 1.0, 'e12': 0.0, 'e13': 0.1320846527814865, 'e20': 1.1108469173303685e-16, 'e21': 0.0, 'e22': 1.0, 'e23': 3.416414499282837, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[14]
+{'e00': 6.087238671389982e-17, 'e01': -0.9941213726997375, 'e02': 0.10827065259218216, 'e03': 0.3114405870437622, 'e10': 4.98691865305831e-16, 'e11': 0.10827065259218216, 'e12': 0.9941214919090271, 'e13': 3.0225069522857666, 'e20': -1.0, 'e21': -6.520850057212729e-18, 'e22': 5.023509946984104e-16, 'e23': 1.5000392336546103e-15, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[15]
+{'e00': 2.7659654428308284e-16, 'e01': 0.9764173030853271, 'e02': 0.2158912718296051, 'e03': 0.8852867484092712, 'e10': -4.44164542842809e-16, 'e11': 0.2158912718296051, 'e12': -0.9764174222946167, 'e13': -2.9078381061553955, 'e20': -1.0, 'e21': 1.7418242590527583e-16, 'e22': 4.934047385886289e-16, 'e23': 1.5161892932225528e-15, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[16]
+{'e00': 6.091278621501691e-17, 'e01': -0.994781494140625, 'e02': 0.10202886164188385, 'e03': 0.30853021144866943, 'e10': 4.990740889232795e-16, 'e11': 0.10202887654304504, 'e12': 0.9947814345359802, 'e13': 2.6713027954101562, 'e20': -1.0, 'e21': -9.674965006313166e-18, 'e22': 5.026844609818326e-16, 'e23': 1.3264487249607876e-15, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[17]
+{'e00': 6.10608383097741e-17, 'e01': 0.997199296951294, 'e02': 0.07478994876146317, 'e03': 0.47543513774871826, 'e10': -5.007420026755416e-16, 'e11': 0.07478994876146317, 'e12': -0.997199296951294, 'e13': -2.6516470909118652, 'e20': -1.0, 'e21': 2.3439363722939466e-17, 'e22': 5.039063589478061e-16, 'e23': 1.3397568831115736e-15, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[18]
+{'e00': 6.113069205814298e-17, 'e01': -0.9983398914337158, 'e02': 0.05759653076529503, 'e03': 0.19372984766960144, 'e10': 5.017947058103011e-16, 'e11': 0.05759653076529503, 'e12': 0.9983398914337158, 'e13': 2.2595818042755127, 'e20': -1.0, 'e21': -3.2127559333939136e-17, 'e22': 5.044827119288534e-16, 'e23': 1.1219235142420538e-15, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[19]
+{'e00': 6.122827951808953e-17, 'e01': 0.9999340176582336, 'e02': -0.011493493802845478, 'e03': 0.2604128122329712, 'e10': -6.052865677343708e-17, 'e11': 0.011493493802845478, 'e12': 0.9999339580535889, 'e13': 2.2682392597198486, 'e20': 1.0, 'e21': -6.052857736409828e-17, 'e22': 6.122825304830993e-17, 'e23': 1.3562712727259538e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[20]
+{'e00': 6.095122695244347e-17, 'e01': -0.9954090118408203, 'e02': 0.09571241587400436, 'e03': 0.2675079107284546, 'e10': 4.994608653428195e-16, 'e11': 0.09571241587400436, 'e12': 0.9954090714454651, 'e13': 1.8192164897918701, 'e20': -1.0, 'e21': -1.2866801045707246e-17, 'e22': 5.030016218810201e-16, 'e23': 9.029761911677763e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[21]
+{'e00': 6.122365392410414e-17, 'e01': 0.999858021736145, 'e02': -0.01685153879225254, 'e03': 0.291222482919693, 'e10': -6.020053738549445e-17, 'e11': 0.01685153692960739, 'e12': 0.999858021736145, 'e13': 1.8324453830718994, 'e20': 1.0, 'e21': -6.020047121104544e-17, 'e22': 6.122364730665924e-17, 'e23': 1.0316231316802858e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[22]
+{'e00': 6.104239549083662e-17, 'e01': -0.9968981742858887, 'e02': 0.07870247960090637, 'e03': 0.23486481606960297, 'e10': 5.005023452910279e-16, 'e11': 0.07870247215032578, 'e12': 0.9968981742858887, 'e13': 1.4120690822601318, 'e20': -1.0, 'e21': -2.1462273018762172e-17, 'e22': 5.037541047755371e-16, 'e23': 7.007591452303104e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[23]
+{'e00': -1.6078366169891328e-16, 'e01': 0.9998220205307007, 'e02': -0.018864566460251808, 'e03': 0.3203681409358978, 'e10': 1.0459570467301967e-15, 'e11': 0.018864570185542107, 'e12': 0.9998220801353455, 'e13': 1.4135510921478271, 'e20': 1.0, 'e21': 1.4102352123999333e-16, 'e22': -1.0488040303450368e-15, 'e23': -1.4195298108092731e-15, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[24]
+{'e00': 6.085140279612057e-17, 'e01': -0.9937787652015686, 'e02': 0.11137176305055618, 'e03': 0.2737794518470764, 'e10': 4.985019711069684e-16, 'e11': 0.11137175559997559, 'e12': 0.9937787652015686, 'e13': 0.9668793678283691, 'e20': -1.0, 'e21': -4.953778720607557e-18, 'e22': 5.021778294002561e-16, 'e23': 4.798261122298728e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[25]
+{'e00': 2.8286400575761343e-16, 'e01': 0.9985422492027283, 'e02': -0.053975265473127365, 'e03': 0.3062976598739624, 'e10': 1.0642805928407937e-15, 'e11': 0.05397525802254677, 'e12': 0.998542308807373, 'e13': 0.9927558898925781, 'e20': 1.0, 'e21': -3.398964546319196e-16, 'e22': -1.0474615890027571e-15, 'e23': -1.1386790964881648e-15, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[26]
+{'e00': 6.065804767357508e-17, 'e01': -0.9906211495399475, 'e02': 0.13663740456104279, 'e03': 0.3142920434474945, 'e10': 4.969549183683677e-16, 'e11': 0.13663740456104279, 'e12': 0.9906212091445923, 'e13': 0.4833810329437256, 'e20': -1.0, 'e21': 7.813482718907508e-18, 'e22': 5.005821781463066e-16, 'e23': 2.4109289360112283e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[27]
+{'e00': -1.6045080422042194e-16, 'e01': 0.9977520108222961, 'e02': -0.0670132040977478, 'e03': 0.33616113662719727, 'e10': 1.0382141068011083e-15, 'e11': 0.0670131966471672, 'e12': 0.9977521300315857, 'e13': 0.5179347991943359, 'e20': 1.0, 'e21': 9.051604509107287e-17, 'e22': -1.0466326613847504e-15, 'e23': -4.824401088446588e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[28]
+{'e00': 6.084187367546396e-17, 'e01': -0.9936231970787048, 'e02': 0.11275157332420349, 'e03': 0.300610214471817, 'e10': 4.98417532510039e-16, 'e11': 0.11275157332420349, 'e12': 0.9936231970787048, 'e13': 0.06356048583984375, 'e20': -1.0, 'e21': -4.256531638674359e-18, 'e22': 5.02099214154839e-16, 'e23': 3.308425988680572e-17, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[29]
+{'e00': 6.092123007470985e-17, 'e01': -0.9949193596839905, 'e02': 0.10067635774612427, 'e03': 0.3163273334503174, 'e10': 4.991568863938736e-16, 'e11': 0.10067636519670486, 'e12': 0.9949192404747009, 'e13': -0.372322678565979, 'e20': -1.0, 'e21': -1.0358419678712655e-17, 'e22': 5.027541294417442e-16, 'e23': -1.8248255469497992e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[30]
+{'e00': 6.049263140339917e-17, 'e01': -0.9879195094108582, 'e02': 0.1549677699804306, 'e03': 0.2585480213165283, 'e10': 4.958325467736965e-16, 'e11': 0.1549677550792694, 'e12': 0.9879194498062134, 'e13': -0.8109660148620605, 'e20': -1.0, 'e21': 1.7076213995148747e-17, 'e22': 4.992170257331287e-16, 'e23': -4.00608044052184e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[31]
+{'e00': 6.073523355089362e-17, 'e01': -0.9918816089630127, 'e02': 0.1271643191576004, 'e03': 0.2587325870990753, 'e10': 4.97534924179e-16, 'e11': 0.1271643191576004, 'e12': 0.9918816685676575, 'e13': -1.2287209033966064, 'e20': -1.0, 'e21': 3.0265312318057173e-18, 'e22': 5.01219199862201e-16, 'e23': -6.080662651694634e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[32]
+{'e00': 6.104632625310747e-17, 'e01': -0.9969621896743774, 'e02': 0.07788766920566559, 'e03': 0.31279832124710083, 'e10': 5.005523731744751e-16, 'e11': 0.07788766920566559, 'e12': 0.9969621300697327, 'e13': -1.6578564643859863, 'e20': -1.0, 'e21': -2.1874031947162493e-17, 'e22': 5.037864508462104e-16, 'e23': -8.212936806300511e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[33]
+{'e00': 6.06677025256848e-17, 'e01': -0.9907785654067993, 'e02': 0.13549110293388367, 'e03': 0.17777973413467407, 'e10': 4.970251691634306e-16, 'e11': 0.13549108803272247, 'e12': 0.9907786846160889, 'e13': -2.1137166023254395, 'e20': -1.0, 'e21': 7.234218062103973e-18, 'e22': 5.006617463037893e-16, 'e23': -1.0482545177205056e-15, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[34]
+{'e00': 1.0, 'e01': 4.0494851880660084e-17, 'e02': -1.2460789037330698e-16, 'e03': 0.24586467444896698, 'e10': -4.0494851880660084e-17, 'e11': 1.0, 'e12': 3.552713678800501e-15, 'e13': 0.2637389898300171, 'e20': 1.2460789037330698e-16, 'e21': 0.0, 'e22': 1.0, 'e23': -2.3019185066223145, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[35]
+{'e00': 1.0, 'e01': 5.103165388565041e-17, 'e02': -1.3218836706700626e-17, 'e03': -0.24586474895477295, 'e10': 5.103165388565041e-17, 'e11': -1.0, 'e12': 8.881784197001252e-16, 'e13': -0.26374000310897827, 'e20': -1.3218836706700626e-17, 'e21': -5.665538686387998e-16, 'e22': -1.0, 'e23': 2.3019185066223145, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[36]
+{'e00': 2.1002293100244704e-16, 'e01': 0.07124705612659454, 'e02': -0.9974586963653564, 'e03': 2.349252223968506, 'e10': -7.49127519080279e-18, 'e11': 0.9974587559700012, 'e12': 0.07124704867601395, 'e13': -0.3160685896873474, 'e20': 1.0, 'e21': -7.49128180824769e-18, 'e22': 2.1002290453266744e-16, 'e23': -4.957645194401201e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[37]
+{'e00': 2.0734146291945634e-16, 'e01': 0.12834151089191437, 'e02': -0.9917299151420593, 'e03': 2.5756609439849854, 'e10': -1.3360512066115646e-17, 'e11': 0.9917299151420593, 'e12': 0.12834151089191437, 'e13': -0.46280306577682495, 'e20': 1.0, 'e21': -1.3360488905058495e-17, 'e22': 2.0734146291945634e-16, 'e23': -5.440808139987223e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[38]
+{'e00': 1.0, 'e01': -3.845116651972737e-17, 'e02': 0.0, 'e03': -1.4210854715202004e-14, 'e10': 1.469072767894177e-17, 'e11': 1.0, 'e12': 0.0, 'e13': -0.07065888494253159, 'e20': 0.0, 'e21': 0.0, 'e22': 1.0, 'e23': -3.378390312194824, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[39]
+{'e00': 2.090568369865443e-16, 'e01': 0.0766965001821518, 'e02': -0.9970545172691345, 'e03': 2.585259199142456, 'e10': -8.028777152839747e-18, 'e11': 0.9970544576644897, 'e12': 0.0766965001821518, 'e13': -0.060581453144550323, 'e20': 1.0, 'e21': -8.028790387729548e-18, 'e22': 2.090568634563239e-16, 'e23': -5.510822295220488e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[40]
+{'e00': 2.1746410220918627e-16, 'e01': 0.0953088253736496, 'e02': -0.9954478144645691, 'e03': 2.784233570098877, 'e10': -1.0386761368040559e-17, 'e11': 0.9954477548599243, 'e12': 0.0953088253736496, 'e13': -0.06741513311862946, 'e20': 1.0, 'e21': -1.038677460293036e-17, 'e22': 2.1746408897429647e-16, 'e23': -5.522266239733485e-16, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+BINDPOSE[41]
+{'e00': 1.0, 'e01': -6.04557060608548e-17, 'e02': 0.0, 'e03': 0.0, 'e10': 4.043396477013128e-17, 'e11': 1.0, 'e12': 0.0, 'e13': 0.19496585428714752, 'e20': 0.0, 'e21': 0.0, 'e22': 1.0, 'e23': -3.3958873748779297, 'e30': 0.0, 'e31': 0.0, 'e32': 0.0, 'e33': 1.0}
+
+VERTEX DATA KEYS: ['m_VertexCount', 'm_Channels', 'm_DataSize']
+VERTEX COUNT: 3005
+CHANNELS:
+{'stream': 0, 'offset': 0, 'format': 0, 'dimension': 3}
+{'stream': 0, 'offset': 12, 'format': 0, 'dimension': 3}
+{'stream': 0, 'offset': 24, 'format': 0, 'dimension': 4}
+{'stream': 0, 'offset': 0, 'format': 0, 'dimension': 0}
+{'stream': 1, 'offset': 0, 'format': 0, 'dimension': 2}
+{'stream': 0, 'offset': 0, 'format': 0, 'dimension': 0}
+{'stream': 0, 'offset': 0, 'format': 0, 'dimension': 0}
+{'stream': 0, 'offset': 0, 'format': 0, 'dimension': 0}
+{'stream': 0, 'offset': 0, 'format': 0, 'dimension': 0}
+{'stream': 0, 'offset': 0, 'format': 0, 'dimension': 0}
+{'stream': 0, 'offset': 0, 'format': 0, 'dimension': 0}
+{'stream': 0, 'offset': 0, 'format': 0, 'dimension': 0}
+{'stream': 2, 'offset': 0, 'format': 0, 'dimension': 4}
+{'stream': 2, 'offset': 16, 'format': 10, 'dimension': 4}
+STREAMS:
+
+=================================================================
+PATH: 3920 TYPE: Avatar
+NAME: Eel_IdleAvatar
+
+AVATAR PATH COUNT: 46
+0 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint
+1 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Upper_Fin1_Joint
+2 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint
+3 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint/Eel_Rig_Final:Eel_Spine10_Joint/Eel_Rig_Final:Eel_Upper_Fin11_Joint
+4 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Upper_Fin7_Joint
+5 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Upper_Fin6_Joint
+6 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Right_Cheek_Joint
+7 Eel_Rig_Final:Eel_Root_Joint
+8 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Neck_Joint/Eel_Rig_Final:Eel_Jaw_Joint/Eel_Rig_Final:Eel_Jaw1_Joint
+9 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Neck_Joint/Eel_Rig_Final:Eel_Head_Joint/Eel_Rig_Final:Eel_Head_End_Joint
+10 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint
+11 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Neck_Joint
+12 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Upper_Fin8_Joint
+13 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Neck_Joint/Eel_Rig_Final:Eel_Head_Joint
+14 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint
+15 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint/Eel_Rig_Final:Eel_Spine10_Joint
+16 Eel_Rig_Final:Eel_LOD2
+17 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Upper_Fin5_Joint
+18 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Lower_Fin_Joint
+19 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Upper_Fin2_Joint
+20 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Left_Cheek_Joint
+21 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint/Eel_Rig_Final:Eel_Spine10_Joint/Eel_Rig_Final:Eel_Spine11_Joint/Eel_Rig_Final:Eel_Lower_Fin6_Joint
+22 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint/Eel_Rig_Final:Eel_Spine10_Joint/Eel_Rig_Final:Eel_Spine11_Joint
+23 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Upper_Fin_Joint
+24 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint/Eel_Rig_Final:Eel_Upper_Fin10_Joint
+25 Eel_Rig_Final:Eel_Mesh
+26 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Lower_Fin1_Joint
+27 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint
+28 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint/Eel_Rig_Final:Eel_Spine10_Joint/Eel_Rig_Final:Eel_Spine11_Joint/Eel_Rig_Final:Eel_Upper_Fin12_Joint
+29 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Lower_Fin3_Joint
+30 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Neck_Joint/Eel_Rig_Final:Eel_Jaw_Joint
+31 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint
+32 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Upper_Fin3_Joint
+33 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint
+34 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint/Eel_Rig_Final:Eel_Lower_Fin4_Joint
+35 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint/Eel_Rig_Final:Eel_Spine10_Joint/Eel_Rig_Final:Eel_Lower_Fin5_Joint
+36
+37 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Spine9_Joint/Eel_Rig_Final:Eel_Spine10_Joint/Eel_Rig_Final:Eel_Spine11_Joint/Eel_Rig_Final:Eel_Spine_End_Joint
+38 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Upper_Fin4_Joint
+39 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint
+40 Eel_Rig_Final:Eel_LOD1
+41 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint
+42 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Neck_Joint/Eel_Rig_Final:Eel_Jaw_Joint/Eel_Rig_Final:Eel_Jaw1_Joint/Eel_Rig_Final:Eel_Jaw_End_Joint
+43 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Spine8_Joint/Eel_Rig_Final:Eel_Upper_Fin9_Joint
+44 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint
+45 Eel_Rig_Final:Eel_Root_Joint/Eel_Rig_Final:Eel_Spine_Joint/Eel_Rig_Final:Eel_Spine1_Joint/Eel_Rig_Final:Eel_Spine2_Joint/Eel_Rig_Final:Eel_Spine3_Joint/Eel_Rig_Final:Eel_Spine4_Joint/Eel_Rig_Final:Eel_Spine5_Joint/Eel_Rig_Final:Eel_Spine6_Joint/Eel_Rig_Final:Eel_Spine7_Joint/Eel_Rig_Final:Eel_Lower_Fin2_Joint
+
+=================================================================
+PATH: 3942 TYPE: AnimatorController
+NAME: EelController
+
+CONTROLLER KEYS: ['m_LayerArray', 'm_StateMachineArray', 'm_Values', 'm_DefaultValues']
+CONTROLLER DATA:
+{'m_LayerArray': [{'data': {'m_StateMachineIndex': 0, 'm_StateMachineSynchronizedLayerIndex': 0, 'm_BodyMask': {'word0': 4294967295, 'word1': 4294967295, 'word2': 524287}, 'm_SkeletonMask': {'data': {'m_Data': []}}, 'm_Binding': 756556552, '(int&)m_LayerBlendingMode': 0, 'm_DefaultWeight': 0.0, 'm_IKPass': False, 'm_SyncedLayerAffectsTiming': False}}], 'm_StateMachineArray': [{'data': {'m_StateConstantArray': [{'data': {'m_TransitionConstantArray': [{'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 1, 'm_EventID': 3955553525, 'm_EventThreshold': 0.0, 'm_ExitTime': 0.0}}], 'm_DestinationState': 1, 'm_FullPathID': 2357474990, 'm_ID': 3035553521, 'm_UserID': 0, 'm_TransitionDuration': 0.12865972518920898, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.7580645084381104, 'm_HasExitTime': False, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}, {'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 1, 'm_EventID': 1080829965, 'm_EventThreshold': 0.0, 'm_ExitTime': 0.0}}], 'm_DestinationState': 2, 'm_FullPathID': 2118966208, 'm_ID': 2682633449, 'm_UserID': 0, 'm_TransitionDuration': 0.25, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.7580645084381104, 'm_HasExitTime': False, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}, {'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 4, 'm_EventID': 3471299058, 'm_EventThreshold': 0.0010000000474974513, 'm_ExitTime': 0.0}}], 'm_DestinationState': 3, 'm_FullPathID': 4236487113, 'm_ID': 1687454509, 'm_UserID': 0, 'm_TransitionDuration': 0.25, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.8442906737327576, 'm_HasExitTime': False, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}], 'm_BlendTreeConstantIndexArray': [0], 'm_BlendTreeConstantArray': [{'data': {'m_NodeArray': [{'data': {'m_BlendType': 0, 'm_BlendEventID': 3471299058, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [1, 5], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': [0.0, 1.0]}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 4294967295, 'm_Duration': 0.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}, {'data': {'m_BlendType': 0, 'm_BlendEventID': 3166393104, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [2, 3, 4], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': [-0.10000000149011612, 0.0, 0.10000000149011612]}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 4294967295, 'm_Duration': 0.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}, {'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 0, 'm_Duration': 2.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}, {'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 1, 'm_Duration': 1.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}, {'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 2, 'm_Duration': 2.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}, {'data': {'m_BlendType': 0, 'm_BlendEventID': 3166393104, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [6, 7, 8], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': [-0.10000000149011612, 0.0, 0.10000000149011612]}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 4294967295, 'm_Duration': 0.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}, {'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 0, 'm_Duration': 0.5, 'm_CycleOffset': 0.0, 'm_Mirror': False}}, {'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 4, 'm_Duration': 1.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}, {'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 2, 'm_Duration': 0.5, 'm_CycleOffset': 0.0, 'm_Mirror': False}}]}}], 'm_NameID': 2147435812, 'm_PathID': 2512770110, 'm_FullPathID': 2512770110, 'm_TagID': 0, 'm_SpeedParamID': 0, 'm_MirrorParamID': 0, 'm_CycleOffsetParamID': 0, 'm_TimeParamID': 0, 'm_Speed': 1.0, 'm_CycleOffset': 0.0, 'm_IKOnFeet': False, 'm_WriteDefaultValues': True, 'm_Loop': True, 'm_Mirror': False}}, {'data': {'m_TransitionConstantArray': [{'data': {'m_ConditionConstantArray': [], 'm_DestinationState': 0, 'm_FullPathID': 3212335436, 'm_ID': 3975760165, 'm_UserID': 0, 'm_TransitionDuration': 0.289864182472229, 'm_TransitionOffset': 0.04629401117563248, 'm_ExitTime': 0.8506524562835693, 'm_HasExitTime': True, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}, {'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 1, 'm_EventID': 1080829965, 'm_EventThreshold': 0.0, 'm_ExitTime': 0.0}}], 'm_DestinationState': 2, 'm_FullPathID': 3896279144, 'm_ID': 3003748676, 'm_UserID': 0, 'm_TransitionDuration': 0.14847326278686523, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.7580645680427551, 'm_HasExitTime': False, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}], 'm_BlendTreeConstantIndexArray': [0], 'm_BlendTreeConstantArray': [{'data': {'m_NodeArray': [{'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 6, 'm_Duration': 1.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}]}}], 'm_NameID': 3955553525, 'm_PathID': 3705751494, 'm_FullPathID': 3705751494, 'm_TagID': 0, 'm_SpeedParamID': 0, 'm_MirrorParamID': 0, 'm_CycleOffsetParamID': 0, 'm_TimeParamID': 0, 'm_Speed': 1.0, 'm_CycleOffset': 0.0, 'm_IKOnFeet': False, 'm_WriteDefaultValues': True, 'm_Loop': False, 'm_Mirror': False}}, {'data': {'m_TransitionConstantArray': [{'data': {'m_ConditionConstantArray': [], 'm_DestinationState': 0, 'm_FullPathID': 3961918413, 'm_ID': 2000944551, 'm_UserID': 0, 'm_TransitionDuration': 0.35515451431274414, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.8999999761581421, 'm_HasExitTime': True, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}, {'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 1, 'm_EventID': 3955553525, 'm_EventThreshold': 0.0, 'm_ExitTime': 0.0}}], 'm_DestinationState': 1, 'm_FullPathID': 3866155848, 'm_ID': 1053822079, 'm_UserID': 0, 'm_TransitionDuration': 0.10000000149011612, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.8999999761581421, 'm_HasExitTime': False, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}], 'm_BlendTreeConstantIndexArray': [0], 'm_BlendTreeConstantArray': [{'data': {'m_NodeArray': [{'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 7, 'm_Duration': 1.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}]}}], 'm_NameID': 1080829965, 'm_PathID': 1130333774, 'm_FullPathID': 1130333774, 'm_TagID': 0, 'm_SpeedParamID': 0, 'm_MirrorParamID': 0, 'm_CycleOffsetParamID': 0, 'm_TimeParamID': 0, 'm_Speed': 1.0, 'm_CycleOffset': 0.0, 'm_IKOnFeet': False, 'm_WriteDefaultValues': True, 'm_Loop': False, 'm_Mirror': False}}, {'data': {'m_TransitionConstantArray': [{'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 3, 'm_EventID': 3471299058, 'm_EventThreshold': 0.0, 'm_ExitTime': 0.0}}], 'm_DestinationState': 0, 'm_FullPathID': 548289853, 'm_ID': 3643234293, 'm_UserID': 0, 'm_TransitionDuration': 0.39768028259277344, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.8336597681045532, 'm_HasExitTime': False, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}, {'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 1, 'm_EventID': 1080829965, 'm_EventThreshold': 0.0, 'm_ExitTime': 0.0}}], 'm_DestinationState': 4, 'm_FullPathID': 2658019635, 'm_ID': 178542235, 'm_UserID': 0, 'm_TransitionDuration': 0.08513748645782471, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.8500000238418579, 'm_HasExitTime': False, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}], 'm_BlendTreeConstantIndexArray': [0], 'm_BlendTreeConstantArray': [{'data': {'m_NodeArray': [{'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 8, 'm_Duration': 1.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}]}}], 'm_NameID': 2081823275, 'm_PathID': 1432961145, 'm_FullPathID': 1432961145, 'm_TagID': 0, 'm_SpeedParamID': 0, 'm_MirrorParamID': 0, 'm_CycleOffsetParamID': 0, 'm_TimeParamID': 0, 'm_Speed': 1.0, 'm_CycleOffset': 0.0, 'm_IKOnFeet': False, 'm_WriteDefaultValues': True, 'm_Loop': True, 'm_Mirror': False}}, {'data': {'m_TransitionConstantArray': [{'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 4, 'm_EventID': 3471299058, 'm_EventThreshold': 0.0010000000474974513, 'm_ExitTime': 0.0}}], 'm_DestinationState': 3, 'm_FullPathID': 2057298898, 'm_ID': 1148730746, 'm_UserID': 0, 'm_TransitionDuration': 0.10000000149011612, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.8999999761581421, 'm_HasExitTime': True, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}, {'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 3, 'm_EventID': 3471299058, 'm_EventThreshold': 0.0, 'm_ExitTime': 0.0}}], 'm_DestinationState': 0, 'm_FullPathID': 1034343009, 'm_ID': 3794830129, 'm_UserID': 0, 'm_TransitionDuration': 0.7879722714424133, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.5428353548049927, 'm_HasExitTime': True, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}], 'm_BlendTreeConstantIndexArray': [0], 'm_BlendTreeConstantArray': [{'data': {'m_NodeArray': [{'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 9, 'm_Duration': 1.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}]}}], 'm_NameID': 1980965647, 'm_PathID': 3388237738, 'm_FullPathID': 3388237738, 'm_TagID': 0, 'm_SpeedParamID': 0, 'm_MirrorParamID': 0, 'm_CycleOffsetParamID': 0, 'm_TimeParamID': 0, 'm_Speed': 1.0, 'm_CycleOffset': 0.0, 'm_IKOnFeet': False, 'm_WriteDefaultValues': True, 'm_Loop': False, 'm_Mirror': False}}, {'data': {'m_TransitionConstantArray': [{'data': {'m_ConditionConstantArray': [], 'm_DestinationState': 6, 'm_FullPathID': 3047152850, 'm_ID': 2399970260, 'm_UserID': 0, 'm_TransitionDuration': 0.10000000149011612, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.8999999761581421, 'm_HasExitTime': True, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}], 'm_BlendTreeConstantIndexArray': [0], 'm_BlendTreeConstantArray': [{'data': {'m_NodeArray': [{'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 10, 'm_Duration': 1.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}]}}], 'm_NameID': 646380074, 'm_PathID': 2747970984, 'm_FullPathID': 2747970984, 'm_TagID': 0, 'm_SpeedParamID': 0, 'm_MirrorParamID': 0, 'm_CycleOffsetParamID': 0, 'm_TimeParamID': 0, 'm_Speed': 1.0, 'm_CycleOffset': 0.0, 'm_IKOnFeet': False, 'm_WriteDefaultValues': True, 'm_Loop': False, 'm_Mirror': False}}, {'data': {'m_TransitionConstantArray': [], 'm_BlendTreeConstantIndexArray': [0], 'm_BlendTreeConstantArray': [{'data': {'m_NodeArray': [{'data': {'m_BlendType': 0, 'm_BlendEventID': 4294967295, 'm_BlendEventYID': 4294967295, 'm_ChildIndices': [], 'm_Blend1dData': {'data': {'m_ChildThresholdArray': []}}, 'm_Blend2dData': {'data': {'m_ChildPositionArray': [], 'm_ChildMagnitudeArray': [], 'm_ChildPairVectorArray': [], 'm_ChildPairAvgMagInvArray': [], 'm_ChildNeighborListArray': []}}, 'm_BlendDirectData': {'data': {'m_ChildBlendEventIDArray': [], 'm_NormalizedBlendValues': False}}, 'm_ClipID': 11, 'm_Duration': 1.0, 'm_CycleOffset': 0.0, 'm_Mirror': False}}]}}], 'm_NameID': 1293411866, 'm_PathID': 1684585544, 'm_FullPathID': 1684585544, 'm_TagID': 0, 'm_SpeedParamID': 0, 'm_MirrorParamID': 0, 'm_CycleOffsetParamID': 0, 'm_TimeParamID': 0, 'm_Speed': 1.0, 'm_CycleOffset': 0.0, 'm_IKOnFeet': False, 'm_WriteDefaultValues': True, 'm_Loop': True, 'm_Mirror': False}}], 'm_AnyStateTransitionConstantArray': [{'data': {'m_ConditionConstantArray': [{'data': {'m_ConditionMode': 1, 'm_EventID': 1293411866, 'm_EventThreshold': 0.0, 'm_ExitTime': 0.0}}], 'm_DestinationState': 5, 'm_FullPathID': 3879033275, 'm_ID': 1859255481, 'm_UserID': 0, 'm_TransitionDuration': 0.5462788343429565, 'm_TransitionOffset': 0.0, 'm_ExitTime': 0.9000000357627869, 'm_HasExitTime': False, 'm_HasFixedDuration': True, 'm_InterruptionSource': 0, 'm_OrderedInterruption': True, 'm_CanTransitionToSelf': True}}], 'm_SelectorStateConstantArray': [{'data': {'m_TransitionConstantArray': [{'data': {'m_Destination': 0, 'm_ConditionConstantArray': []}}], 'm_FullPathID': 756556552, 'm_IsEntry': True}}, {'data': {'m_TransitionConstantArray': [{'data': {'m_Destination': 30000, 'm_ConditionConstantArray': []}}], 'm_FullPathID': 756556552, 'm_IsEntry': False}}], 'm_DefaultState': 0, 'm_SynchronizedLayerCount': 1}}], 'm_Values': {'data': {'m_ValueArray': [{'m_ID': 3471299058, 'm_Type': 1, 'm_Index': 0}, {'m_ID': 3166393104, 'm_Type': 1, 'm_Index': 1}, {'m_ID': 3955553525, 'm_Type': 9, 'm_Index': 0}, {'m_ID': 1080829965, 'm_Type': 9, 'm_Index': 1}, {'m_ID': 1293411866, 'm_Type': 9, 'm_Index': 2}]}}, 'm_DefaultValues': {'data': {'m_PositionValues': [], 'm_QuaternionValues': [], 'm_ScaleValues': [], 'm_FloatValues': [0.0, 0.0], 'm_IntValues': [], 'm_BoolValues': [False, False, False]}}}
+
+========== EEL STRUCTURE INSPECTION COMPLETE ==========
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
