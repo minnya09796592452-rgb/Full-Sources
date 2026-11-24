@@ -1,0 +1,111 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import UnityPy, os, struct
+>
+> sd4_dir = "/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded Deep 4"
+> assert os.path.isdir(sd4_dir), f"NOT FOUND: {sd4_dir}"
+>
+> def parse_unity_gradient(buf, off):
+>     if off + 68 > len(buf):
+>         return None, off
+>     ckeys = struct.unpack_from("<32B", buf, off)
+>     ctimes = struct.unpack_from("<8H", buf, off + 32)
+>     atimes = struct.unpack_from("<8H", buf, off + 48)
+>     n_col, n_alp = struct.unpack_from("<BB", buf, off + 64)
+>     colors = []
+>     for idx in range(min(n_col, 8)):
+>         r, g, b, a = ckeys[idx*4 : idx*4+4]
+>         t = round(ctimes[idx] / 65535.0, 4)
+>         colors.append((t, round(r/255.0, 4), round(g/255.0, 4), round(b/255.0, 4)))
+>     alphas = []
+>     for idx in range(min(n_alp, 8)):
+>         a_val = round(ckeys[idx*4 + 3] / 255.0, 4)
+>         t = round(atimes[idx] / 65535.0, 4)
+>         alphas.append((t, a_val))
+>     return {"numColorKeys": n_col, "colors": colors, "numAlphaKeys": n_alp, "alphas": alphas}, off + 68
+>
+> env = UnityPy.load(sd4_dir)
+> atmo_pids = set()
+> for obj in env.objects:
+>     if obj.type.name == "MonoScript":
+>         try:
+>             d = obj.read()
+>             if getattr(d, "m_ClassName", "") == "Atmosphere":
+>                 src = os.path.basename(getattr(obj.assets_file, "name", ""))
+>                 print(f"[LOCKED SD4 MONOSCRIPT] {src} | pid={obj.path_id}")
+>                 atmo_pids.add(obj.path_id)
+>         except Exception:
+>             pass
+>
+> for obj in env.objects:
+>     if obj.type.name == "MonoBehaviour":
+>         raw = obj.get_raw_data()
+>         for pid in atmo_pids:
+>             p_bytes = struct.pack("<q", pid)
+>             if p_bytes in raw[:40]:
+>                 idx = raw[:40].find(p_bytes)
+>                 src = os.path.basename(getattr(obj.assets_file, "name", ""))
+>                 print(f"\n==================== SD4 ATMOSPHERE DATA ({src} | pid={obj.path_id} | len={len(raw)}B) ====================")
+>                 off = idx + 12
+>                 sun_int = struct.unpack_from("<f", raw, off + 36)
+>                 sun_grad, off = parse_unity_gradient(raw, off + 40)
+>                 print(f"  _sunIlluminary.Intensity  : {sun_int}")
+>                 print(f"  _sunIlluminary.Gradient   : {sun_grad}")
+>                 moon_int = struct.unpack_from("<f", raw, off + 36)
+>                 moon_grad, off = parse_unity_gradient(raw, off + 40)
+>                 print(f"  _moonIlluminary.Intensity : {moon_int}")
+>                 print(f"  _moonIlluminary.Gradient  : {moon_grad}")
+>                 lat, lon, dt = struct.unpack_from("<fff", raw, off + 12)
+>                 print(f"  _latitude={lat}, _longitude={lon}, _date={dt}")
+>                 off += 24
+>                 for gname in ("_skyColorPolariser", "_ambientSkyColorGradient", "_ambientGroundColorGradient", "_ambientUnderwaterGroundColorGradient"):
+>                     gdata, off = parse_unity_gradient(raw, off)
+>                     print(f"  {gname:36s}: {gdata}")
+> EOF
+[LOCKED SD4 MONOSCRIPT] globalgamemanagers.assets | pid=1624
+
+==================== SD4 ATMOSPHERE DATA (level2 | pid=287 | len=1188B) ====================
+  _sunIlluminary.Intensity  : (1.5,)
+  _sunIlluminary.Gradient   : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _moonIlluminary.Intensity : (0.11764705926179886,)
+  _moonIlluminary.Gradient  : {'numColorKeys': 50, 'colors': [(0.747, 0.0, 0.0, 0.0), (0.75, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0), (1.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.251, 0.8196), (0.0, 0.4824, 0.3294, 0.4), (0.0, 0.6, 0.6, 0.5176)], 'numAlphaKeys': 0, 'alphas': []}
+  _latitude=0.0, _longitude=0.0, _date=2.536350220427919e-43
+  _skyColorPolariser                  : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientSkyColorGradient            : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientGroundColorGradient         : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientUnderwaterGroundColorGradient: {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+
+==================== SD4 ATMOSPHERE DATA (level3 | pid=1230 | len=1188B) ====================
+  _sunIlluminary.Intensity  : (1.5,)
+  _sunIlluminary.Gradient   : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _moonIlluminary.Intensity : (0.11764705926179886,)
+  _moonIlluminary.Gradient  : {'numColorKeys': 94, 'colors': [(0.747, 0.0, 0.0, 0.0), (0.75, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0), (1.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.251, 0.8196), (0.0, 0.4824, 0.3294, 0.4), (0.0, 0.6, 0.6, 0.5176)], 'numAlphaKeys': 0, 'alphas': []}
+  _latitude=0.0, _longitude=0.0, _date=1.0944141006376821e-42
+  _skyColorPolariser                  : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientSkyColorGradient            : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientGroundColorGradient         : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientUnderwaterGroundColorGradient: {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+
+==================== SD4 ATMOSPHERE DATA (level4 | pid=5591 | len=1188B) ====================
+  _sunIlluminary.Intensity  : (1.5,)
+  _sunIlluminary.Gradient   : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _moonIlluminary.Intensity : (0.11764705926179886,)
+  _moonIlluminary.Gradient  : {'numColorKeys': 24, 'colors': [(0.747, 0.0, 0.0, 0.0), (0.75, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0), (1.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.251, 0.8196), (0.0, 0.4824, 0.3294, 0.4), (0.0, 0.6, 0.6, 0.5176)], 'numAlphaKeys': 0, 'alphas': []}
+  _latitude=0.0, _longitude=0.0, _date=3.421970849881203e-42
+  _skyColorPolariser                  : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientSkyColorGradient            : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientGroundColorGradient         : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientUnderwaterGroundColorGradient: {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+
+==================== SD4 ATMOSPHERE DATA (sharedassets0.assets | pid=487 | len=1188B) ====================
+  _sunIlluminary.Intensity  : (1.5,)
+  _sunIlluminary.Gradient   : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _moonIlluminary.Intensity : (0.11764705926179886,)
+  _moonIlluminary.Gradient  : {'numColorKeys': 230, 'colors': [(0.747, 0.0, 0.0, 0.0), (0.75, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0), (1.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.251, 0.8196), (0.0, 0.4824, 0.3294, 0.4), (0.0, 0.6, 0.6, 0.5176)], 'numAlphaKeys': 0, 'alphas': []}
+  _latitude=0.0, _longitude=0.0, _date=3.8115318229635024e-43
+  _skyColorPolariser                  : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientSkyColorGradient            : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientGroundColorGradient         : {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+  _ambientUnderwaterGroundColorGradient: {'numColorKeys': 0, 'colors': [], 'numAlphaKeys': 0, 'alphas': []}
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+-------------
