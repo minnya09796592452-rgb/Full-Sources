@@ -1,76 +1,11 @@
 Google Drive archive extraction
 Drive file ID: 1pVtCrJFmfkX-lJswUeDhPgMg62wdZETZ
 Archive SHA-256: 504ce1fca20c84272092cfffa11460de8bbb77dc2c76450efb81bf265f5a6507
-Extracted files: 211
+Extracted files: 146
 Total extracted bytes: 31102870
 
 Files:
 33	Project/.editorconfig
-39	Project/.git/COMMIT_EDITMSG
-277	Project/.git/FETCH_HEAD
-21	Project/.git/HEAD
-347	Project/.git/config
-73	Project/.git/description
-478	Project/.git/hooks/applypatch-msg.sample
-896	Project/.git/hooks/commit-msg.sample
-4726	Project/.git/hooks/fsmonitor-watchman.sample
-189	Project/.git/hooks/post-update.sample
-424	Project/.git/hooks/pre-applypatch.sample
-1649	Project/.git/hooks/pre-commit.sample
-416	Project/.git/hooks/pre-merge-commit.sample
-1374	Project/.git/hooks/pre-push.sample
-4898	Project/.git/hooks/pre-rebase.sample
-544	Project/.git/hooks/pre-receive.sample
-1492	Project/.git/hooks/prepare-commit-msg.sample
-2783	Project/.git/hooks/push-to-checkout.sample
-2308	Project/.git/hooks/sendemail-validate.sample
-3650	Project/.git/hooks/update.sample
-2931	Project/.git/index
-240	Project/.git/info/exclude
-223	Project/.git/logs/HEAD
-223	Project/.git/logs/refs/heads/main
-193	Project/.git/logs/refs/remotes/origin/main
-193	Project/.git/logs/refs/remotes/origin/minnya09796592452-rgb-patch-1
-37	Project/.git/objects/00/b71f317313b4fb6f162663bb7962b89253fa5f
-20886	Project/.git/objects/04/81a438fde863f349ef5939907813ad9c4cd4cc
-2468	Project/.git/objects/07/9f6678ef5c9463c2417b6bf4577e7d8d6a6338
-36	Project/.git/objects/12/82d677792b5e9e4e8f86dcd3ca318a88775284
-158	Project/.git/objects/18/cc62a1a6752dc9a929fc4816bf9a9b64998484
-75326	Project/.git/objects/1b/a3765879b5ee6cc509b4ed9f7327078df260b5
-9495	Project/.git/objects/2f/69c477cee1dfb976b1f032e1cec83a8e918f08
-7209	Project/.git/objects/3a/aa2faeafacfb5ba6d6c2aec24f21948957bb06
-60	Project/.git/objects/41/3a163279a899a447ceb2985d4982b43f578157
-335	Project/.git/objects/46/4bc2b05aba99b1219487e1bb6e6083fa21ea86
-140	Project/.git/objects/4a/924506c7a10e416b409e1cb437c6536c6b6451
-231	Project/.git/objects/54/031b4e7fccc06e716f987a02be3d3428f5cb64
-480098	Project/.git/objects/55/ca4edd806c58d796965750d79d5118a9d93ddb
-159	Project/.git/objects/56/60d7a61548f1a983ca6001a14733e6cdd407ec
-119	Project/.git/objects/69/d7a4a019c41a7d29defdc599817e37473c514b
-36	Project/.git/objects/6b/f57eab12d811bb6e4c447da5db3e15760d1446
-3794	Project/.git/objects/75/7c59056b18a7844f18204199545076653e941c
-1314	Project/.git/objects/78/41d45705c56a608598d44486c326b03b37e55a
-87	Project/.git/objects/8a/d74f78d9c9b9b8f3d68772c6d5aa0cb3fe47e9
-61	Project/.git/objects/97/6199ccfefae6da1a59eb666eefc73cc6828c5d
-36	Project/.git/objects/9c/a62c831ccc70aef4563a6c8da73b2261a5851a
-169	Project/.git/objects/b0/3dfb1a14598f381837c453be971d69c49fcca8
-780	Project/.git/objects/b0/cab68eaa897ca023f6805fced52e016ebbe727
-2264	Project/.git/objects/b4/381f510a5c2b2dc09b3ab77e58687498ae1fb2
-18830	Project/.git/objects/be/42e9924e5dc0334a52062bdeffb66aa842ae78
-139	Project/.git/objects/be/84a354f840243f24255b28861d79161996a988
-49738	Project/.git/objects/c2/565360f5110dc9b3c89c3b893bbace4e2806d3
-539	Project/.git/objects/c6/bbb7d820dd72528b71ac28bab9f45ec7613e6d
-65	Project/.git/objects/cc/bac2a6d25bda39d822e17051e460af7fde49a7
-422	Project/.git/objects/cd/641525ea12dc121d055c8e228ae8333cc5c5b1
-346	Project/.git/objects/db/5016cce7437d5f9b144f05f9925a504cdaab95
-221	Project/.git/objects/e0/65534123de7df9e3821408fe37ac28eadaee08
-15	Project/.git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
-47	Project/.git/objects/f2/8239ba52858394ae47b28ba1602bbd54baa833
-14064	Project/.git/objects/pack/pack-378d1780b97ff1ad19f1a0bc967c8a971769d6ed.idx
-25150939	Project/.git/objects/pack/pack-378d1780b97ff1ad19f1a0bc967c8a971769d6ed.pack
-1908	Project/.git/objects/pack/pack-378d1780b97ff1ad19f1a0bc967c8a971769d6ed.rev
-41	Project/.git/refs/heads/main
-41	Project/.git/refs/remotes/origin/main
-41	Project/.git/refs/remotes/origin/minnya09796592452-rgb-patch-1
 80	Project/.gitattributes
 23	Project/.gitignore
 1	Project/.godot/.gdignore
