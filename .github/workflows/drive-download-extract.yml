@@ -165,10 +165,31 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- Outputs/Drive_Extracted
+
+          # Remove the old submodule/gitlink entry from the index only.
+          # The extracted files remain in the working tree and will be staged below.
+          git rm --cached -r --ignore-unmatch -- Outputs/Drive_Extracted/Project
+
+          # Stage real extracted files (including files under Project/).
+          git add -A -- Outputs/Drive_Extracted
+
+          # Fail safely if Git still sees Project as a submodule (mode 160000).
+          if git ls-files --stage -- Outputs/Drive_Extracted/Project | grep -q '^160000 '; then
+            echo "::error::Project is still staged as a gitlink instead of regular files."
+            exit 1
+          fi
+
+          project_file_count="$(git ls-files --stage -- Outputs/Drive_Extracted/Project | wc -l | tr -d ' ')"
+          if [ "$project_file_count" -eq 0 ]; then
+            echo "::error::No regular Project files were staged."
+            exit 1
+          fi
+          echo "Regular Project files staged: $project_file_count"
+          git diff --cached --stat
+
           if git diff --cached --quiet; then
             echo "No output changes to commit."
             exit 0
           fi
-          git commit -m "Import extracted Google Drive archive"
+          git commit -m "Import extracted Google Drive archive as regular files"
           git push origin HEAD:main
