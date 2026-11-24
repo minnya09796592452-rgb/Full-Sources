@@ -63,8 +63,8 @@ func _test_projection_matrix_helpers() -> void:
 	var hit = solver._segment_plane_intersection(Vector3(0.0, 2.0, 0.0), Vector3(0.0, -2.0, 0.0), 0.0)
 	assert(hit != null)
 	assert(hit.is_equal_approx(Vector3.ZERO))
-	assert(solver.FRUSTUM_CORNERS.size() == 8)
-	assert(solver.FRUSTUM_EDGES.size() == 12)
+	assert(ProjectionSolver.FRUSTUM_CORNERS.size() == 8)
+	assert(ProjectionSolver.FRUSTUM_EDGES.size() == 12)
 	solver.free()
 
 
