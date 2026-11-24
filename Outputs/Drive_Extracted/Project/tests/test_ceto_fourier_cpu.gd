@@ -12,6 +12,8 @@ func _run_tests() -> void:
 	_test_double_packed_matches_direct_2d_inverse_dft(4)
 	_test_double_packed_matches_direct_2d_inverse_dft(8)
 	_test_single_packed_matches_direct_2d_inverse_dft()
+	_test_start_index_zero_ping_pong()
+	_test_size_one_returns_ceto_destination()
 	_test_cancellation_returns_minus_one()
 	print("CetoFourierCPU tests: all checks passed.")
 	quit(0)
@@ -102,3 +104,27 @@ func _test_cancellation_returns_minus_one() -> void:
 	var always_cancel := func() -> bool: return true
 	assert(fft.perform_fft_double_packed(1, buffers, always_cancel) == -1,
 		"Cancelled FFT must return -1.")
+
+
+func _test_start_index_zero_ping_pong() -> void:
+	var grid_size := 4
+	var fft = FourierCPU.new(grid_size)
+	var input_buffer := PackedVector4Array()
+	var output_buffer := PackedVector4Array()
+	input_buffer.resize(grid_size * grid_size)
+	output_buffer.resize(grid_size * grid_size)
+
+	for index in range(input_buffer.size()):
+		input_buffer[index] = Vector4(float(index) * 0.09, float(index % 4) * 0.12, 0.0, 0.0)
+
+	# start_idx=0 means the original input is in buffer 1.
+	var buffers: Array = [output_buffer, input_buffer]
+	var output_index: int = fft.perform_fft_single_packed(0, buffers)
+	assert(output_index == 1, "Ceto ping-pong parity must return buffer 1 for N=4, start_idx=0.")
+
+
+func _test_size_one_returns_ceto_destination() -> void:
+	var fft = FourierCPU.new(1)
+	var buffers: Array = [PackedVector4Array([Vector4.ZERO]), PackedVector4Array([Vector4.ONE])]
+	assert(fft.perform_fft_double_packed(0, buffers) == 0,
+		"Ceto returns destination index 0 when the transform has zero passes.")
