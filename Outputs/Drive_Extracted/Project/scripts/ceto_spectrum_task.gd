@@ -23,12 +23,12 @@ var spectrum01: PackedColorArray = PackedColorArray()
 var spectrum23: PackedColorArray = PackedColorArray()
 var wtable: PackedColorArray = PackedColorArray()
 
-var _random: RefCounted
+var _random
 var _cancel_check: Callable = Callable()
 var cancelled: bool = false
 
 
-func _init(condition: RefCounted) -> void:
+func _init(condition: Variant) -> void:
 	if condition == null:
 		push_error("CetoSpectrumTask: condition is required.")
 		return
@@ -191,7 +191,7 @@ func _create_w_table() -> void:
 			wtable[index] = color
 
 
-func apply_to_condition(condition: RefCounted) -> void:
+func apply_to_condition(condition: Variant) -> void:
 	if condition == null or cancelled:
 		return
 	condition.apply_spectrum_data(spectrum01, spectrum23, wtable)
