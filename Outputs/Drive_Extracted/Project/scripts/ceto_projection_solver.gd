@@ -54,12 +54,12 @@ func update_projection(camera: Camera3D, level: float, displacement: float = 0.0
 	var position: Array = [camera_position.x, camera_position.y, camera_position.z]
 	var margin := (20.0 if tight_fit else 50.0) + max_displacement
 	if disable_projection_flipping:
-		position[1] = maxf(position[1], level)
+		position[1] = _precision(maxf(position[1], level))
 		is_flipped = false
-		position[1] = maxf(position[1], level + margin)
+		position[1] = _precision(maxf(position[1], level + margin))
 	elif position[1] < level:
 		is_flipped = true
-		position[1] = minf(position[1], level - margin)
+		position[1] = _precision(minf(position[1], level - margin))
 	else:
 		is_flipped = false
 		position[1] = maxf(position[1], level + margin)
@@ -152,14 +152,14 @@ func _h_project(inverse_vp: Array, corner: Vector4) -> Array:
 	var far_corner := _mul_vector(inverse_vp, [corner.x, corner.y, 0.0, corner.w])
 	var delta: Array = []
 	for i in range(4):
-		delta.append(far_corner[i] - near_corner[i])
-	var denominator := delta[1] - delta[3] * sea_level
+		delta.append(_precision(far_corner[i] - near_corner[i]))
+	var denominator := _precision(delta[1] - _precision(delta[3] * sea_level))
 	if absf(denominator) < 0.0000001:
 		denominator = 0.0000001 if denominator >= 0.0 else -0.0000001
-	var t := (near_corner[3] * sea_level - near_corner[1]) / denominator
+	var t := _precision(_precision(near_corner[3] * sea_level - near_corner[1]) / denominator)
 	var result: Array = []
 	for i in range(4):
-		result.append(near_corner[i] + delta[i] * t)
+		result.append(_precision(near_corner[i] + _precision(delta[i] * t)))
 	return result
 
 
