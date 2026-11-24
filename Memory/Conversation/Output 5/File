@@ -1,0 +1,26 @@
+=== [1] SHADER UNIFORM DECLARATION ===
+uniform sampler3D Inscatter :
+                Inscatter,
+                Inscatter,
+
+=== [2] CONTROLLER TEXTURE BINDING ===
+79: @export var inscatter_texture: Texture3D
+123: func _load_inscatter_bin() -> ImageTexture3D:
+145:    if inscatter_texture == null:
+146:            inscatter_texture = _load_inscatter_bin()
+149:    if inscatter_texture == null and ResourceLoader.exists("res://resources/atmosphere/inscatter_3d.tres"):
+150:            inscatter_texture = load("res://resources/atmosphere/inscatter_3d.tres")
+160:    if inscatter_texture == null:
+161:            inscatter_texture = _load_inscatter_bin()
+458:    if inscatter_texture != null:
+460:                    "Inscatter",
+461:                    inscatter_texture
+541: func set_inscatter_texture(value: Texture3D) -> void:
+542:    inscatter_texture = value
+544:    if sky_material != null and inscatter_texture != null:
+546:                    "Inscatter",
+547:                    inscatter_texture
+
+APPLIED Step 3.1-A -> return vec4(uv_a, 1.0);
+root@localhost:/storage/emulated/0/Download/CASTAWAY_DEPTHS_WORK/GODOT/reports#
+
