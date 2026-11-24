@@ -132,7 +132,7 @@ func _create_range_matrix(projection: Array, camera_view: Array, projector_vp: A
 		min_y = minf(min_y, y)
 		max_x = maxf(max_x, x)
 		max_y = maxf(max_y, y)
-	if not is_finite(min_x) or not is_finite(min_y) or not is_finite(max_x) or not is_finite(max_y):
+	if is_inf(min_x) or is_inf(min_y) or is_inf(max_x) or is_inf(max_y) or is_nan(min_x) or is_nan(min_y) or is_nan(max_x) or is_nan(max_y):
 		return range_matrix
 	range_matrix[0] = maxf(max_x - min_x, 0.000001)
 	range_matrix[3] = min_x
