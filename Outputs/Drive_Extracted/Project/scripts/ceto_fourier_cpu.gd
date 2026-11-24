@@ -138,6 +138,7 @@ func _perform_fft(
 			return -1
 
 	var pass_number := start_idx
+	var final_destination_index := 0
 
 	# Ceto runs all horizontal passes first.
 	for stage in range(passes):
@@ -148,6 +149,7 @@ func _perform_fft(
 				double_packed, cancel_check
 		):
 			return -1
+		final_destination_index = destination_index
 		pass_number += 1
 
 	# Then it runs all vertical passes, continuing the same ping-pong parity.
@@ -159,9 +161,10 @@ func _perform_fft(
 				double_packed, cancel_check
 		):
 			return -1
+		final_destination_index = destination_index
 		pass_number += 1
 
-	return (pass_number - 1) % 2
+	return final_destination_index
 
 
 func _execute_pass(
