@@ -73,5 +73,7 @@ func _test_projection_precision_adapters() -> void:
 	var double = Projection3d.new()
 	assert(not single.is_double())
 	assert(double.is_double())
+	assert(single._precision(1.00000006) != 1.00000006)
+	assert(double._precision(1.00000006) == 1.00000006)
 	single.free()
 	double.free()
