@@ -16,8 +16,6 @@ func _init(seed: int = 0) -> void:
 	_seed_array.resize(56)
 	var subtraction: int = MBIG if seed == -2147483648 else absi(seed)
 	var mj: int = MSEED - subtraction
-	if mj < 0:
-		mj += MBIG
 	_seed_array[55] = mj
 	var mk: int = 1
 
