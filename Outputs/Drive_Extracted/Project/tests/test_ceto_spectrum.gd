@@ -7,7 +7,6 @@ const MixedCondition = preload("res://scripts/ceto_unified_phillips_spectrum_con
 const SpectrumTask = preload("res://scripts/ceto_spectrum_task.gd")
 const UnifiedSpectrum = preload("res://scripts/ceto_unified_spectrum.gd")
 const PhillipsSpectrum = preload("res://scripts/ceto_phillips_spectrum.gd")
-const UnifiedSpectrumModel = preload("res://scripts/ceto_unified_spectrum.gd")
 
 
 func _initialize() -> void:
@@ -100,7 +99,7 @@ func _test_cancellation() -> void:
 
 func _test_spectrum_formula_reference_values() -> void:
 	var phillips = PhillipsSpectrum.new(8.0, 0.0)
-	var unified = UnifiedSpectrumModel.new(8.0, 0.0, 0.64)
+	var unified = UnifiedSpectrum.new(8.0, 0.0, 0.64)
 	assert(absf(phillips.spectrum(0.5, 0.25) - 0.0972493643) < 1.0e-6,
 		"Phillips spectrum formula differs from the C# reference value.")
 	assert(absf(unified.spectrum(0.5, 0.25) - 0.0228057660) < 1.0e-6,
