@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/sun_only_controller.gd" id="1_ctrl"]
 [ext_resource type="Shader" path="res://shaders/sun_only_sky.gdshader" id="2_sdr"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" path="res://assets/ocean/wave_normal_orig.png" id="9_wnrm"]
 [ext_resource type="Texture2D" path="res://assets/ocean/deep_sea_base_orig.png" id="10_dsea"]
 [ext_resource type="Script" path="res://scripts/ceto_projected_grid.gd" id="11_pgrid"]
+[ext_resource type="Script" path="res://scripts/ceto_ocean_runtime_controller.gd" id="12_runtime"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sun"]
 shader = ExtResource("2_sdr")
@@ -91,3 +92,6 @@ mesh = SubResource("PlaneMesh_ocean")
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 3.2, 0)
 current = true
+
+[node name="CetoOceanRuntimeController" type="Node" parent="."]
+script = ExtResource("12_runtime")
