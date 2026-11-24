@@ -2,11 +2,16 @@ extends SceneTree
 
 const RuntimeController = preload("res://scripts/ceto_ocean_runtime_controller.gd")
 const ProjectedGridScript = preload("res://scripts/ceto_projected_grid.gd")
+const ProjectionSolver = preload("res://scripts/ceto_projection_solver.gd")
+const Projection3f = preload("res://scripts/ceto_projection_3f.gd")
+const Projection3d = preload("res://scripts/ceto_projection_3d.gd")
 
 
 func _initialize() -> void:
 	_test_rgba_float_upload_layout()
-	_test_projected_grid_overscan()
+	_test_ceto_projected_grid_quads_and_border_uv()
+	_test_projection_matrix_helpers()
+	_test_projection_precision_adapters()
 	print("Ceto ocean render-stage static checks passed.")
 	quit(0)
 
@@ -29,18 +34,44 @@ func _test_rgba_float_upload_layout() -> void:
 	assert(image.get_pixel(1, 0).is_equal_approx(Color(4.0, 5.0, 6.0, 1.0)))
 
 
-func _test_projected_grid_overscan() -> void:
-	assert(ProjectedGridScript != null)
-	assert(RuntimeController != null)
+func _test_ceto_projected_grid_quads_and_border_uv() -> void:
 	var grid = ProjectedGridScript.new()
-	grid.max_grid_width = 320
-	grid.max_grid_height = 192
-	var arrays: Array = grid._build_grid_arrays(Vector2(320.0, 180.0), 4, 0.18)
-	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
-	assert(vertices.size() > 0)
-	assert(vertices[0].x < -1.0)
-	assert(vertices[0].y > 1.0)
-	var last: Vector3 = vertices[vertices.size() - 1]
-	assert(last.x > 1.0)
-	assert(last.y < -1.0)
+	grid.max_screen_width = 2048
+	grid.max_screen_height = 2048
+	var quads: Array = grid._build_grid_arrays(Vector2(320.0, 180.0), 4, 0.1, 256)
+	assert(quads.size() == 2)
+	var first: Array = quads[0]
+	var second: Array = quads[1]
+	var first_vertices: PackedVector3Array = first[Mesh.ARRAY_VERTEX]
+	var first_uvs: PackedVector2Array = first[Mesh.ARRAY_TEX_UV]
+	var first_border: PackedVector2Array = first[Mesh.ARRAY_TEX_UV2]
+	var second_border: PackedVector2Array = second[Mesh.ARRAY_TEX_UV2]
+	assert(first_vertices.size() == 64 * 64)
+	assert(first_uvs[0].is_equal_approx(Vector2.ZERO))
+	assert(first_border[0].x > 0.0 and first_border[0].y > 0.0)
+	assert(first_border[63].x == 0.0)
+	assert(second_border[63].x > 0.0)
+	assert(first[Mesh.ARRAY_INDEX].size() == (63 * 63 * 6))
 	grid.free()
+
+
+func _test_projection_matrix_helpers() -> void:
+	var solver = ProjectionSolver.new()
+	var identity: Array = solver._identity()
+	assert(solver._multiply(identity, identity) == identity)
+	assert(solver._inverse(identity) == identity)
+	var hit = solver._segment_plane_intersection(Vector3(0.0, 2.0, 0.0), Vector3(0.0, -2.0, 0.0), 0.0)
+	assert(hit != null)
+	assert(hit.is_equal_approx(Vector3.ZERO))
+	assert(solver.FRUSTUM_CORNERS.size() == 8)
+	assert(solver.FRUSTUM_EDGES.size() == 12)
+	solver.free()
+
+
+func _test_projection_precision_adapters() -> void:
+	var single = Projection3f.new()
+	var double = Projection3d.new()
+	assert(not single.is_double())
+	assert(double.is_double())
+	single.free()
+	double.free()
