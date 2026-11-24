@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_disabled, diffuse_burley, specular_schlick_ggx;
+render_mode blend_mix, depth_draw_opaque, cull_disabled, diffuse_burley, specular_schlick_ggx;\n\nuniform mat4 Ceto_Interpolation;\nuniform mat4 Ceto_ProjectorVP;\nuniform float Ceto_GridEdgeBorder = 200.0;\nuniform vec2 Ceto_ScreenGridSize = vec2(0.01);\nuniform int _CullFace = 2;
 
 uniform sampler2D displacement_map_0 : filter_linear, repeat_enable;
 uniform sampler2D displacement_map_1 : filter_linear, repeat_enable;
@@ -39,7 +39,7 @@ uniform float specular_intensity = 0.2;
 varying vec3 v_world_position;
 varying vec2 v_ocean_uv;
 varying float v_view_distance;
-varying float v_underwater;
+varying float v_underwater;\nvarying vec2 v_projector_uv;
 
 vec4 sample_displacement(vec2 world_xz) {
 	vec4 d0 = texture(displacement_map_0, world_xz / max(grid_size_0 * grid_scale, 0.001));
@@ -74,21 +74,22 @@ float jacobian_foam(vec2 world_xz, float cell_size) {
 }
 
 void vertex() {
-	vec2 ndc = VERTEX.xy;
-	vec4 near_view = INV_PROJECTION_MATRIX * vec4(ndc, 1.0, 1.0);
-	vec4 far_view = INV_PROJECTION_MATRIX * vec4(ndc, 0.0, 1.0);
-	near_view.xyz /= max(abs(near_view.w), 0.000001);
-	far_view.xyz /= max(abs(far_view.w), 0.000001);
-	vec3 near_world = (INV_VIEW_MATRIX * vec4(near_view.xyz, 1.0)).xyz;
-	vec3 far_world = (INV_VIEW_MATRIX * vec4(far_view.xyz, 1.0)).xyz;
-	vec3 ray_dir = normalize(far_world - near_world);
-	float denom = ray_dir.y;
-	float hit_distance = abs(denom) > 0.00001 ? (sea_level - near_world.y) / denom : max_horizon_dist;
-	if (hit_distance < 0.0) {
-		hit_distance = max_horizon_dist;
-	}
-	hit_distance = clamp(hit_distance, 0.0, max_horizon_dist);
-	vec3 ocean_world = near_world + ray_dir * hit_distance;
+	// Ceto_Interpolation stores the four homogeneous world-space horizon hits as rows.
+	vec4 weights = vec4(
+		(1.0 - UV.x) * (1.0 - UV.y),
+		UV.x * (1.0 - UV.y),
+		UV.x * UV.y,
+		(1.0 - UV.x) * UV.y
+	);
+	vec4 world_h = weights * Ceto_Interpolation;
+	vec3 ocean_world = world_h.xyz / max(abs(world_h.w), 0.000001);
+
+	// Original ProjectedGrid border UV2 stores squared distance outside each screen edge.
+	vec2 border_direction = sign(UV - vec2(0.5));
+	ocean_world.xz += border_direction * UV2 * Ceto_GridEdgeBorder;
+
+	vec4 projector_clip = vec4(ocean_world, 1.0) * Ceto_ProjectorVP;
+	v_projector_uv = projector_clip.xy / max(abs(projector_clip.w), 0.000001);
 	vec4 displacement = sample_displacement(ocean_world.xz);
 	ocean_world.x += displacement.r * choppyness;
 	ocean_world.y += displacement.g;
@@ -100,7 +101,7 @@ void vertex() {
 	POSITION = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ocean_world, 1.0);
 }
 
-void fragment() {
+void fragment() {\n\t// Unity Ceto material values: 1 = Front, 2 = Back.\n\tif ((_CullFace == 2 && !FRONT_FACING) || (_CullFace == 1 && FRONT_FACING)) {\n\t\tdiscard;\n\t}
 	float texel_world = max(grid_size_3 * grid_scale / 64.0, 0.05);
 	vec2 dx = vec2(texel_world, 0.0);
 	vec2 dz = vec2(0.0, texel_world);
