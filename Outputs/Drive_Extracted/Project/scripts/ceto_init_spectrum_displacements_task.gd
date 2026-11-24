@@ -12,6 +12,7 @@ var _spectrum23: PackedColorArray
 var _wtable: PackedColorArray
 var _inverse_grid_sizes: Vector4
 var _data: Array = []
+var _buffer
 
 
 func _init(buffer: Variant, condition: Variant, time: float) -> void:
@@ -28,6 +29,7 @@ func _init(buffer: Variant, condition: Variant, time: float) -> void:
 		push_error("CetoInitSpectrumDisplacementsTask: spectrum condition arrays are incomplete.")
 		return
 
+	_buffer = buffer
 	_spectrum01 = condition.spectrum01
 	_spectrum23 = condition.spectrum23
 	_wtable = condition.wtable
@@ -90,6 +92,8 @@ func run() -> bool:
 	_data[0] = height_data
 	_data[1] = displacement_01
 	_data[2] = displacement_23
+	for buffer_index in range(3):
+		_buffer.set_read_buffer(buffer_index, _data[buffer_index])
 	return true
 
 
