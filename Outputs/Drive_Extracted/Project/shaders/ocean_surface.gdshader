@@ -1,5 +1,11 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_disabled, diffuse_burley, specular_schlick_ggx;\n\nuniform mat4 Ceto_Interpolation;\nuniform mat4 Ceto_ProjectorVP;\nuniform float Ceto_GridEdgeBorder = 200.0;\nuniform vec2 Ceto_ScreenGridSize = vec2(0.01);\nuniform int _CullFace = 2;
+render_mode blend_mix, depth_draw_opaque, cull_disabled, diffuse_burley, specular_schlick_ggx;
+
+uniform mat4 Ceto_Interpolation;
+uniform mat4 Ceto_ProjectorVP;
+uniform float Ceto_GridEdgeBorder = 200.0;
+uniform vec2 Ceto_ScreenGridSize = vec2(0.01);
+uniform int _CullFace = 2;
 
 uniform sampler2D displacement_map_0 : filter_linear, repeat_enable;
 uniform sampler2D displacement_map_1 : filter_linear, repeat_enable;
@@ -39,7 +45,8 @@ uniform float specular_intensity = 0.2;
 varying vec3 v_world_position;
 varying vec2 v_ocean_uv;
 varying float v_view_distance;
-varying float v_underwater;\nvarying vec2 v_projector_uv;
+varying float v_underwater;
+varying vec2 v_projector_uv;
 
 vec4 sample_displacement(vec2 world_xz) {
 	vec4 d0 = texture(displacement_map_0, world_xz / max(grid_size_0 * grid_scale, 0.001));
@@ -101,7 +108,11 @@ void vertex() {
 	POSITION = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ocean_world, 1.0);
 }
 
-void fragment() {\n\t// Unity Ceto material values: 1 = Front, 2 = Back.\n\tif ((_CullFace == 2 && !FRONT_FACING) || (_CullFace == 1 && FRONT_FACING)) {\n\t\tdiscard;\n\t}
+void fragment() {
+\t// Unity Ceto material values: 1 = Front, 2 = Back.
+\tif ((_CullFace == 2 && !FRONT_FACING) || (_CullFace == 1 && FRONT_FACING)) {
+\t\tdiscard;
+\t}
 	float texel_world = max(grid_size_3 * grid_scale / 64.0, 0.05);
 	vec2 dx = vec2(texel_world, 0.0);
 	vec2 dz = vec2(0.0, texel_world);
