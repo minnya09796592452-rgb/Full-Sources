@@ -71,9 +71,9 @@ func _test_projection_matrix_helpers() -> void:
 	var inverse_product: Array = solver._multiply(transform_matrix, solver._inverse(transform_matrix))
 	for index in range(16):
 		assert(is_equal_approx(inverse_product[index], identity[index]))
-	var hit = solver._segment_plane_intersection(Vector3(0.0, 2.0, 0.0), Vector3(0.0, -2.0, 0.0), 0.0)
+	var hit = solver._segment_plane_intersection([0.0, 2.0, 0.0], [0.0, -2.0, 0.0], 0.0)
 	assert(hit != null)
-	assert(hit.is_equal_approx(Vector3.ZERO))
+	assert(is_equal_approx(hit[0], 0.0) and is_equal_approx(hit[1], 0.0) and is_equal_approx(hit[2], 0.0))
 	assert(ProjectionSolver.FRUSTUM_CORNERS.size() == 8)
 	assert(ProjectionSolver.FRUSTUM_EDGES.size() == 12)
 	solver.free()
