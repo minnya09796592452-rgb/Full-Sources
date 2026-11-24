@@ -66,6 +66,11 @@ func _test_projection_matrix_helpers() -> void:
 	var identity: Array = solver._identity()
 	assert(solver._multiply(identity, identity) == identity)
 	assert(solver._inverse(identity) == identity)
+	assert(solver._projection_to_array(solver._array_to_projection(identity)) == identity)
+	var transform_matrix: Array = [2.0, 0.0, 0.0, 3.0, 0.0, 3.0, 0.0, 4.0, 0.0, 0.0, 4.0, 5.0, 0.0, 0.0, 0.0, 1.0]
+	var inverse_product: Array = solver._multiply(transform_matrix, solver._inverse(transform_matrix))
+	for index in range(16):
+		assert(is_equal_approx(inverse_product[index], identity[index]))
 	var hit = solver._segment_plane_intersection(Vector3(0.0, 2.0, 0.0), Vector3(0.0, -2.0, 0.0), 0.0)
 	assert(hit != null)
 	assert(hit.is_equal_approx(Vector3.ZERO))
