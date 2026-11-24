@@ -27,7 +27,7 @@ var sea_level := 0.0
 var last_projector_vp := Projection()
 var last_interpolation := Projection()
 var last_range_matrix := Projection()
-var last_frustum_points: Array[Vector3] = []
+var last_frustum_points: Array = []
 
 
 func is_double() -> bool:
@@ -49,22 +49,27 @@ func update_projection(camera: Camera3D, level: float, displacement: float = 0.0
 	max_displacement = maxf(displacement, 0.0)
 	var projection := _projection_to_array(camera.get_camera_projection())
 	var camera_view := _transform_to_array(camera.global_transform.affine_inverse())
-	var position := camera.global_position
+	var camera_position := camera.global_position
 	var direction := -camera.global_basis.z.normalized()
+	var position: Array = [camera_position.x, camera_position.y, camera_position.z]
 	var margin := (20.0 if tight_fit else 50.0) + max_displacement
 	if disable_projection_flipping:
-		position.y = maxf(position.y, level)
+		position[1] = maxf(position[1], level)
 		is_flipped = false
-		position.y = maxf(position.y, level + margin)
-	elif position.y < level:
+		position[1] = maxf(position[1], level + margin)
+	elif position[1] < level:
 		is_flipped = true
-		position.y = minf(position.y, level - margin)
+		position[1] = minf(position[1], level - margin)
 	else:
 		is_flipped = false
-		position.y = maxf(position.y, level + margin)
+		position[1] = maxf(position[1], level + margin)
 
-	var target := Vector3(position.x + direction.x * 50.0, level, position.z + direction.z * 50.0)
-	var projector_view := _look_at_matrix(position, target, Vector3.UP)
+	var target: Array = [
+		_precision(position[0] + direction.x * 50.0),
+		level,
+		_precision(position[2] + direction.z * 50.0)
+	]
+	var projector_view := _look_at_matrix(position, target, [0.0, 1.0, 0.0])
 	var projector_vp := _multiply(projection, projector_view)
 	var range_matrix := _create_range_matrix(projection, camera_view, projector_vp)
 	var inverse_vp := _multiply(_inverse(projector_vp), range_matrix)
@@ -90,25 +95,27 @@ func update_projection(camera: Camera3D, level: float, displacement: float = 0.0
 func _create_range_matrix(projection: Array, camera_view: Array, projector_vp: Array) -> Array:
 	var range_matrix := _identity()
 	var inverse_camera_vp := _inverse(_multiply(projection, camera_view))
-	var corners: Array[Vector3] = []
+	var corners: Array = []
 	for clip_corner in FRUSTUM_CORNERS:
 		var p := _mul_vector(inverse_camera_vp, [clip_corner.x, clip_corner.y, clip_corner.z, clip_corner.w])
-		var divisor := p[3]
+		var divisor: float = p[3]
 		if absf(divisor) < 0.0000001:
 			divisor = 0.0000001 if divisor >= 0.0 else -0.0000001
-		corners.append(Vector3(p[0] / divisor, p[1] / divisor, p[2] / divisor))
+		corners.append([
+			_precision(p[0] / divisor),
+			_precision(p[1] / divisor),
+			_precision(p[2] / divisor)
+		])
 	last_frustum_points.clear()
 	var extent := maxf(1.0, max_displacement)
 	for corner in corners:
-		if corner.y <= sea_level + extent and corner.y >= sea_level - extent:
-			last_frustum_points.append(corner)
+		if corner[1] <= sea_level + extent and corner[1] >= sea_level - extent:
+			last_frustum_points.append(corner.duplicate())
 	for edge in FRUSTUM_EDGES:
-		var a: Vector3 = corners[edge.x]
-		var b: Vector3 = corners[edge.y]
-		var point := _segment_plane_intersection(a, b, sea_level + extent)
+		var point = _segment_plane_intersection(corners[edge.x], corners[edge.y], sea_level + extent)
 		if point != null:
 			last_frustum_points.append(point)
-		point = _segment_plane_intersection(a, b, sea_level - extent)
+		point = _segment_plane_intersection(corners[edge.x], corners[edge.y], sea_level - extent)
 		if point != null:
 			last_frustum_points.append(point)
 	if last_frustum_points.is_empty():
@@ -123,23 +130,22 @@ func _create_range_matrix(projection: Array, camera_view: Array, projector_vp: A
 	var max_x := -INF
 	var max_y := -INF
 	for point in last_frustum_points:
-		var projected := _mul_vector(projector_vp, [point.x, sea_level, point.z, 1.0])
+		var projected := _mul_vector(projector_vp, [point[0], sea_level, point[2], 1.0])
 		if absf(projected[3]) < 0.0000001:
 			continue
-		var x := projected[0] / projected[3]
-		var y := projected[1] / projected[3]
+		var x := _precision(projected[0] / projected[3])
+		var y := _precision(projected[1] / projected[3])
 		min_x = minf(min_x, x)
 		min_y = minf(min_y, y)
 		max_x = maxf(max_x, x)
 		max_y = maxf(max_y, y)
 	if is_inf(min_x) or is_inf(min_y) or is_inf(max_x) or is_inf(max_y) or is_nan(min_x) or is_nan(min_y) or is_nan(max_x) or is_nan(max_y):
 		return range_matrix
-	range_matrix[0] = maxf(max_x - min_x, 0.000001)
+	range_matrix[0] = _precision(maxf(max_x - min_x, 0.000001))
 	range_matrix[3] = min_x
-	range_matrix[5] = maxf(max_y - min_y, 0.000001)
+	range_matrix[5] = _precision(maxf(max_y - min_y, 0.000001))
 	range_matrix[7] = min_y
 	return range_matrix
-
 
 func _h_project(inverse_vp: Array, corner: Vector4) -> Array:
 	var near_corner := _mul_vector(inverse_vp, [corner.x, corner.y, 1.0, corner.w])
@@ -157,25 +163,58 @@ func _h_project(inverse_vp: Array, corner: Vector4) -> Array:
 	return result
 
 
-func _segment_plane_intersection(a: Vector3, b: Vector3, plane_y: float):
-	var delta := b - a
-	if absf(delta.y) < 0.0000001:
+func _segment_plane_intersection(a: Array, b: Array, plane_y: float):
+	var dx := _precision(b[0] - a[0])
+	var dy := _precision(b[1] - a[1])
+	var dz := _precision(b[2] - a[2])
+	if absf(dy) < 0.0000001:
 		return null
-	var t := (plane_y - a.y) / delta.y
+	var t := _precision(_precision(plane_y - a[1]) / dy)
 	if t > 0.0 and t <= 1.0:
-		return a + delta * t
+		return [
+			_precision(a[0] + _precision(dx * t)),
+			_precision(a[1] + _precision(dy * t)),
+			_precision(a[2] + _precision(dz * t))
+		]
 	return null
 
 
-func _look_at_matrix(position: Vector3, target: Vector3, up: Vector3) -> Array:
-	var z_axis := (position - target).normalized()
-	var x_axis := up.cross(z_axis).normalized()
-	var y_axis := z_axis.cross(x_axis)
+func _dot3(a: Array, b: Array) -> float:
+	return _precision(_precision(a[0] * b[0]) + _precision(a[1] * b[1]) + _precision(a[2] * b[2]))
+
+
+func _cross3(a: Array, b: Array) -> Array:
+	return [
+		_precision(_precision(a[1] * b[2]) - _precision(a[2] * b[1])),
+		_precision(_precision(a[2] * b[0]) - _precision(a[0] * b[2])),
+		_precision(_precision(a[0] * b[1]) - _precision(a[1] * b[0]))
+	]
+
+
+func _normalize3(value: Array) -> Array:
+	var length := sqrt(_dot3(value, value))
+	if length < 0.0000001:
+		return [0.0, 0.0, 0.0]
+	return [
+		_precision(value[0] / length),
+		_precision(value[1] / length),
+		_precision(value[2] / length)
+	]
+
+
+func _look_at_matrix(position: Array, target: Array, up: Array) -> Array:
+	var z_axis := _normalize3([
+		_precision(position[0] - target[0]),
+		_precision(position[1] - target[1]),
+		_precision(position[2] - target[2])
+	])
+	var x_axis := _normalize3(_cross3(up, z_axis))
+	var y_axis := _cross3(z_axis, x_axis)
 	# Ceto's Unity view matrix negates the complete first row.
 	return [
-		-x_axis.x, -x_axis.y, -x_axis.z, x_axis.dot(position),
-		y_axis.x, y_axis.y, y_axis.z, -y_axis.dot(position),
-		z_axis.x, z_axis.y, z_axis.z, -z_axis.dot(position),
+		-_precision(x_axis[0]), -_precision(x_axis[1]), -_precision(x_axis[2]), _dot3(x_axis, position),
+		y_axis[0], y_axis[1], y_axis[2], -_dot3(y_axis, position),
+		z_axis[0], z_axis[1], z_axis[2], -_dot3(z_axis, position),
 		0.0, 0.0, 0.0, 1.0
 	]
 
