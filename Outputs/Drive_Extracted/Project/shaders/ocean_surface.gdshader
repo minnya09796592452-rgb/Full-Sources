@@ -88,7 +88,8 @@ vec3 ceto_project_world(vec2 screen_uv) {
 		(1.0 - screen_uv.x) * screen_uv.y
 	);
 	vec4 world_h = weights * Ceto_Interpolation;
-	return world_h.xyz / max(abs(world_h.w), 0.000001);
+	float world_w = abs(world_h.w) < 0.000001 ? (world_h.w < 0.0 ? -0.000001 : 0.000001) : world_h.w;
+	return world_h.xyz / world_w;
 }
 
 void vertex() {
@@ -104,7 +105,8 @@ void vertex() {
 	ocean_world.xz += sign(UV.y - 0.5) * UV2.y * Ceto_GridEdgeBorder * edge_y;
 
 	vec4 projector_clip = vec4(ocean_world, 1.0) * Ceto_ProjectorVP;
-	v_projector_uv = projector_clip.xy / max(abs(projector_clip.w), 0.000001);
+	float projector_w = abs(projector_clip.w) < 0.000001 ? (projector_clip.w < 0.0 ? -0.000001 : 0.000001) : projector_clip.w;
+	v_projector_uv = projector_clip.xy / projector_w;
 	vec4 displacement = sample_displacement(ocean_world.xz);
 	ocean_world.x += displacement.r * choppyness;
 	ocean_world.y += displacement.g;
